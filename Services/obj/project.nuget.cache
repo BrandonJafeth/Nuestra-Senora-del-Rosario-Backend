@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "XRn31o73bD9zwCB2W9nJMNfbG8oZJ2uxJT74fGY6d3ptmVW754i8Ysv3iGMDJiMkvYHTqBFT33UKv9qWbMS2CQ==",
+  "success": true,
+  "projectFilePath": "C:\\Nuestra Señora del Rosario back\\Services\\Services.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\brand\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\7.0.18\\microsoft.windowsdesktop.app.ref.7.0.18.nupkg.sha512",
+    "C:\\Users\\brand\\.nuget\\packages\\microsoft.netcore.app.ref\\7.0.18\\microsoft.netcore.app.ref.7.0.18.nupkg.sha512",
+    "C:\\Users\\brand\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\7.0.18\\microsoft.aspnetcore.app.ref.7.0.18.nupkg.sha512"
+  ],
+  "logs": []
+}
