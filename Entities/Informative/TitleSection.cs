@@ -10,6 +10,6 @@ namespace Entities.Informative
     {
         public int Id_TitleSection { get; set; }
         public string Title_Text_Section { get; set; }
-        public string Description_Section { get; set; }
+        public string? Description_Section { get; set; }
     }
 }

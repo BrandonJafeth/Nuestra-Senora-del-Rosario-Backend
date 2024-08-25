@@ -1,4 +1,5 @@
-﻿using Entities.Informative;
+﻿
+using Entities.Informative;
 using Microsoft.AspNetCore.Mvc;
 using Services.Informative.GenericRepository;
 
