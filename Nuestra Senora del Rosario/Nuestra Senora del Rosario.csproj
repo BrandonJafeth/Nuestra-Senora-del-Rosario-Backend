@@ -21,8 +21,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\Informative\" />
     <Folder Include="Controllers\Administrative\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Services\Services.csproj" />
   </ItemGroup>
 
 </Project>
