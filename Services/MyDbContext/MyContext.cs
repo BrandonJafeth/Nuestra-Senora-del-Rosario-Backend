@@ -26,7 +26,7 @@ namespace Services.MyDbContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-         
+
             modelBuilder.Entity<NavbarItem>()
                 .HasMany(n => n.Children)
                 .WithOne(n => n.Parent)
@@ -75,6 +75,10 @@ namespace Services.MyDbContext
             modelBuilder.Entity<RegistrationSection>()
                 .Property(r => r.Id_RegistrationSection)
                 .ValueGeneratedOnAdd();
+
+         modelBuilder.Entity<TitleSection>()
+        .Property(ts => ts.Description_Section)
+        .IsRequired(false);
 
 
         }
