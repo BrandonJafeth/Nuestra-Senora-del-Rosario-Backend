@@ -1,4 +1,5 @@
 ﻿using Entities.Informative;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Services.Informative.GenericRepository;
 
@@ -20,43 +21,20 @@ public class AboutUsSectionController : ControllerBase
         return Ok(items);
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetAboutUsSection(int id)
-    {
-        var item = await _aboutUsSectionService.GetByIdAsync(id);
-        if (item == null)
-        {
-            return NotFound();
-        }
-        return Ok(item);
-    }
 
-    [HttpPost]
-    public async Task<IActionResult> AddAboutUsSection(AboutUsSection aboutUsSection)
-    {
-        await _aboutUsSectionService.AddAsync(aboutUsSection);
-        await _aboutUsSectionService.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetAboutUsSection), new { id = aboutUsSection.Id_About_Us }, aboutUsSection);
-    }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAboutUsSection(int id, AboutUsSection aboutUsSection)
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> PatchAboutUsSection(int id, [FromBody] JsonPatchDocument<AboutUsSection> patchDoc)
     {
-        if (id != aboutUsSection.Id_About_Us)
+        if (patchDoc == null)
         {
             return BadRequest();
         }
 
-        await _aboutUsSectionService.UpdateAsync(aboutUsSection);
+        await _aboutUsSectionService.PatchAsync(id, patchDoc);
         await _aboutUsSectionService.SaveChangesAsync();
+
         return NoContent();
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAboutUsSection(int id)
-    {
-        await _aboutUsSectionService.DeleteAsync(id);
-        await _aboutUsSectionService.SaveChangesAsync();
-        return NoContent();
-    }
 }

@@ -1,4 +1,5 @@
 ﻿using Entities.Informative;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Services.Informative.GenericRepository;
 
@@ -20,43 +21,19 @@ public class HeroSectionController : ControllerBase
         return Ok(items);
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetHeroSection(int id)
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> PatchHeroSection(int id, [FromBody] JsonPatchDocument<HeroSection> patchDoc)
     {
-        var item = await _heroSectionService.GetByIdAsync(id);
-        if (item == null)
-        {
-            return NotFound();
-        }
-        return Ok(item);
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> AddHeroSection(HeroSection heroSection)
-    {
-        await _heroSectionService.AddAsync(heroSection);
-        await _heroSectionService.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetHeroSection), new { id = heroSection.Id_Hero }, heroSection);
-    }
-
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateHeroSection(int id, HeroSection heroSection)
-    {
-        if (id != heroSection.Id_Hero)
+        if (patchDoc == null)
         {
             return BadRequest();
         }
 
-        await _heroSectionService.UpdateAsync(heroSection);
+        await _heroSectionService.PatchAsync(id, patchDoc);
         await _heroSectionService.SaveChangesAsync();
+
         return NoContent();
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteHeroSection(int id)
-    {
-        await _heroSectionService.DeleteAsync(id);
-        await _heroSectionService.SaveChangesAsync();
-        return NoContent();
-    }
+
 }

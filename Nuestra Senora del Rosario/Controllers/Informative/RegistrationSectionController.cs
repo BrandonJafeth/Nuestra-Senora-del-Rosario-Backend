@@ -1,4 +1,5 @@
 ﻿using Entities.Informative;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Services.Informative.GenericRepository;
 
@@ -20,43 +21,20 @@ public class RegistrationSectionController : ControllerBase
         return Ok(items);
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetRegistrationSection(int id)
-    {
-        var item = await _registrationSectionService.GetByIdAsync(id);
-        if (item == null)
-        {
-            return NotFound();
-        }
-        return Ok(item);
-    }
 
-    [HttpPost]
-    public async Task<IActionResult> AddRegistrationSection(RegistrationSection registrationSection)
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> PatchRegistrationSection(int id, [FromBody] JsonPatchDocument<RegistrationSection> patchDoc)
     {
-        await _registrationSectionService.AddAsync(registrationSection);
-        await _registrationSectionService.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetRegistrationSection), new { id = registrationSection.Id_RegistrationSection }, registrationSection);
-    }
-
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateRegistrationSection(int id, RegistrationSection registrationSection)
-    {
-        if (id != registrationSection.Id_RegistrationSection)
+        if (patchDoc == null)
         {
             return BadRequest();
         }
 
-        await _registrationSectionService.UpdateAsync(registrationSection);
+        await _registrationSectionService.PatchAsync(id, patchDoc);
         await _registrationSectionService.SaveChangesAsync();
+
         return NoContent();
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteRegistrationSection(int id)
-    {
-        await _registrationSectionService.DeleteAsync(id);
-        await _registrationSectionService.SaveChangesAsync();
-        return NoContent();
-    }
+
 }
