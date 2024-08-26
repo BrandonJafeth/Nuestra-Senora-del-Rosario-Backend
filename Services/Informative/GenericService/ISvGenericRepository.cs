@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.JsonPatch;
 
 namespace Services.Informative.GenericRepository
 {
@@ -9,6 +8,7 @@ namespace Services.Informative.GenericRepository
         Task<T> GetByIdAsync(int id);
         Task AddAsync(T entity);
         Task UpdateAsync(T entity);
+        Task PatchAsync(int id, JsonPatchDocument<T> patchDoc);
         Task DeleteAsync(int id);
         Task SaveChangesAsync();
     }

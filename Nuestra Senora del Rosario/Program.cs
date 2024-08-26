@@ -1,18 +1,24 @@
 using Microsoft.EntityFrameworkCore;
 using Services.Informative.GenericRepository;
+using Services.Informative.NavbarItemServices;
 using Services.MyDbContext;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuración de servicios
+// Configurar AutoMapper
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+// Otros servicios, como DbContext y servicios genéricos
 builder.Services.AddDbContext<MyContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
 
 builder.Services.AddScoped(typeof(ISvGenericRepository<>), typeof(SvGenericRepository<>));
+builder.Services.AddScoped<ISvNavbarItemService, SvNavbarItem>();
 
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddNewtonsoftJson();
 
 // Configuración de Swagger
 builder.Services.AddEndpointsApiExplorer();

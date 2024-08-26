@@ -1,36 +1,50 @@
 ﻿
+using AutoMapper;
 using Entities.Informative;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Services.DTOS;
 using Services.Informative.GenericRepository;
+using Services.Informative.NavbarItemServices;
 
 [ApiController]
 [Route("api/[controller]")]
 public class NavbarItemController : ControllerBase
 {
-    private readonly ISvGenericRepository<NavbarItem> _navbarItemService;
+    private readonly ISvNavbarItemService _navbarItemService;
+    private readonly IMapper _mapper;
 
-    public NavbarItemController(ISvGenericRepository<NavbarItem> navbarItemService)
+    public NavbarItemController(ISvNavbarItemService navbarItemService, IMapper mapper)
     {
         _navbarItemService = navbarItemService;
+        _mapper = mapper;
     }
+
 
     [HttpGet]
     public async Task<IActionResult> GetNavbarItems()
     {
-        var items = await _navbarItemService.GetAllAsync();
-        return Ok(items);
+       
+        var navbarItems = await _navbarItemService.GetAllWithChildrenAsync();
+        var navbarItemsDto = _mapper.Map<IEnumerable<NavbarItemDto>>(navbarItems);
+        return Ok(navbarItemsDto);
     }
 
+   
     [HttpGet("{id}")]
     public async Task<IActionResult> GetNavbarItem(int id)
     {
-        var item = await _navbarItemService.GetByIdAsync(id);
-        if (item == null)
+        var navbarItem = await _navbarItemService.GetNavbarItemWithChildrenAsync(id);
+        if (navbarItem == null)
         {
             return NotFound();
         }
-        return Ok(item);
+
+        var navbarItemDto = _mapper.Map<NavbarItemDto>(navbarItem);
+        return Ok(navbarItemDto);
     }
+
+
 
     [HttpPost]
     public async Task<IActionResult> AddNavbarItem(NavbarItem navbarItem)
@@ -40,16 +54,18 @@ public class NavbarItemController : ControllerBase
         return CreatedAtAction(nameof(GetNavbarItem), new { id = navbarItem.Id_Nav_It }, navbarItem);
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateNavbarItem(int id, NavbarItem navbarItem)
+
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> PatchNavbarItem(int id, [FromBody] JsonPatchDocument<NavbarItem> patchDoc)
     {
-        if (id != navbarItem.Id_Nav_It)
+        if (patchDoc == null)
         {
             return BadRequest();
         }
 
-        await _navbarItemService.UpdateAsync(navbarItem);
+        await _navbarItemService.PatchAsync(id, patchDoc);
         await _navbarItemService.SaveChangesAsync();
+
         return NoContent();
     }
 

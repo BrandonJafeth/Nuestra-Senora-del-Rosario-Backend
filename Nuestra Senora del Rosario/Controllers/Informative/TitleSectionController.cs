@@ -1,4 +1,5 @@
 ﻿using Entities.Informative;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Services.Informative.GenericRepository;
 
@@ -39,19 +40,19 @@ public class TitleSectionController : ControllerBase
         return CreatedAtAction(nameof(GetTitleSection), new { id = titleSection.Id_TitleSection }, titleSection);
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateTitleSection(int id, TitleSection titleSection)
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> PatchTitleSection(int id, [FromBody] JsonPatchDocument<TitleSection> patchDoc)
     {
-        if (id != titleSection.Id_TitleSection)
+        if (patchDoc == null)
         {
             return BadRequest();
         }
 
-        await _titleSectionService.UpdateAsync(titleSection);
+        await _titleSectionService.PatchAsync(id, patchDoc);
         await _titleSectionService.SaveChangesAsync();
+
         return NoContent();
     }
-
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteTitleSection(int id)
     {

@@ -1,7 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.EntityFrameworkCore;
+using Services.MyDbContext;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Services.MyDbContext;  
 
 namespace Services.Informative.GenericRepository
 {
@@ -35,6 +36,16 @@ namespace Services.Informative.GenericRepository
         {
             _dbSet.Attach(entity);
             _myDbContext.Entry(entity).State = EntityState.Modified;
+        }
+
+        public async Task PatchAsync(int id, JsonPatchDocument<T> patchDoc)
+        {
+            var entity = await GetByIdAsync(id);
+            if (entity != null)
+            {
+                patchDoc.ApplyTo(entity);  
+                _myDbContext.Entry(entity).State = EntityState.Modified;
+            }
         }
 
         public async Task DeleteAsync(int id)
