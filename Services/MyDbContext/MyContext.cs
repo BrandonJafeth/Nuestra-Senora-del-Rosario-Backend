@@ -23,6 +23,12 @@ namespace Services.MyDbContext
         public DbSet<TitleSection> TitleSections { get; set; }
         public DbSet<ServiceSection> ServiceSections { get; set; }
         public DbSet<RegistrationSection> RegistrationSections { get; set; }
+        public DbSet<VolunteeringSection> VolunteeringSections { get; set; }
+        public DbSet<DonationsSection> DonationsSections { get; set; }
+        public DbSet<GalleryCategory> GalleryCategories { get; set; }
+        public DbSet<GalleryItem> GalleryItems { get; set; }
+        public DbSet<Contact> Contacts { get; set; }
+        public DbSet<ButtonInfo> ButtonInfos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -79,6 +85,53 @@ namespace Services.MyDbContext
          modelBuilder.Entity<TitleSection>()
         .Property(ts => ts.Description_Section)
         .IsRequired(false);
+
+            // VolunteeringSection
+            modelBuilder.Entity<VolunteeringSection>()
+                .HasKey(vs => vs.Id_VolunteeringSection);
+            modelBuilder.Entity<VolunteeringSection>()
+                .Property(vs => vs.Id_VolunteeringSection)
+                .ValueGeneratedOnAdd();  
+
+            // DonationsSection
+            modelBuilder.Entity<DonationsSection>()
+                .HasKey(ds => ds.Id_DonationsSection);
+            modelBuilder.Entity<DonationsSection>()
+                .Property(ds => ds.Id_DonationsSection)
+                .ValueGeneratedOnAdd();  
+
+            // GalleryCategory
+            modelBuilder.Entity<GalleryCategory>()
+                .HasKey(gc => gc.Id_GalleryCategory);
+            modelBuilder.Entity<GalleryCategory>()
+                .Property(gc => gc.Id_GalleryCategory)
+                .ValueGeneratedOnAdd();  
+
+            // GalleryItem
+            modelBuilder.Entity<GalleryItem>()
+                .HasKey(gi => gi.Id_GalleryItem);
+            modelBuilder.Entity<GalleryItem>()
+                .Property(gi => gi.Id_GalleryItem)
+                .ValueGeneratedOnAdd();  
+            modelBuilder.Entity<GalleryItem>()
+                .HasOne(gi => gi.GalleryCategory)
+                .WithMany(gc => gc.GalleryItems)
+                .HasForeignKey(gi => gi.Id_GalleryCategory)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Contact
+            modelBuilder.Entity<Contact>()
+                .HasKey(c => c.Id_Contact);
+            modelBuilder.Entity<Contact>()
+                .Property(c => c.Id_Contact)
+                .ValueGeneratedOnAdd();  
+
+            // ButtonInfo
+            modelBuilder.Entity<ButtonInfo>()
+                .HasKey(bi => bi.Id_ButtonInfo);
+            modelBuilder.Entity<ButtonInfo>()
+                .Property(bi => bi.Id_ButtonInfo)
+                .ValueGeneratedOnAdd();  
 
 
         }
