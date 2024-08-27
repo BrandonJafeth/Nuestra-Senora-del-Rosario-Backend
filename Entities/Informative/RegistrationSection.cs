@@ -10,7 +10,7 @@ namespace Entities.Informative
     {
         public int Id_RegistrationSection { get; set; }
         public string Registration_MoreInfoPrompt { get; set; }
-        public string RegistrationText_Button { get; set; }
+
         public string Registration_SupportMessage { get; set; }
         public string RegistrationImage_Url { get; set; }
     }
