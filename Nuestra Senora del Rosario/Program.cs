@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Configurar AutoMapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-// Otros servicios, como DbContext y servicios genéricos
+// Otros servicios, como DbContext y servicios genÃ©ricos
 builder.Services.AddDbContext<MyContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
@@ -16,17 +16,26 @@ builder.Services.AddDbContext<MyContext>(options =>
 builder.Services.AddScoped(typeof(ISvGenericRepository<>), typeof(SvGenericRepository<>));
 builder.Services.AddScoped<ISvNavbarItemService, SvNavbarItem>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder => builder
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
+
 
 builder.Services.AddControllers()
     .AddNewtonsoftJson();
 
-// Configuración de Swagger
+// ConfiguraciÃ³n de Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configuración del pipeline HTTP
+// ConfiguraciÃ³n del pipeline HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
