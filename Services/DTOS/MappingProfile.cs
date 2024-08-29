@@ -8,6 +8,7 @@ public class MappingProfile : Profile
     public MappingProfile()
     {
         CreateMap<NavbarItem, NavbarItemDto>();
-    
+        CreateMap<GalleryCategory, GalleryCategoryDto>();
+
     }
 }
