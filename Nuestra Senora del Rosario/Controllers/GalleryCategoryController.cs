@@ -1,7 +1,10 @@
-﻿using Entities.Informative;
+﻿using AutoMapper;
+using Entities.Informative;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Services.DTOS;
 using Services.Informative.GenericRepository;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 [ApiController]
@@ -9,30 +12,35 @@ using System.Threading.Tasks;
 public class GalleryCategoryController : ControllerBase
 {
     private readonly ISvGenericRepository<GalleryCategory> _galleryCategoryService;
+    private readonly IMapper _mapper;
 
-    public GalleryCategoryController(ISvGenericRepository<GalleryCategory> galleryCategoryService)
+    public GalleryCategoryController(ISvGenericRepository<GalleryCategory> galleryCategoryService, IMapper mapper)
     {
         _galleryCategoryService = galleryCategoryService;
+        _mapper = mapper;
     }
 
     // GET: api/GalleryCategory
     [HttpGet]
     public async Task<IActionResult> GetGalleryCategories()
     {
-        var items = await _galleryCategoryService.GetAllAsync();
-        return Ok(items);
+        var categories = await _galleryCategoryService.GetAllAsync();
+        var categoryDtos = _mapper.Map<IEnumerable<GalleryCategoryDto>>(categories);
+        return Ok(categoryDtos);
     }
 
     // GET: api/GalleryCategory/{id}
     [HttpGet("{id}")]
     public async Task<IActionResult> GetGalleryCategory(int id)
     {
-        var item = await _galleryCategoryService.GetByIdAsync(id);
-        if (item == null)
+        var category = await _galleryCategoryService.GetByIdAsync(id);
+        if (category == null)
         {
             return NotFound();
         }
-        return Ok(item);
+
+        var categoryDto = _mapper.Map<GalleryCategoryDto>(category);
+        return Ok(categoryDto);
     }
 
     // POST: api/GalleryCategory
@@ -41,7 +49,9 @@ public class GalleryCategoryController : ControllerBase
     {
         await _galleryCategoryService.AddAsync(galleryCategory);
         await _galleryCategoryService.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetGalleryCategory), new { id = galleryCategory.Id_GalleryCategory }, galleryCategory);
+
+        var categoryDto = _mapper.Map<GalleryCategoryDto>(galleryCategory);
+        return CreatedAtAction(nameof(GetGalleryCategory), new { id = galleryCategory.Id_GalleryCategory }, categoryDto);
     }
 
     // PATCH: api/GalleryCategory/{id}

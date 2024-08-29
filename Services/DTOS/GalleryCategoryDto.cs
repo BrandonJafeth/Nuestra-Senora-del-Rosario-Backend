@@ -1,0 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Services.DTOS
+{
+    public class GalleryCategoryDto
+    {
+        public int Id_GalleryCategory { get; set; }
+        public string Name_Gallery_Category { get; set; }
+    }
+}
