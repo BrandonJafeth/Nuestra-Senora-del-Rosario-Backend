@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Services.DTOS;
 using Services.Informative.GenericRepository;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -45,25 +43,44 @@ public class GalleryCategoryController : ControllerBase
 
     // POST: api/GalleryCategory
     [HttpPost]
-    public async Task<IActionResult> AddGalleryCategory(GalleryCategory galleryCategory)
+    public async Task<IActionResult> AddGalleryCategory(GalleryCategoryDto galleryCategoryDto)
     {
+        // Mapeamos el DTO a la entidad
+        var galleryCategory = _mapper.Map<GalleryCategory>(galleryCategoryDto);
+
         await _galleryCategoryService.AddAsync(galleryCategory);
         await _galleryCategoryService.SaveChangesAsync();
 
-        var categoryDto = _mapper.Map<GalleryCategoryDto>(galleryCategory);
-        return CreatedAtAction(nameof(GetGalleryCategory), new { id = galleryCategory.Id_GalleryCategory }, categoryDto);
+        var createdGalleryCategoryDto = _mapper.Map<GalleryCategoryDto>(galleryCategory);
+        return CreatedAtAction(nameof(GetGalleryCategory), new { id = createdGalleryCategoryDto.Id_GalleryCategory }, createdGalleryCategoryDto);
     }
 
     // PATCH: api/GalleryCategory/{id}
     [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchGalleryCategory(int id, [FromBody] JsonPatchDocument<GalleryCategory> patchDoc)
+    public async Task<IActionResult> PatchGalleryCategory(int id, [FromBody] JsonPatchDocument<GalleryCategoryDto> patchDoc)
     {
         if (patchDoc == null)
         {
             return BadRequest();
         }
 
-        await _galleryCategoryService.PatchAsync(id, patchDoc);
+        var galleryCategory = await _galleryCategoryService.GetByIdAsync(id);
+        if (galleryCategory == null)
+        {
+            return NotFound();
+        }
+
+        // Aplica el parche al DTO y luego mapea de nuevo a la entidad
+        var galleryCategoryDto = _mapper.Map<GalleryCategoryDto>(galleryCategory);
+        patchDoc.ApplyTo(galleryCategoryDto, ModelState);
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        _mapper.Map(galleryCategoryDto, galleryCategory);
+
         await _galleryCategoryService.SaveChangesAsync();
 
         return NoContent();

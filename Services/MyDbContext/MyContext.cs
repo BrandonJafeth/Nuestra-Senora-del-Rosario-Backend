@@ -30,6 +30,8 @@ namespace Services.MyDbContext
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<ButtonInfo> ButtonInfos { get; set; }
 
+        public DbSet<AssociatesSection> AssociatesSections { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
@@ -56,6 +58,12 @@ namespace Services.MyDbContext
                 .HasKey(a => a.Id_About_Us);
             modelBuilder.Entity<AboutUsSection>()
                 .Property(a => a.Id_About_Us)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<AssociatesSection>()
+               .HasKey(a => a.Id_AssociatesSection);
+            modelBuilder.Entity<AssociatesSection>()
+                .Property(a => a.Id_AssociatesSection)
                 .ValueGeneratedOnAdd();
 
             modelBuilder.Entity<SiteSettings>()
