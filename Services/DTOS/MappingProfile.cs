@@ -9,6 +9,7 @@ public class MappingProfile : Profile
     {
         CreateMap<NavbarItem, NavbarItemDto>();
         CreateMap<GalleryCategory, GalleryCategoryDto>();
+        CreateMap<GalleryItem, GalleryItemDto>().ReverseMap();
 
     }
 }
