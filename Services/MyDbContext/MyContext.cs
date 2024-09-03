@@ -29,10 +29,11 @@ namespace Services.MyDbContext
         public DbSet<GalleryItem> GalleryItems { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<ButtonInfo> ButtonInfos { get; set; }
-
         public DbSet<VolunteerProfile> VolunteerProfiles { get; set; }
-
         public DbSet<AssociatesSection> AssociatesSections { get; set; }
+        public DbSet<AdministrativeRequirements> AdministrativeRequirements { get; set; }
+        public DbSet<NursingRequirements> NursingRequirements { get; set; }
+        public DbSet<ImportantInformation> ImportantInformation { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -150,6 +151,16 @@ namespace Services.MyDbContext
                 .Property(v => v.Id_Volunteer_Profile)
                 .ValueGeneratedOnAdd();
 
+
+            modelBuilder.Entity<AdministrativeRequirements>().HasKey(ar => ar.Id_AdministrativeRequirement);
+            modelBuilder.Entity<AdministrativeRequirements>().Property(ar => ar.Id_AdministrativeRequirement).ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<NursingRequirements>().HasKey(nr => nr.Id_NursingRequirement);
+            modelBuilder.Entity<NursingRequirements>().Property(nr => nr.Id_NursingRequirement).ValueGeneratedOnAdd();
+
+
+            modelBuilder.Entity<ImportantInformation>().HasKey(ii => ii.Id_ImportantInformation);
+            modelBuilder.Entity<ImportantInformation>().Property(ii => ii.Id_ImportantInformation).ValueGeneratedOnAdd();
 
         }
     }
