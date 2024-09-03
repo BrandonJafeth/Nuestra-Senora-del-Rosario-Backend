@@ -23,26 +23,6 @@ public class AssociatesSectionController : ControllerBase
         return Ok(items);
     }
 
-    // GET: api/AssociatesSection/{id}
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetAssociatesSection(int id)
-    {
-        var item = await _associatesSectionService.GetByIdAsync(id);
-        if (item == null)
-        {
-            return NotFound();
-        }
-        return Ok(item);
-    }
-
-    // POST: api/AssociatesSection
-    [HttpPost]
-    public async Task<IActionResult> AddAssociatesSection(AssociatesSection associatesSection)
-    {
-        await _associatesSectionService.AddAsync(associatesSection);
-        await _associatesSectionService.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetAssociatesSection), new { id = associatesSection.Id_AssociatesSection }, associatesSection);
-    }
 
     // PATCH: api/AssociatesSection/{id}
     [HttpPatch("{id}")]
@@ -59,12 +39,5 @@ public class AssociatesSectionController : ControllerBase
         return NoContent();
     }
 
-    // DELETE: api/AssociatesSection/{id}
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAssociatesSection(int id)
-    {
-        await _associatesSectionService.DeleteAsync(id);
-        await _associatesSectionService.SaveChangesAsync();
-        return NoContent();
-    }
+
 }
