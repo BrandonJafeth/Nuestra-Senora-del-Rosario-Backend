@@ -35,6 +35,15 @@ namespace Services.MyDbContext
         public DbSet<NursingRequirements> NursingRequirements { get; set; }
         public DbSet<ImportantInformation> ImportantInformation { get; set; }
 
+        public DbSet<DonationType> DonationTypes { get; set; }
+
+        public DbSet<MethodDonation> MethodDonations { get; set; }
+
+
+        public DbSet<FormDonation> FormDonations { get; set; }
+
+         
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
@@ -161,6 +170,49 @@ namespace Services.MyDbContext
 
             modelBuilder.Entity<ImportantInformation>().HasKey(ii => ii.Id_ImportantInformation);
             modelBuilder.Entity<ImportantInformation>().Property(ii => ii.Id_ImportantInformation).ValueGeneratedOnAdd();
+
+
+            // Configuración para DonationType
+            modelBuilder.Entity<DonationType>()
+                .HasKey(d => d.Id_DonationType);  // Llave primaria
+            modelBuilder.Entity<DonationType>()
+                .Property(d => d.Id_DonationType)
+                .ValueGeneratedOnAdd();  // Auto-incremental
+
+            // Configuración para MethodDonation
+            modelBuilder.Entity<MethodDonation>()
+                .HasKey(m => m.Id_MethodDonation);  // Llave primaria
+            modelBuilder.Entity<MethodDonation>()
+                .Property(m => m.Id_MethodDonation)
+                .ValueGeneratedOnAdd();  // Auto-incremental
+
+            // Relación entre MethodDonation y DonationType
+            modelBuilder.Entity<MethodDonation>()
+                .HasOne(m => m.DonationType)  // Relación con DonationType
+                .WithMany(d => d.MethodDonations)  // Relación uno a muchos (requiere propiedad de colección en DonationType)
+                .HasForeignKey(m => m.DonationTypeId)
+                .OnDelete(DeleteBehavior.Cascade);  // Borrar en cascada si el DonationType es eliminado
+
+            // Configuración para FormDonation
+            modelBuilder.Entity<FormDonation>()
+                .HasKey(f => f.Id_FormDonation);  // Llave primaria
+            modelBuilder.Entity<FormDonation>()
+                .Property(f => f.Id_FormDonation)
+                .ValueGeneratedOnAdd();  // Auto-incremental
+
+            // Relación entre FormDonation y DonationType
+            modelBuilder.Entity<FormDonation>()
+                .HasOne(f => f.DonationType)  // Relación con DonationType
+                .WithMany(d => d.FormDonations)  // Relación uno a muchos (requiere propiedad de colección en DonationType)
+                .HasForeignKey(f => f.Id_DonationType)
+                .OnDelete(DeleteBehavior.Cascade);  // Borrar en cascada si el DonationType es eliminado
+
+            // Relación entre FormDonation y MethodDonation
+            modelBuilder.Entity<FormDonation>()
+                .HasOne(f => f.MethodDonation)  // Relación con MethodDonation
+                .WithMany(m => m.FormDonations)  // Relación uno a muchos (requiere propiedad de colección en MethodDonation)
+                .HasForeignKey(f => f.Id_MethodDonation)
+                .OnDelete(DeleteBehavior.Cascade);
 
         }
     }
