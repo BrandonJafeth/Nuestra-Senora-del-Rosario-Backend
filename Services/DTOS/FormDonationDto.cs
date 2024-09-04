@@ -10,10 +10,8 @@
         public string Dn_Phone { get; set; }
         public DateTime Delivery_date { get; set; }
 
-        // Relación con DonationType
-        public DonationTypeDto DonationType { get; set; }
-
-        // Relación con MethodDonation
-        public MethodDonationDto MethodDonation { get; set; }
+        // Solo nombres de DonationType y MethodDonation
+        public string DonationType { get; set; }
+        public string MethodDonation { get; set; }
     }
 }
