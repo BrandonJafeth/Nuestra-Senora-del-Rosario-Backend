@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Entities.Informative;
 using Services.DTOS;
+using Services.DTOS.CreatesDto;
 
 
 public class MappingProfile : Profile
@@ -18,11 +19,13 @@ public class MappingProfile : Profile
         // Mapeo para MethodDonation (sin la referencia al DonationType)
         CreateMap<MethodDonation, MethodDonationDto>();
 
-        // Mapeo entre FormDonation y FormDonationDto
+        // Map de FormDonation a FormDonationDto (GET)
         CreateMap<FormDonation, FormDonationDto>()
-            .ForMember(dest => dest.DonationType, opt => opt.MapFrom(src => src.DonationType))
-            .ForMember(dest => dest.MethodDonation, opt => opt.MapFrom(src => src.MethodDonation))
-            .ReverseMap();
+            .ForMember(dest => dest.DonationType, opt => opt.MapFrom(src => src.DonationType.Name_DonationType))
+            .ForMember(dest => dest.MethodDonation, opt => opt.MapFrom(src => src.MethodDonation.Name_MethodDonation));
+
+        // Map de FormDonationCreateDto a FormDonation (POST)
+        CreateMap<FormDonationCreateDto, FormDonation>();
 
     }
 }
