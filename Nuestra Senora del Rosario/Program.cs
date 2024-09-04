@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using Services.Informative.DonationType;
 using Services.Informative.GalleryItemServices;
 using Services.Informative.GenericRepository;
+using Services.Informative.MethodDonationService;
 using Services.Informative.NavbarItemServices;
 using Services.MyDbContext;
 
@@ -17,6 +19,8 @@ builder.Services.AddDbContext<MyContext>(options =>
 builder.Services.AddScoped(typeof(ISvGenericRepository<>), typeof(SvGenericRepository<>));
 builder.Services.AddScoped<ISvNavbarItemService, SvNavbarItem>();
 builder.Services.AddScoped<ISvGalleryItem, SvGalleryItem>();
+builder.Services.AddScoped<ISvMethodDonation, SvMethodDonation>();
+builder.Services.AddScoped<ISvDonationType, SvDonationType>();
 
 builder.Services.AddCors(options =>
 {
