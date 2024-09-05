@@ -41,8 +41,10 @@ namespace Services.MyDbContext
 
 
         public DbSet<FormDonation> FormDonations { get; set; }
+        public DbSet<VoluntarieType> VoluntarieTypes { get; set; }
+        public DbSet<FormVoluntarie> FormVoluntaries { get; set; }
 
-         
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -213,6 +215,28 @@ namespace Services.MyDbContext
                 .WithMany(m => m.FormDonations)  // Relación uno a muchos (requiere propiedad de colección en MethodDonation)
                 .HasForeignKey(f => f.Id_MethodDonation)
                 .OnDelete(DeleteBehavior.Cascade);
+
+
+            // Configuración para VoluntarieType
+            modelBuilder.Entity<VoluntarieType>()
+                .HasKey(v => v.Id_VoluntarieType);
+            modelBuilder.Entity<VoluntarieType>()
+                .Property(v => v.Id_VoluntarieType)
+                .ValueGeneratedOnAdd();
+
+            // Configuración para FormVoluntarie
+            modelBuilder.Entity<FormVoluntarie>()
+                .HasKey(f => f.Id_FormVoluntarie);
+            modelBuilder.Entity<FormVoluntarie>()
+                .Property(f => f.Id_FormVoluntarie)
+                .ValueGeneratedOnAdd();
+
+            // Relación entre FormVoluntarie y VoluntarieType
+            modelBuilder.Entity<FormVoluntarie>()
+                .HasOne(f => f.VoluntarieType)
+                .WithMany(v => v.FormVoluntaries)  // Relación inversa
+                .HasForeignKey(f => f.Id_VoluntarieType)
+                .OnDelete(DeleteBehavior.Cascade);  // Borrar en cascada si se elimina VoluntarieType
 
         }
     }

@@ -12,6 +12,7 @@ public class MappingProfile : Profile
         CreateMap<GalleryCategory, GalleryCategoryDto>();
         CreateMap<GalleryItem, GalleryItemDto>().ReverseMap();
 
+
         // Mapeo para DonationType
         CreateMap<DonationType, DonationTypeDto>()
             .ForMember(dest => dest.MethodDonations, opt => opt.MapFrom(src => src.MethodDonations));
@@ -26,6 +27,20 @@ public class MappingProfile : Profile
 
         // Map de FormDonationCreateDto a FormDonation (POST)
         CreateMap<FormDonationCreateDto, FormDonation>();
+
+
+        /// Mapeo para VoluntarieType con su relación a FormVoluntaries
+        CreateMap<VoluntarieType, VoluntarieTypeDto>().ReverseMap();
+
+        // Mapeo para FormVoluntarie (GET)
+        CreateMap<FormVoluntarie, FormVoluntarieDto>()
+            .ForMember(dest => dest.VoluntarieTypeName, opt => opt.MapFrom(src => src.VoluntarieType.Name_VoluntarieType)); // Solo el nombre del tipo de voluntariado
+
+        // Mapeo inverso de FormVoluntarieCreateDto a FormVoluntarie (POST)
+        CreateMap<FormVoluntarieCreateDto, FormVoluntarie>()
+            .ForMember(dest => dest.VoluntarieType, opt => opt.Ignore()) // Ignoramos el objeto VoluntarieType completo
+            .ForMember(dest => dest.Id_VoluntarieType, opt => opt.MapFrom(src => src.VoluntarieTypeId)); // Mapear el ID directamente
+
 
     }
 }
