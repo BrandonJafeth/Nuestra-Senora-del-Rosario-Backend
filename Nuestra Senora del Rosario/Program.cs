@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Services.Informative.DonationType;
 using Services.Informative.FormDonationService;
+using Services.Informative.FormVoluntarieServices;
 using Services.Informative.GalleryItemServices;
 using Services.Informative.GenericRepository;
 using Services.Informative.MethodDonationService;
@@ -23,6 +24,8 @@ builder.Services.AddScoped<ISvGalleryItem, SvGalleryItem>();
 builder.Services.AddScoped<ISvMethodDonation, SvMethodDonation>();
 builder.Services.AddScoped<ISvDonationType, SvDonationType>();
 builder.Services.AddScoped<ISvFormDonation, SvFormDonationService>();
+builder.Services.AddScoped<ISvFormVoluntarieService, SvFormVoluntarieService>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
