@@ -4,6 +4,7 @@ using Services.Informative;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,13 +39,14 @@ namespace Services.MyDbContext
         public DbSet<DonationType> DonationTypes { get; set; }
 
         public DbSet<MethodDonation> MethodDonations { get; set; }
-
-
+        public DbSet<Applicant> Applicants { get; set; }
+        public DbSet<Guardian> Guardians { get; set; }
+        public DbSet<ApplicationForm> ApplicationForms { get; set; }
         public DbSet<FormDonation> FormDonations { get; set; }
         public DbSet<VoluntarieType> VoluntarieTypes { get; set; }
         public DbSet<FormVoluntarie> FormVoluntaries { get; set; }
 
-
+        public DbSet<ApplicationStatus> ApplicationStatuses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -238,6 +240,58 @@ namespace Services.MyDbContext
                 .HasForeignKey(f => f.Id_VoluntarieType)
                 .OnDelete(DeleteBehavior.Cascade);  // Borrar en cascada si se elimina VoluntarieType
 
+            // Configuración para Applicant
+            modelBuilder.Entity<Applicant>()
+                .HasKey(a => a.Id_Applicant);  // Llave primaria
+            modelBuilder.Entity<Applicant>()
+                .Property(a => a.Id_Applicant)
+                .ValueGeneratedOnAdd();  // Auto incremento
+
+            // Configuración para Guardian
+            modelBuilder.Entity<Guardian>()
+                .HasKey(g => g.Id_Guardian);  // Llave primaria
+            modelBuilder.Entity<Guardian>()
+                .Property(g => g.Id_Guardian)
+                .ValueGeneratedOnAdd();  // Auto incremento
+
+            // Configuración para ApplicationStatus
+            modelBuilder.Entity<ApplicationStatus>()
+                .HasKey(s => s.Id_Status);  // Llave primaria
+            modelBuilder.Entity<ApplicationStatus>()
+                .Property(s => s.Id_Status)
+                .ValueGeneratedOnAdd();  // Auto incremento
+            modelBuilder.Entity<ApplicationStatus>()
+                .Property(s => s.Status_Name)
+                .IsRequired()  // Campo requerido
+                .HasMaxLength(50);  // Longitud máxima del estado
+
+            // Configuración para ApplicationForm
+            modelBuilder.Entity<ApplicationForm>()
+                .HasKey(af => af.Id_ApplicationForm);  // Llave primaria
+            modelBuilder.Entity<ApplicationForm>()
+                .Property(af => af.Id_ApplicationForm)
+                .ValueGeneratedOnAdd();  // Auto incremento
+
+            // Relación entre ApplicationForm y Applicant
+            modelBuilder.Entity<ApplicationForm>()
+                .HasOne(af => af.Applicant)  // Relación con Applicant
+                .WithMany()  // Un Applicant puede tener varias solicitudes
+                .HasForeignKey(af => af.Id_Applicant)
+                .OnDelete(DeleteBehavior.Cascade);  // Borrar en cascada si el Applicant es eliminado
+
+            // Relación entre ApplicationForm y Guardian
+            modelBuilder.Entity<ApplicationForm>()
+                .HasOne(af => af.Guardian)  // Relación con Guardian
+                .WithMany()  // Un Guardian puede tener varias solicitudes
+                .HasForeignKey(af => af.Id_Guardian)
+                .OnDelete(DeleteBehavior.Cascade);  // Borrar en cascada si el Guardian es eliminado
+
+            // Relación entre ApplicationForm y ApplicationStatus
+            modelBuilder.Entity<ApplicationForm>()
+                .HasOne(af => af.ApplicationStatus)  // Relación con ApplicationStatus
+                .WithMany()  // Un estado puede estar asignado a muchas solicitudes
+                .HasForeignKey(af => af.Id_Status)
+                .OnDelete(DeleteBehavior.Restrict);  // No eliminar el estado si está asignado a solicitudes
         }
     }
 }
