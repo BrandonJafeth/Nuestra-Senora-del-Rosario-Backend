@@ -1,19 +1,19 @@
 ﻿using Entities.Informative;
 using Microsoft.EntityFrameworkCore;
-using Services.DTOS.CreatesDto;
 using Services.MyDbContext;
 using AutoMapper;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Services.Informative.DTOS.CreatesDto;
 
 namespace Services.Informative.ApplicationFormService
 {
     public class SvApplicationForm : ISvApplicationForm
     {
-        private readonly MyContext _context;
+        private readonly MyInformativeContext _context;
         private readonly IMapper _mapper; // Inyección de AutoMapper
 
-        public SvApplicationForm(MyContext context, IMapper mapper)
+        public SvApplicationForm(MyInformativeContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;

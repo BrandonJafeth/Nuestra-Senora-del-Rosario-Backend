@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Services.DTOS
+namespace Services.Informative.DTOS
 {
     public class ApplicationFormDto
     {

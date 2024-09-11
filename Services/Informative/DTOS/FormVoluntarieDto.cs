@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Services.DTOS
+namespace Services.Informative.DTOS
 {
     public class FormVoluntarieDto
     {
@@ -15,6 +15,6 @@ namespace Services.DTOS
         public DateTime End_Date { get; set; }
 
         // En lugar de VoluntarieTypeDto, solo incluimos el nombre del tipo de voluntariado
-        public string VoluntarieTypeName { get; set; }
+        public string Name_voluntarieType { get; set; }
     }
 }

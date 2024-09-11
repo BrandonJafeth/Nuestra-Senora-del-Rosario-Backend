@@ -1,7 +1,7 @@
 ﻿using Entities.Informative;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Services.Informative.GenericRepository;
+using Services.GenericService;
 
 [ApiController]
 [Route("api/[controller]")]

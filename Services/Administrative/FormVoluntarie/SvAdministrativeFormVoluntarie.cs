@@ -1,20 +1,18 @@
-﻿using Entities.Informative;
+﻿
+using Entities.Informative;
 using Microsoft.EntityFrameworkCore;
 using Services.GenericService;
 using Services.MyDbContext;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Services.Informative.FormVoluntarieServices
+namespace Services.Administrative.FormVoluntarieService
 {
-    public class SvFormVoluntarieService : SvGenericRepository<FormVoluntarie>, ISvFormVoluntarieService
+    public class AdministrativeFormVoluntarieService : SvGenericRepository<FormVoluntarie>, IAdministrativeFormVoluntarieService
     {
-        private readonly MyInformativeContext _context;
+        private readonly AdministrativeContext _context;
 
-        public SvFormVoluntarieService(MyInformativeContext context) : base(context)
+        public AdministrativeFormVoluntarieService(AdministrativeContext context) : base(context)
         {
             _context = context;
         }

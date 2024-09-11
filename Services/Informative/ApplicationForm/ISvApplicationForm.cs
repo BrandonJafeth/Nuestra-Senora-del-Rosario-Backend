@@ -1,7 +1,7 @@
 ﻿using Entities.Informative;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Services.DTOS.CreatesDto; // Asegúrate de incluir el DTO
+using Services.Informative.DTOS.CreatesDto; // Asegúrate de incluir el DTO
 
 namespace Services.Informative.ApplicationFormService
 {

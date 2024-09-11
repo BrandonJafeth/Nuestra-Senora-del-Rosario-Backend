@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Services.DTOS.CreatesDto
+namespace Services.Informative.DTOS.CreatesDto
 {
     public class ApplicationFormCreateDto
     {

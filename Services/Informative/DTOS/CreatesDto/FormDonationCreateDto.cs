@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services.DTOS.CreatesDto
+namespace Services.Informative.DTOS.CreatesDto
 {
     public class FormDonationCreateDto
     {

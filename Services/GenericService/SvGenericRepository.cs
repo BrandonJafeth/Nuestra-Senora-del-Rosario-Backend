@@ -1,20 +1,20 @@
 ﻿using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
-using Services.MyDbContext;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Services.Informative.GenericRepository
+namespace Services.GenericService
 {
     public class SvGenericRepository<T> : ISvGenericRepository<T> where T : class
     {
-        private readonly MyContext _myDbContext;
+        private readonly DbContext _dbContext;
         private readonly DbSet<T> _dbSet;
 
-        public SvGenericRepository(MyContext myDbContext)
+        // El constructor ahora acepta un DbContext genérico
+        public SvGenericRepository(DbContext dbContext)
         {
-            _myDbContext = myDbContext;
-            _dbSet = _myDbContext.Set<T>();
+            _dbContext = dbContext;
+            _dbSet = _dbContext.Set<T>();
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()
@@ -35,7 +35,7 @@ namespace Services.Informative.GenericRepository
         public async Task UpdateAsync(T entity)
         {
             _dbSet.Attach(entity);
-            _myDbContext.Entry(entity).State = EntityState.Modified;
+            _dbContext.Entry(entity).State = EntityState.Modified;
         }
 
         public async Task PatchAsync(int id, JsonPatchDocument<T> patchDoc)
@@ -43,8 +43,8 @@ namespace Services.Informative.GenericRepository
             var entity = await GetByIdAsync(id);
             if (entity != null)
             {
-                patchDoc.ApplyTo(entity);  
-                _myDbContext.Entry(entity).State = EntityState.Modified;
+                patchDoc.ApplyTo(entity);
+                _dbContext.Entry(entity).State = EntityState.Modified;
             }
         }
 
@@ -59,7 +59,7 @@ namespace Services.Informative.GenericRepository
 
         public async Task SaveChangesAsync()
         {
-            await _myDbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

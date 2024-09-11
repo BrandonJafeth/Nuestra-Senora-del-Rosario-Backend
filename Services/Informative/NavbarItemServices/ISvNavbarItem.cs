@@ -1,10 +1,10 @@
-﻿using Services.Informative.GenericRepository;
-using Entities.Informative;
+﻿using Entities.Informative;
+using Services.GenericService;
 
 
 
 
-namespace Services.Informative.NavbarItemServices  
+namespace Services.Informative.NavbarItemServices
 {
     public interface ISvNavbarItemService : ISvGenericRepository<NavbarItem>
     {

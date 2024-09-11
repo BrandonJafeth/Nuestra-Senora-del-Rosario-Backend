@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services.DTOS
+namespace Services.Informative.DTOS
 {
     public class GalleryItemDto
     {

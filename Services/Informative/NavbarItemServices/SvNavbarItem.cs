@@ -1,18 +1,18 @@
-﻿using Services.Informative.GenericRepository;
-using Entities.Informative;  // Importa el espacio de nombres de las entidades
+﻿using Entities.Informative;  // Importa el espacio de nombres de las entidades
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Services.MyDbContext;
+using Services.GenericService;
 
 namespace Services.Informative.NavbarItemServices
 {
     public class SvNavbarItem : SvGenericRepository<NavbarItem>, ISvNavbarItemService
     {
-        private readonly MyContext _context;
+        private readonly MyInformativeContext _context;
 
-        public SvNavbarItem(MyContext context) : base(context)
+        public SvNavbarItem(MyInformativeContext context) : base(context)
         {
             _context = context;
         }

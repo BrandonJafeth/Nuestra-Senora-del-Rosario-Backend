@@ -1,6 +1,6 @@
 ﻿using Entities.Informative;
 using Microsoft.EntityFrameworkCore;
-using Services.Informative.GenericRepository;
+using Services.GenericService;
 using Services.MyDbContext;
 using System;
 using System.Collections.Generic;
@@ -12,9 +12,9 @@ namespace Services.Informative.MethodDonationService
 {
     public class SvMethodDonation : SvGenericRepository<MethodDonation>, ISvMethodDonation
     {
-        private readonly MyContext _context;
+        private readonly MyInformativeContext _context;
 
-        public SvMethodDonation(MyContext context) : base(context)
+        public SvMethodDonation(MyInformativeContext context) : base(context)
         {
             _context = context;
         }
