@@ -1,4 +1,4 @@
-﻿using Entities.Informative;  // Importa el espacio de nombres de las entidades
+﻿using Entities.Informative;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,29 +8,24 @@ using Services.GenericService;
 
 namespace Services.Informative.NavbarItemServices
 {
-    public class SvNavbarItem : SvGenericRepository<NavbarItem>, ISvNavbarItemService
+    public class SvNavbarItem : SvGenericRepository<NavbarItem, MyInformativeContext>, ISvNavbarItemService
     {
-        private readonly MyInformativeContext _context;
-
         public SvNavbarItem(MyInformativeContext context) : base(context)
         {
-            _context = context;
         }
 
-      
         public async Task<IEnumerable<NavbarItem>> GetAllWithChildrenAsync()
         {
             return await _context.NavbarItems
-                .Where(n => n.ParentId == null) 
-                .Include(n => n.Children)      
+                .Where(n => n.ParentId == null)
+                .Include(n => n.Children)
                 .ToListAsync();
         }
 
-        
         public async Task<NavbarItem> GetNavbarItemWithChildrenAsync(int id)
         {
             return await _context.NavbarItems
-                .Include(n => n.Children)       
+                .Include(n => n.Children)
                 .FirstOrDefaultAsync(n => n.Id_Nav_It == id && n.ParentId == null);
         }
     }

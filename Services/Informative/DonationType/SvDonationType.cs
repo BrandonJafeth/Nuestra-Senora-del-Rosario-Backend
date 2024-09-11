@@ -1,21 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Services.GenericService;
 using Services.MyDbContext;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Services.Informative.DonationType
 {
-    public class SvDonationType : SvGenericRepository<Entities.Informative.DonationType>, ISvDonationType
+    public class SvDonationType : SvGenericRepository<Entities.Informative.DonationType, MyInformativeContext>, ISvDonationType
     {
-        private readonly MyInformativeContext _context;
-
+        // Constructor que pasa el contexto a la clase base
         public SvDonationType(MyInformativeContext context) : base(context)
         {
-            _context = context;
         }
 
         // Método especializado para obtener tipos de donación con sus métodos

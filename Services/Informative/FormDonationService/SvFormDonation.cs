@@ -7,13 +7,11 @@ using System.Threading.Tasks;
 
 namespace Services.Informative.FormDonationService
 {
-    public class SvFormDonationService : SvGenericRepository<FormDonation>, ISvFormDonation
+    public class SvFormDonationService : SvGenericRepository<FormDonation, MyInformativeContext>, ISvFormDonation
     {
-        private readonly MyInformativeContext _context;
-
+        // Constructor que pasa el contexto a la clase base
         public SvFormDonationService(MyInformativeContext context) : base(context)
         {
-            _context = context;
         }
 
         // Obtener todas las donaciones con sus detalles (DonationType y MethodDonation)
