@@ -5,16 +5,17 @@ using System.Threading.Tasks;
 
 namespace Services.GenericService
 {
-    public class SvGenericRepository<T> : ISvGenericRepository<T> where T : class
+    public class SvGenericRepository<T, TContext> : ISvGenericRepository<T>
+        where T : class
+        where TContext : DbContext
     {
-        private readonly DbContext _dbContext;
-        private readonly DbSet<T> _dbSet;
+        protected readonly TContext _context;
+        protected readonly DbSet<T> _dbSet;
 
-        // El constructor ahora acepta un DbContext genérico
-        public SvGenericRepository(DbContext dbContext)
+        public SvGenericRepository(TContext context)
         {
-            _dbContext = dbContext;
-            _dbSet = _dbContext.Set<T>();
+            _context = context;
+            _dbSet = context.Set<T>();
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()
@@ -32,10 +33,10 @@ namespace Services.GenericService
             await _dbSet.AddAsync(entity);
         }
 
-        public async Task UpdateAsync(T entity)
+        public void Update(T entity)
         {
             _dbSet.Attach(entity);
-            _dbContext.Entry(entity).State = EntityState.Modified;
+            _context.Entry(entity).State = EntityState.Modified;
         }
 
         public async Task PatchAsync(int id, JsonPatchDocument<T> patchDoc)
@@ -44,7 +45,7 @@ namespace Services.GenericService
             if (entity != null)
             {
                 patchDoc.ApplyTo(entity);
-                _dbContext.Entry(entity).State = EntityState.Modified;
+                _context.Entry(entity).State = EntityState.Modified;
             }
         }
 
@@ -59,7 +60,7 @@ namespace Services.GenericService
 
         public async Task SaveChangesAsync()
         {
-            await _dbContext.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
     }
 }

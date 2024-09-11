@@ -8,13 +8,10 @@ using Services.MyDbContext;
 
 namespace Services.Informative.GalleryItemServices
 {
-    public class SvGalleryItem : SvGenericRepository<GalleryItem>, ISvGalleryItem
+    public class SvGalleryItem : SvGenericRepository<GalleryItem, MyInformativeContext>, ISvGalleryItem
     {
-        private readonly MyInformativeContext _context;
-
         public SvGalleryItem(MyInformativeContext context) : base(context)
         {
-            _context = context;
         }
 
         // Método para obtener los GalleryItems por categoría con paginación
@@ -22,7 +19,7 @@ namespace Services.Informative.GalleryItemServices
         {
             return await _context.GalleryItems
                 .Where(gi => gi.Id_GalleryCategory == categoryId)
-                .OrderBy(gi => gi.Id_GalleryItem) 
+                .OrderBy(gi => gi.Id_GalleryItem)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

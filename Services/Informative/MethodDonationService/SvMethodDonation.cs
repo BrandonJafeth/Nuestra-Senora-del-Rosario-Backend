@@ -10,13 +10,10 @@ using System.Threading.Tasks;
 
 namespace Services.Informative.MethodDonationService
 {
-    public class SvMethodDonation : SvGenericRepository<MethodDonation>, ISvMethodDonation
+    public class SvMethodDonation : SvGenericRepository<MethodDonation, MyInformativeContext>, ISvMethodDonation
     {
-        private readonly MyInformativeContext _context;
-
         public SvMethodDonation(MyInformativeContext context) : base(context)
         {
-            _context = context;
         }
 
         // Método especializado para obtener métodos de donación con sus tipos

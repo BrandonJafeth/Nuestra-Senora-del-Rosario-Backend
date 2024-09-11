@@ -2,23 +2,19 @@
 using Microsoft.EntityFrameworkCore;
 using Services.GenericService;
 using Services.MyDbContext;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Services.Informative.FormVoluntarieServices
 {
-    public class SvFormVoluntarieService : SvGenericRepository<FormVoluntarie>, ISvFormVoluntarieService
+    public class SvFormVoluntarieService : SvGenericRepository<FormVoluntarie, MyInformativeContext>, ISvFormVoluntarieService
     {
-        private readonly MyInformativeContext _context;
-
+        // Constructor que pasa el contexto a la clase base
         public SvFormVoluntarieService(MyInformativeContext context) : base(context)
         {
-            _context = context;
         }
 
+        // Método para obtener todas las formas de voluntarios con su tipo
         public async Task<IEnumerable<FormVoluntarie>> GetAllFormVoluntariesWithTypeAsync()
         {
             return await _context.FormVoluntaries
@@ -26,12 +22,12 @@ namespace Services.Informative.FormVoluntarieServices
                 .ToListAsync();
         }
 
+        // Método para obtener una forma de voluntario con su tipo por ID
         public async Task<FormVoluntarie> GetFormVoluntarieWithTypeByIdAsync(int id)
         {
             return await _context.FormVoluntaries
                 .Include(f => f.VoluntarieType)  // Incluir el tipo de voluntariado
                 .FirstOrDefaultAsync(f => f.Id_FormVoluntarie == id);
         }
-
     }
 }
