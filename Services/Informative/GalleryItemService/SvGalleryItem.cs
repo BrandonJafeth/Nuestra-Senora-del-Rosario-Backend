@@ -3,16 +3,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using Entities.Informative;
 using Microsoft.EntityFrameworkCore;
-using Services.Informative.GenericRepository;
+using Services.GenericService;
 using Services.MyDbContext;
 
 namespace Services.Informative.GalleryItemServices
 {
     public class SvGalleryItem : SvGenericRepository<GalleryItem>, ISvGalleryItem
     {
-        private readonly MyContext _context;
+        private readonly MyInformativeContext _context;
 
-        public SvGalleryItem(MyContext context) : base(context)
+        public SvGalleryItem(MyInformativeContext context) : base(context)
         {
             _context = context;
         }

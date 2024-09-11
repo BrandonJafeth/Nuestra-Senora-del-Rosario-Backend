@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Entities.Informative;
-using Services.DTOS;
-using Services.DTOS.CreatesDto;
+using Services.Informative.DTOS;
+using Services.Informative.DTOS.CreatesDto;
 
 
 public class MappingProfile : Profile
@@ -34,7 +34,7 @@ public class MappingProfile : Profile
 
         // Mapeo para FormVoluntarie (GET)
         CreateMap<FormVoluntarie, FormVoluntarieDto>()
-            .ForMember(dest => dest.VoluntarieTypeName, opt => opt.MapFrom(src => src.VoluntarieType.Name_VoluntarieType)); // Solo el nombre del tipo de voluntariado
+            .ForMember(dest => dest.Name_voluntarieType, opt => opt.MapFrom(src => src.VoluntarieType.Name_VoluntarieType)); // Solo el nombre del tipo de voluntariado
 
         // Mapeo inverso de FormVoluntarieCreateDto a FormVoluntarie (POST)
         CreateMap<FormVoluntarieCreateDto, FormVoluntarie>()

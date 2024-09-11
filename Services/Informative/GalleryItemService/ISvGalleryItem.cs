@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Entities.Informative;
-using Services.Informative.GenericRepository;
+using Services.GenericService;
 
 namespace Services.Informative.GalleryItemServices
 {

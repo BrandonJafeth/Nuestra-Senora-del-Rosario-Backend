@@ -2,8 +2,8 @@
 using Entities.Informative;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Services.DTOS;
-using Services.DTOS.CreatesDto;
+using Services.Informative.DTOS;
+using Services.Informative.DTOS.CreatesDto;
 using Services.Informative.FormVoluntarieServices;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -24,7 +24,7 @@ public class FormVoluntarieController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetFormVoluntaries()
     {
-        var formVoluntaries = await _formVoluntarieService.GetFormVoluntariesWithTypesAsync();
+        var formVoluntaries = await _formVoluntarieService.GetAllFormVoluntariesWithTypeAsync();
         var formVoluntarieDtos = _mapper.Map<IEnumerable<FormVoluntarieDto>>(formVoluntaries);
         return Ok(formVoluntarieDtos);
     }
@@ -32,7 +32,7 @@ public class FormVoluntarieController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetFormVoluntarie(int id)
     {
-        var formVoluntarie = await _formVoluntarieService.GetByIdAsync(id);
+        var formVoluntarie = await _formVoluntarieService.GetFormVoluntarieWithTypeByIdAsync(id);
         if (formVoluntarie == null)
         {
             return NotFound();

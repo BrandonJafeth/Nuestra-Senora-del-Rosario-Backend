@@ -1,10 +1,10 @@
-﻿using Services.Informative.GenericRepository;
-using System;
+﻿using System;
 using Entities.Informative;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Services.GenericService;
 
 namespace Services.Informative.DonationType
 {

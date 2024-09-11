@@ -1,5 +1,5 @@
 ﻿using Entities.Informative;
-using Services.Informative.GenericRepository;
+using Services.GenericService;
 using System;
 using System.Collections.Generic;
 using System.Linq;

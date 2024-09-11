@@ -2,8 +2,8 @@
 using Entities.Informative;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Services.DTOS;
-using Services.Informative.GenericRepository;
+using Services.GenericService;
+using Services.Informative.DTOS;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Services.Informative.GenericRepository;
+using Services.GenericService;
 using Services.MyDbContext;
 using System;
 using System.Collections.Generic;
@@ -11,9 +11,9 @@ namespace Services.Informative.DonationType
 {
     public class SvDonationType : SvGenericRepository<Entities.Informative.DonationType>, ISvDonationType
     {
-        private readonly MyContext _context;
+        private readonly MyInformativeContext _context;
 
-        public SvDonationType(MyContext context) : base(context)
+        public SvDonationType(MyInformativeContext context) : base(context)
         {
             _context = context;
         }

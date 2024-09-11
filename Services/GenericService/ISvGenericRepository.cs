@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.JsonPatch;
 
-namespace Services.Informative.GenericRepository
+namespace Services.GenericService
 {
     public interface ISvGenericRepository<T> where T : class
     {

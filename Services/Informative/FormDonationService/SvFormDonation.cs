@@ -1,6 +1,6 @@
 ﻿using Entities.Informative;
 using Microsoft.EntityFrameworkCore;
-using Services.Informative.GenericRepository;
+using Services.GenericService;
 using Services.MyDbContext;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,9 +9,9 @@ namespace Services.Informative.FormDonationService
 {
     public class SvFormDonationService : SvGenericRepository<FormDonation>, ISvFormDonation
     {
-        private readonly MyContext _context;
+        private readonly MyInformativeContext _context;
 
-        public SvFormDonationService(MyContext context) : base(context)
+        public SvFormDonationService(MyInformativeContext context) : base(context)
         {
             _context = context;
         }

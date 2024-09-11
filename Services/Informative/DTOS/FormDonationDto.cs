@@ -1,4 +1,4 @@
-﻿namespace Services.DTOS
+﻿namespace Services.Informative.DTOS
 {
     public class FormDonationDto
     {

@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace Services.MyDbContext
 {
-    public class MyContext : DbContext
+    public class MyInformativeContext : DbContext
     {
-        public MyContext(DbContextOptions<MyContext> options) : base(options)
+        public MyInformativeContext(DbContextOptions<MyInformativeContext> options) : base(options)
         {
         }
 
