@@ -8,7 +8,7 @@ namespace Services.Administrative.AdministrativeDTO.AdministrativeDTOGet
 {
     public class EmployeeRoleGetDTO
     {
-        public int DniEmployee { get; set; }
+        public int Dni_Employee { get; set; }
         public int IdRole { get; set; }
         public string RoleName { get; set; }
     }

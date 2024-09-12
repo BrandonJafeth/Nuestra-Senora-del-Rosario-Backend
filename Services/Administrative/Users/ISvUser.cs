@@ -9,6 +9,6 @@ namespace Services.Administrative.Users
         Task CreateUserFromEmployeeAsync(int dniEmployee, int idRole);  // Método actualizado para incluir idRole
         Task<UserGetDTO> GetUserByIdAsync(int id);
         Task<IEnumerable<UserGetDTO>> GetAllUsersAsync();
-        Task<string> LoginAsync(UserLoginDTO loginDTO); // Método para login
+        Task<string> LoginAsync(UserLoginDTO loginDTO);
     }
 }
