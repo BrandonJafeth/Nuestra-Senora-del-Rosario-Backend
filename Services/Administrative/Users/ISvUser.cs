@@ -1,16 +1,14 @@
 ﻿using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Services.Administrative.Users
 {
-    public  interface ISvUser
+    public interface ISvUser
     {
-        Task CreateUserFromEmployeeAsync(int dniEmployee);
+        Task CreateUserFromEmployeeAsync(int dniEmployee, int idRole);  // Método actualizado para incluir idRole
         Task<UserGetDTO> GetUserByIdAsync(int id);
         Task<IEnumerable<UserGetDTO>> GetAllUsersAsync();
+        Task<string> LoginAsync(UserLoginDTO loginDTO); // Método para login
     }
 }

@@ -1,6 +1,10 @@
 using Entities.Informative;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Services.Administrative.EmailServices;
+using Services.Administrative.EmployeeRoleServices;
+using Services.Administrative.Employees;
 using Services.Administrative.FormVoluntarieService;
 using Services.Administrative.Users;
 using Services.GenericService;
@@ -12,6 +16,7 @@ using Services.Informative.GalleryItemServices;
 using Services.Informative.MethodDonationService;
 using Services.Informative.NavbarItemServices;
 using Services.MyDbContext;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +32,23 @@ builder.Services.AddDbContext<AdministrativeContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"], // Del appsettings.json
+            ValidAudience = builder.Configuration["Jwt:Audience"], // Del appsettings.json
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+    });
+
+
+
 // Registros genéricos para entidades en MyInformativeContext
 builder.Services.AddScoped<ISvGenericRepository<FormVoluntarie>, SvGenericRepository<FormVoluntarie, MyInformativeContext>>();
 builder.Services.AddScoped<ISvGenericRepository<NavbarItem>, SvGenericRepository<NavbarItem, MyInformativeContext>>();
@@ -38,9 +60,11 @@ builder.Services.AddScoped<ISvGenericRepository<ApplicationForm>, SvGenericRepos
 
 // Registros genéricos para entidades en AdministrativeContext
 builder.Services.AddScoped<ISvGenericRepository<User>, SvGenericRepository<User, AdministrativeContext>>();
-
-
 builder.Services.AddScoped<ISvGenericRepository<Employee>, SvGenericRepository<Employee, AdministrativeContext>>();
+builder.Services.AddScoped<ISvEmployee, SvEmployee>();
+builder.Services.AddScoped<ISvEmployeeRole, SvEmployeeRole>();
+builder.Services.AddScoped<ISvGenericRepository<EmployeeRole>, SvGenericRepository<EmployeeRole, AdministrativeContext>>();
+
 
 // Registros genéricos para entidades en MyInformativeContext
 builder.Services.AddScoped<ISvGenericRepository<AdministrativeRequirements>, SvGenericRepository<AdministrativeRequirements, MyInformativeContext>>();
@@ -71,6 +95,13 @@ builder.Services.AddScoped<ISvApplicationForm, SvApplicationForm>();
 builder.Services.AddScoped<ISvFormVoluntarieService, SvFormVoluntarieService>();
 builder.Services.AddScoped<IAdministrativeFormVoluntarieService, AdministrativeFormVoluntarieService>();
 builder.Services.AddScoped<ISvEmailService, SvEmailService>();
+builder.Services.AddAutoMapper(typeof(AdministrativeMappingProfile));
+builder.Services.AddScoped<ISvUser, SvUser>();
+
+
+
+builder.Services.AddAuthorization();
+
 
 builder.Services.AddCors(options =>
 {
@@ -99,6 +130,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowAll");
+app.UseAuthentication();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
