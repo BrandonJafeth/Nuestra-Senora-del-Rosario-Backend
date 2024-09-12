@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
@@ -14,6 +15,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace Services.Administrative.Users
 {
@@ -25,6 +27,7 @@ namespace Services.Administrative.Users
         private readonly ISvGenericRepository<EmployeeRole> _employeeRoleRepository;
         private readonly ISvEmailService _emailService;
         private readonly IConfiguration _configuration;
+        private readonly IMemoryCache _cache;  // Inyección de IMemoryCache
 
         public SvUser(
             IMapper mapper,
@@ -32,7 +35,8 @@ namespace Services.Administrative.Users
             ISvGenericRepository<Employee> employeeRepository,
             ISvGenericRepository<EmployeeRole> employeeRoleRepository,
             ISvEmailService emailService,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IMemoryCache cache)  // Inyectamos IMemoryCache
         {
             _mapper = mapper;
             _userRepository = userRepository;
@@ -40,7 +44,9 @@ namespace Services.Administrative.Users
             _employeeRoleRepository = employeeRoleRepository;
             _emailService = emailService;
             _configuration = configuration;
+            _cache = cache;  // Asignamos IMemoryCache
         }
+
 
         // Crear usuario desde un empleado con rol asignado
         public async Task CreateUserFromEmployeeAsync(int dniEmployee, int idRole)
@@ -108,33 +114,50 @@ namespace Services.Administrative.Users
         // Método para hashear contraseñas
         private string HashPassword(string password) => BCrypt.Net.BCrypt.HashPassword(password);
 
-        // Iniciar sesión y generar token JWT
         public async Task<string> LoginAsync(UserLoginDTO loginDTO)
         {
+            // Iniciar el cronómetro
+            var stopwatch = Stopwatch.StartNew();
+
+            // Obtener al usuario por DNI antes de cualquier operación
             var user = await _userRepository.GetByDniAsync(loginDTO.DniEmployee);
-            if (user == null || !BCrypt.Net.BCrypt.Verify(loginDTO.Password, user.Password))
-                throw new UnauthorizedAccessException("Credenciales inválidas.");
-
-            var employeeRoles = await _employeeRoleRepository
-                .Query()
-                .Include(er => er.Rol)
-                .Where(er => er.Dni_Employee == loginDTO.DniEmployee && er.Rol != null)
-                .Select(er => er.Rol.Name_Role)
-                .ToListAsync();
-
-            if (!employeeRoles.Any())
-                Console.WriteLine($"No se encontraron roles para el usuario con DNI: {loginDTO.DniEmployee}");
-            else
-                employeeRoles.ForEach(role => Console.WriteLine($"Rol encontrado: {role} para usuario con DNI {loginDTO.DniEmployee}"));
-
-            var claims = new List<Claim>
+            if (user == null)
             {
-                new Claim(JwtRegisteredClaimNames.Sub, loginDTO.DniEmployee.ToString()),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim("id", loginDTO.DniEmployee.ToString())
-            };
+                throw new UnauthorizedAccessException("Credenciales inválidas.");
+            }
 
-            // Agregar roles como claims
+            // Verificar la contraseña antes de hacer operaciones costosas
+            if (!BCrypt.Net.BCrypt.Verify(loginDTO.Password, user.Password))
+            {
+                throw new UnauthorizedAccessException("Credenciales inválidas.");
+            }
+
+            // Intentamos obtener los roles desde la caché
+            var cacheKey = $"UserRoles_{loginDTO.DniEmployee}";
+            if (!_cache.TryGetValue(cacheKey, out List<string> employeeRoles))
+            {
+                employeeRoles = await _employeeRoleRepository
+                    .Query()
+                    .Include(er => er.Rol)
+                    .Where(er => er.Dni_Employee == loginDTO.DniEmployee && er.Rol != null)
+                    .Select(er => er.Rol.Name_Role)
+                    .ToListAsync();
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(30))
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(10));
+
+                _cache.Set(cacheKey, employeeRoles, cacheEntryOptions);
+            }
+
+            // Crear los claims del token JWT
+            var claims = new List<Claim>
+    {
+        new Claim(JwtRegisteredClaimNames.Sub, loginDTO.DniEmployee.ToString()),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        new Claim("id", loginDTO.DniEmployee.ToString())
+    };
+
             employeeRoles.ForEach(role => claims.Add(new Claim(ClaimTypes.Role, role)));
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -147,6 +170,12 @@ namespace Services.Administrative.Users
                 expires: DateTime.Now.AddMinutes(60),
                 signingCredentials: creds
             );
+
+            // Paramos el cronómetro
+            stopwatch.Stop();
+
+            // Logueamos el tiempo total en milisegundos
+            Console.WriteLine($"Login completed in {stopwatch.ElapsedMilliseconds} ms");
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

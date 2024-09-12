@@ -98,7 +98,8 @@ builder.Services.AddScoped<ISvEmailService, SvEmailService>();
 builder.Services.AddAutoMapper(typeof(AdministrativeMappingProfile));
 builder.Services.AddScoped<ISvUser, SvUser>();
 
-
+// Registrar el servicio de caché en memoria
+builder.Services.AddMemoryCache(); // Aquí se añade el servicio de caché
 
 builder.Services.AddAuthorization();
 
