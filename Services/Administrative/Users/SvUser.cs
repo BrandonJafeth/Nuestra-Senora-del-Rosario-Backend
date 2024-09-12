@@ -1,9 +1,17 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
+using Services.Administrative.EmailServices;
 using Services.GenericService;
 using Services.Security;
-using BCrypt.Net;
-using Services.Administrative.EmailServices;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Services.Administrative.Users
 {
@@ -13,14 +21,17 @@ namespace Services.Administrative.Users
         private readonly ISvGenericRepository<User> _userRepository;
         private readonly ISvGenericRepository<Employee> _employeeRepository; // Necesario para obtener el empleado
         private readonly ISvEmailService _emailService; // Servicio de email inyectado
+        private readonly IConfiguration _configuration; // Para acceder a las configuraciones de JWT
 
         public SvUser(IMapper mapper, ISvGenericRepository<User> userRepository,
-                      ISvGenericRepository<Employee> employeeRepository, ISvEmailService emailService)
+                      ISvGenericRepository<Employee> employeeRepository,
+                      ISvEmailService emailService, IConfiguration configuration)
         {
             _mapper = mapper;
             _userRepository = userRepository;
             _employeeRepository = employeeRepository;
             _emailService = emailService;
+            _configuration = configuration;
         }
 
         // Método para crear un usuario desde un empleado (y generar contraseña aleatoria)
@@ -71,6 +82,46 @@ namespace Services.Administrative.Users
         private string HashPassword(string password)
         {
             return BCrypt.Net.BCrypt.HashPassword(password); // Ejemplo con BCrypt
+        }
+
+        // Nuevo método para login y generación de token JWT
+        public async Task<string> LoginAsync(UserLoginDTO loginDTO)
+        {
+            // Aquí aplicamos la solución para el error CS1501.
+            var users = await _userRepository.GetAllAsync();  // Obtener todos los usuarios
+            var user = users.FirstOrDefault(u => u.Dni_Employee == loginDTO.DniEmployee && u.Is_Active);  // Filtrar
+
+            if (user == null || !BCrypt.Net.BCrypt.Verify(loginDTO.Password, user.Password))
+            {
+                return null; // Retorna null si las credenciales no son válidas
+            }
+
+         
+
+            // Crear los claims del token JWT, incluyendo roles si los hay
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Dni_Employee.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim("id", user.Dni_Employee.ToString())
+            };
+
+            // Añadir los roles al token como claims
+         
+            // Obtener la clave secreta para firmar el token
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            // Crear el token
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(60),
+                signingCredentials: creds);
+
+            // Retornar el token generado
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }
