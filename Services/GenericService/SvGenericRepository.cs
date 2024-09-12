@@ -67,5 +67,10 @@ namespace Services.GenericService
         {
             return _dbSet.AsQueryable();
         }
+
+        public async Task<T> GetByDniAsync(int dniEmployee)
+        {
+            return await _dbSet.FirstOrDefaultAsync(u => EF.Property<int>(u, "Dni_Employee") == dniEmployee);
+        }
     }
 }
