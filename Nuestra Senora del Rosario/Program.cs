@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Services.Administrative.EmailServices;
+using Services.Administrative.EmployeeRoleServices;
 using Services.Administrative.Employees;
 using Services.Administrative.FormVoluntarieService;
 using Services.Administrative.Users;
@@ -61,6 +62,9 @@ builder.Services.AddScoped<ISvGenericRepository<ApplicationForm>, SvGenericRepos
 builder.Services.AddScoped<ISvGenericRepository<User>, SvGenericRepository<User, AdministrativeContext>>();
 builder.Services.AddScoped<ISvGenericRepository<Employee>, SvGenericRepository<Employee, AdministrativeContext>>();
 builder.Services.AddScoped<ISvEmployee, SvEmployee>();
+builder.Services.AddScoped<ISvEmployeeRole, SvEmployeeRole>();
+builder.Services.AddScoped<ISvGenericRepository<EmployeeRole>, SvGenericRepository<EmployeeRole, AdministrativeContext>>();
+
 
 // Registros genéricos para entidades en MyInformativeContext
 builder.Services.AddScoped<ISvGenericRepository<AdministrativeRequirements>, SvGenericRepository<AdministrativeRequirements, MyInformativeContext>>();

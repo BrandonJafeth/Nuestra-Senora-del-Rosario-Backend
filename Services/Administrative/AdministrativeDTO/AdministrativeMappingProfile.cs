@@ -10,10 +10,15 @@ public class AdministrativeMappingProfile : Profile
         // Mapping para el usuario (User) desde su DTO de creación
         CreateMap<UserCreateDTO, User>();
 
-        // Mapping para empleado y su DTO de obtención
         CreateMap<Employee, EmployeeGetDTO>()
-         .ForMember(dest => dest.ProfessionName, opt => opt.MapFrom(src => src.Profession.Name_Profession))
-         .ForMember(dest => dest.TypeOfSalaryName, opt => opt.MapFrom(src => src.TypeOfSalary.Name_TypeOfSalary));
+       .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.First_Name))
+       .ForMember(dest => dest.LastName1, opt => opt.MapFrom(src => src.Last_Name1))
+       .ForMember(dest => dest.LastName2, opt => opt.MapFrom(src => src.Last_Name2))
+       .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.Phone_Number))
+       .ForMember(dest => dest.EmergencyPhone, opt => opt.MapFrom(src => src.Emergency_Phone))
+       .ForMember(dest => dest.ProfessionName, opt => opt.MapFrom(src => src.Profession.Name_Profession))
+       .ForMember(dest => dest.TypeOfSalaryName, opt => opt.MapFrom(src => src.TypeOfSalary.Name_TypeOfSalary));
+        // Corrigiendo el mapeo con el nombre correcto
 
 
         CreateMap<EmployeeCreateDTO, Employee>()

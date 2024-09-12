@@ -2,7 +2,10 @@
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
 using Services.GenericService;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Services.Administrative.Employees
 {
@@ -27,14 +30,31 @@ namespace Services.Administrative.Employees
 
         public async Task<EmployeeGetDTO> GetEmployeeByIdAsync(int dni)
         {
-            var employee = await _employeeRepository.GetByIdAsync(dni);
+            var employee = await _employeeRepository
+                .Query()  // Usamos el método "Query" que devuelve IQueryable para poder hacer Include
+                .Include(e => e.Profession)
+                .Include(e => e.TypeOfSalary)
+                .FirstOrDefaultAsync(e => e.Dni == dni);  // Filtrar por DNI
+
+            if (employee == null)
+            {
+                return null;
+            }
+
+            // Mapeamos la entidad a DTO
             return _mapper.Map<EmployeeGetDTO>(employee);
         }
 
         public async Task<IEnumerable<EmployeeGetDTO>> GetAllEmployeesAsync()
         {
-            var employees = await _employeeRepository.GetAllAsync();
+            var employees = await _employeeRepository
+                .Query()  // Usamos el método "Query" que devuelve IQueryable para poder hacer Include
+                .Include(e => e.Profession)
+                .Include(e => e.TypeOfSalary)
+                .ToListAsync();
+
             return _mapper.Map<IEnumerable<EmployeeGetDTO>>(employees);
         }
+
     }
 }

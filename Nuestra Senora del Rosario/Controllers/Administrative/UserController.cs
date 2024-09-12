@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Services.Administrative.Users;
 using System.Threading.Tasks;
+using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -34,12 +35,12 @@ public class UserController : ControllerBase
     }
 
     // Crear un usuario a partir de un empleado
-    [HttpPost("create-from-employee/{dniEmployee}")]
-    public async Task<IActionResult> CreateUserFromEmployee(int dniEmployee)
+    [HttpPost("create-from-employee/{dniEmployee}/{idRole}")]
+    public async Task<IActionResult> CreateUserFromEmployee(int dniEmployee, int idRole)
     {
         try
         {
-            await _userService.CreateUserFromEmployeeAsync(dniEmployee);
+            await _userService.CreateUserFromEmployeeAsync(dniEmployee, idRole);
             return Ok();
         }
         catch (KeyNotFoundException ex)

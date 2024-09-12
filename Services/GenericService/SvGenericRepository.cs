@@ -62,5 +62,10 @@ namespace Services.GenericService
         {
             await _context.SaveChangesAsync();
         }
+
+        public IQueryable<T> Query()
+        {
+            return _dbSet.AsQueryable();
+        }
     }
 }

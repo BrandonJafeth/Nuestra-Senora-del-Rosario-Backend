@@ -13,5 +13,6 @@ namespace Services.GenericService
         Task PatchAsync(int id, JsonPatchDocument<T> patchDoc);
         Task DeleteAsync(int id);
         Task SaveChangesAsync();
+        IQueryable<T> Query();  // Este método devuelve un IQueryable para poder hacer "Include
     }
 }
