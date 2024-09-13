@@ -40,5 +40,9 @@ public class AdministrativeMappingProfile : Profile
         // Mapping para Rol
         CreateMap<RolCreateDTO, Rol>();
         CreateMap<Rol, RolGetDTO>();
+
+        CreateMap<PasswordResetRequestDTO, Employee>();
+        CreateMap<Employee, EmployeeGetDTO>();
+
     }
 }
