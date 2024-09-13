@@ -64,7 +64,8 @@ builder.Services.AddScoped<ISvGenericRepository<Employee>, SvGenericRepository<E
 builder.Services.AddScoped<ISvEmployee, SvEmployee>();
 builder.Services.AddScoped<ISvEmployeeRole, SvEmployeeRole>();
 builder.Services.AddScoped<ISvGenericRepository<EmployeeRole>, SvGenericRepository<EmployeeRole, AdministrativeContext>>();
-
+builder.Services.AddScoped<ISvGenericRepository<TypeOfSalary>, SvGenericRepository<TypeOfSalary, AdministrativeContext>>();
+builder.Services.AddScoped<ISvGenericRepository<Profession>, SvGenericRepository<Profession, AdministrativeContext>>();
 
 // Registros genéricos para entidades en MyInformativeContext
 builder.Services.AddScoped<ISvGenericRepository<AdministrativeRequirements>, SvGenericRepository<AdministrativeRequirements, MyInformativeContext>>();
