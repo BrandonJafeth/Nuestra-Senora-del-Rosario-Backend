@@ -30,7 +30,7 @@ namespace Services.Administrative.PasswordResetServices
             var employee = await _employeeRepository.Query().FirstOrDefaultAsync(e => e.Email == email);
             if (employee == null)
             {
-                return false; // Si no existe el empleado
+                return false; 
             }
 
             // Generar un token de recuperación de contraseña
