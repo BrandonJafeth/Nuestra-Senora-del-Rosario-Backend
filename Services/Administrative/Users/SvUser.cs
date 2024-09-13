@@ -98,18 +98,36 @@ namespace Services.Administrative.Users
         }
 
         // Obtener usuario por ID
-        public async Task<UserGetDTO> GetUserByIdAsync(int id)
-        {
-            var user = await _userRepository.GetByIdAsync(id);
-            return user == null ? null : _mapper.Map<UserGetDTO>(user);
-        }
-
-        // Obtener todos los usuarios
         public async Task<IEnumerable<UserGetDTO>> GetAllUsersAsync()
         {
-            var users = await _userRepository.GetAllAsync();
+            // Incluir las relaciones necesarias para Employee y EmployeeRole
+            var users = await _userRepository.Query()
+                .Include(u => u.Employee) // Incluir la relación con Employee
+                .ThenInclude(e => e.EmployeeRoles) // Incluir la relación con EmployeeRoles
+                .ThenInclude(er => er.Rol) // Incluir la relación con Rol
+                .ToListAsync();
+
+            // Mapear a DTO usando AutoMapper
             return _mapper.Map<IEnumerable<UserGetDTO>>(users);
         }
+
+        public async Task<UserGetDTO> GetUserByIdAsync(int id)
+        {
+            // Incluir las relaciones necesarias para Employee y EmployeeRole
+            var user = await _userRepository.Query()
+                .Include(u => u.Employee) // Incluir la relación con Employee
+                .ThenInclude(e => e.EmployeeRoles) // Incluir la relación con EmployeeRoles
+                .ThenInclude(er => er.Rol) // Incluir la relación con Rol
+                .FirstOrDefaultAsync(u => u.Id_User == id);
+
+            // Si el usuario no existe, retorna null
+            if (user == null)
+                return null;
+
+            // Mapear a DTO usando AutoMapper
+            return _mapper.Map<UserGetDTO>(user);
+        }
+
 
         // Método para hashear contraseñas
         private string HashPassword(string password) => BCrypt.Net.BCrypt.HashPassword(password);
