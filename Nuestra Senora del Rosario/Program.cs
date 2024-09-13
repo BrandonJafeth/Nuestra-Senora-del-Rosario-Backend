@@ -1,3 +1,4 @@
+using Entities.Administration;
 using Entities.Informative;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,7 @@ using Services.Administrative.EmailServices;
 using Services.Administrative.EmployeeRoleServices;
 using Services.Administrative.Employees;
 using Services.Administrative.FormVoluntarieService;
+using Services.Administrative.PasswordResetServices;
 using Services.Administrative.Users;
 using Services.GenericService;
 using Services.Informative.ApplicationFormService;
@@ -64,6 +66,13 @@ builder.Services.AddScoped<ISvGenericRepository<Employee>, SvGenericRepository<E
 builder.Services.AddScoped<ISvEmployee, SvEmployee>();
 builder.Services.AddScoped<ISvEmployeeRole, SvEmployeeRole>();
 builder.Services.AddScoped<ISvGenericRepository<EmployeeRole>, SvGenericRepository<EmployeeRole, AdministrativeContext>>();
+builder.Services.AddScoped<ISvGenericRepository<TypeOfSalary>, SvGenericRepository<TypeOfSalary, AdministrativeContext>>();
+builder.Services.AddScoped<ISvGenericRepository<Profession>, SvGenericRepository<Profession, AdministrativeContext>>();
+
+builder.Services.AddScoped<ISvPasswordResetService, SvPasswordResetService>();
+
+
+
 
 
 // Registros genéricos para entidades en MyInformativeContext
