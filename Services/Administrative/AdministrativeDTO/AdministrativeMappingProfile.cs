@@ -42,7 +42,7 @@ public class AdministrativeMappingProfile : Profile
         CreateMap<Rol, RolGetDTO>();
 
         CreateMap<PasswordResetRequestDTO, Employee>();
-        CreateMap<Employee, EmployeeGetDTO>();
+       
 
     }
 }
