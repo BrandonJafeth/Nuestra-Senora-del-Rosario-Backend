@@ -39,7 +39,9 @@ public class AdministrativeMappingProfile : Profile
 
         // Mapping para Rol
         CreateMap<RolCreateDTO, Rol>();
-        CreateMap<Rol, RolGetDTO>();
+        CreateMap<Rol, RolGetDTO>()
+            .ForMember(dest => dest.IdRole, opt => opt.MapFrom(src => src.Id_Role))
+            .ForMember(dest => dest.NameRole, opt => opt.MapFrom(src => src.Name_Role));
 
         CreateMap<PasswordResetRequestDTO, Employee>();
        
