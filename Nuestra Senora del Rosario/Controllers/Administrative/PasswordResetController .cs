@@ -12,9 +12,11 @@ namespace Nuestra_Senora_del_Rosario.Controllers.Administrative
     {
         private readonly ISvPasswordResetService _passwordResetService;
 
+
         public PasswordResetController(ISvPasswordResetService passwordResetService)
         {
             _passwordResetService = passwordResetService;
+            //_passwordResetService = passwordResetService;
         }
 
         [HttpPost("request")]
@@ -33,5 +35,38 @@ namespace Nuestra_Senora_del_Rosario.Controllers.Administrative
 
             return Ok("Password reset link has been sent.");
         }
+
+        [HttpPost("update-password")]
+        public async Task<IActionResult> UpdatePassword([FromBody] PasswordResetDTO passwordUpdateDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Valida el token
+            var isValidToken = await _passwordResetService.ValidatePasswordResetTokenAsync(passwordUpdateDto.Token);
+            if (!isValidToken)
+            {
+                return BadRequest("Token inválido o expirado.");
+            }
+
+            // Lógica para verificar que la nueva contraseña y su confirmación sean iguales
+            if (passwordUpdateDto.NewPassword != passwordUpdateDto.ConfirmPassword)
+            {
+                return BadRequest("Las contraseñas no coinciden.");
+            }
+
+            // Restablecer la contraseña en el servicio
+            var result = await _passwordResetService.ResetPasswordAsync(passwordUpdateDto.Token, passwordUpdateDto.NewPassword, passwordUpdateDto.ConfirmPassword);
+
+            if (!result)
+            {
+                return BadRequest("No se pudo actualizar la contraseña.");
+            }
+
+            return Ok("Contraseña actualizada correctamente.");
+        }
+
     }
 }
