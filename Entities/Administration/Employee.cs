@@ -17,4 +17,5 @@
 
     // Relación M:N con Rol
     public ICollection<EmployeeRole> EmployeeRoles { get; set; }
+ 
 }
