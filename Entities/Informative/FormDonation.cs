@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entities.Informative
 {
@@ -13,9 +9,7 @@ namespace Entities.Informative
         public string Dn_Lastname1 { get; set; }
         public string Dn_Lastname2 { get; set; }
         public int Dn_Cedula { get; set; }
-
         public string Dn_Email { get; set; }
-
         public string Dn_Phone { get; set; }
         public DateTime Delivery_date { get; set; }
 
@@ -26,5 +20,9 @@ namespace Entities.Informative
         // Relación con MethodDonation
         public int Id_MethodDonation { get; set; }
         public MethodDonation MethodDonation { get; set; }
+
+        // Foreign Key - Status (Nuevo campo para el estado)
+        public int Id_Status { get; set; }
+        public Status Status { get; set; }  // Relación con Status
     }
 }

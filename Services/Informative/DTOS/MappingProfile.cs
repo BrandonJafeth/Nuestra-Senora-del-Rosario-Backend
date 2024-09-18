@@ -34,7 +34,8 @@ public class MappingProfile : Profile
 
         // Mapeo para FormVoluntarie (GET)
         CreateMap<FormVoluntarie, FormVoluntarieDto>()
-            .ForMember(dest => dest.Name_voluntarieType, opt => opt.MapFrom(src => src.VoluntarieType.Name_VoluntarieType)); // Solo el nombre del tipo de voluntariado
+       .ForMember(dest => dest.Name_voluntarieType, opt => opt.MapFrom(src => src.VoluntarieType.Name_VoluntarieType))
+       .ForMember(dest => dest.Status_Name, opt => opt.MapFrom(src => src.Status.Status_Name));  // Mapear el nombre del estado
 
         // Mapeo inverso de FormVoluntarieCreateDto a FormVoluntarie (POST)
         CreateMap<FormVoluntarieCreateDto, FormVoluntarie>()

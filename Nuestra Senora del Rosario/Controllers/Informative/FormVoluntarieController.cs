@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using Entities.Informative;
-using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Services.Informative.DTOS;
 using Services.Informative.DTOS.CreatesDto;
@@ -21,14 +19,15 @@ public class FormVoluntarieController : ControllerBase
         _mapper = mapper;
     }
 
+    // GET: api/FormVoluntarie
     [HttpGet]
     public async Task<IActionResult> GetFormVoluntaries()
     {
         var formVoluntaries = await _formVoluntarieService.GetAllFormVoluntariesWithTypeAsync();
-        var formVoluntarieDtos = _mapper.Map<IEnumerable<FormVoluntarieDto>>(formVoluntaries);
-        return Ok(formVoluntarieDtos);
+        return Ok(formVoluntaries);
     }
 
+    // GET: api/FormVoluntarie/{id}
     [HttpGet("{id}")]
     public async Task<IActionResult> GetFormVoluntarie(int id)
     {
@@ -38,38 +37,53 @@ public class FormVoluntarieController : ControllerBase
             return NotFound();
         }
 
-        var formVoluntarieDto = _mapper.Map<FormVoluntarieDto>(formVoluntarie);
-        return Ok(formVoluntarieDto);
+        return Ok(formVoluntarie);
     }
 
+    // POST: api/FormVoluntarie
     [HttpPost]
-    public async Task<IActionResult> AddFormVoluntarie(FormVoluntarieCreateDto formVoluntarieCreateDto)
+    public async Task<IActionResult> CreateFormVoluntarie([FromBody] FormVoluntarieCreateDto formVoluntarieCreateDto)
     {
-        var formVoluntarie = _mapper.Map<FormVoluntarie>(formVoluntarieCreateDto);
-        await _formVoluntarieService.AddAsync(formVoluntarie);
-        await _formVoluntarieService.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetFormVoluntarie), new { id = formVoluntarie.Id_FormVoluntarie }, formVoluntarie);
-    }
-
-
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchFormVoluntarie(int id, [FromBody] JsonPatchDocument<FormVoluntarie> patchDoc)
-    {
-        if (patchDoc == null)
+        if (!ModelState.IsValid)
         {
-            return BadRequest();
+            return BadRequest(ModelState);
         }
 
-        await _formVoluntarieService.PatchAsync(id, patchDoc);
-        await _formVoluntarieService.SaveChangesAsync();
-        return NoContent();
+        try
+        {
+            await _formVoluntarieService.CreateFormVoluntarieAsync(formVoluntarieCreateDto);
+            return Ok("Formulario de voluntariado creado con éxito.");
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
+    // PATCH: api/FormVoluntarie/{id}/status
+    [HttpPatch("{id}/status")]
+    public async Task<IActionResult> UpdateFormVoluntarieStatus(int id, [FromBody] int statusId)
+    {
+        try
+        {
+            await _formVoluntarieService.UpdateFormVoluntarieStatusAsync(id, statusId);
+            return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    // DELETE: api/FormVoluntarie/{id}
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteFormVoluntarie(int id)
     {
-        await _formVoluntarieService.DeleteAsync(id);
-        await _formVoluntarieService.SaveChangesAsync();
+        await _formVoluntarieService.DeleteFormVoluntarieAsync(id);
         return NoContent();
     }
 }

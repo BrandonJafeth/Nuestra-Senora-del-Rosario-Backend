@@ -14,7 +14,10 @@ namespace Services.Informative.DTOS
         public DateTime Delivery_Date { get; set; }
         public DateTime End_Date { get; set; }
 
-        // En lugar de VoluntarieTypeDto, solo incluimos el nombre del tipo de voluntariado
+        // Nombre del tipo de voluntariado
         public string Name_voluntarieType { get; set; }
+
+        // Nuevo campo para el estado
+        public string Status_Name { get; set; }  // Nombre del estado, como "Pendiente", "Aprobado", etc.
     }
 }
