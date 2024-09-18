@@ -8,4 +8,6 @@ public class User
     
     public string Password { get; set; }
     public bool Is_Active { get; set; } = true;
+
+    public DateTime? PasswordExpiration { get; set; } // Fecha de caducidad de la contraseña
 }

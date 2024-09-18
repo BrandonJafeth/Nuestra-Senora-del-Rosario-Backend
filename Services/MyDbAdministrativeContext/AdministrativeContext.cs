@@ -1,4 +1,5 @@
-﻿using Entities.Informative;
+﻿using Entities.Administration;
+using Entities.Informative;
 using Microsoft.EntityFrameworkCore;
 
 namespace Services.MyDbContext
@@ -22,6 +23,8 @@ namespace Services.MyDbContext
         public DbSet<Employee> Employees { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<EmployeeRole> EmployeeRoles { get; set; }
+
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -248,7 +251,17 @@ namespace Services.MyDbContext
                 .HasOne(af => af.ApplicationStatus)  // Relación con ApplicationStatus
                 .WithMany()  // Un estado puede estar asignado a muchas solicitudes
                 .HasForeignKey(af => af.Id_Status)
+
+
+
                 .OnDelete(DeleteBehavior.Restrict);  // No eliminar el estado si está asignado a solicitudes
+
+
+
+
+
+            // Configuración adicional (si la necesitas)
+            modelBuilder.Entity<PasswordResetToken>().HasKey(p => p.Id);
         }
     }
 }

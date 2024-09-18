@@ -33,7 +33,7 @@ namespace Services.Administrative.EmailServices
                 From = new MailAddress(_configuration["Smtp:From"]),
                 Subject = subject,
                 Body = body,
-                IsBodyHtml = true,  // Permitir HTML en el cuerpo del mensaje
+                IsBodyHtml = true, 
             };
 
             mailMessage.To.Add(to);
