@@ -17,17 +17,17 @@ public class MappingProfile : Profile
         CreateMap<DonationType, DonationTypeDto>()
             .ForMember(dest => dest.MethodDonations, opt => opt.MapFrom(src => src.MethodDonations));
 
-        // Mapeo para MethodDonation (sin la referencia al DonationType)
+        // Mapeo de MethodDonation a MethodDonationDto
         CreateMap<MethodDonation, MethodDonationDto>();
 
-        // Map de FormDonation a FormDonationDto (GET)
+        // Mapeo para FormDonation a FormDonationDto (GET)
         CreateMap<FormDonation, FormDonationDto>()
             .ForMember(dest => dest.DonationType, opt => opt.MapFrom(src => src.DonationType.Name_DonationType))
-            .ForMember(dest => dest.MethodDonation, opt => opt.MapFrom(src => src.MethodDonation.Name_MethodDonation));
+            .ForMember(dest => dest.MethodDonation, opt => opt.MapFrom(src => src.MethodDonation.Name_MethodDonation))
+            .ForMember(dest => dest.Status_Name, opt => opt.MapFrom(src => src.Status.Status_Name));  // Nombre del estado
 
-        // Map de FormDonationCreateDto a FormDonation (POST)
+        // Mapeo de FormDonationCreateDto a FormDonation (POST)
         CreateMap<FormDonationCreateDto, FormDonation>();
-
 
         /// Mapeo para VoluntarieType con su relación a FormVoluntaries
         CreateMap<VoluntarieType, VoluntarieTypeDto>().ReverseMap();
