@@ -27,7 +27,7 @@ namespace Services.Administrative.Users
         private readonly ISvGenericRepository<EmployeeRole> _employeeRoleRepository;
         private readonly ISvEmailService _emailService;
         private readonly IConfiguration _configuration;
-        private readonly IMemoryCache _cache;  // Inyección de IMemoryCache
+        private readonly IMemoryCache _cache;
 
         public SvUser(
             IMapper mapper,
@@ -36,7 +36,7 @@ namespace Services.Administrative.Users
             ISvGenericRepository<EmployeeRole> employeeRoleRepository,
             ISvEmailService emailService,
             IConfiguration configuration,
-            IMemoryCache cache)  // Inyectamos IMemoryCache
+            IMemoryCache cache)
         {
             _mapper = mapper;
             _userRepository = userRepository;
@@ -44,37 +44,102 @@ namespace Services.Administrative.Users
             _employeeRoleRepository = employeeRoleRepository;
             _emailService = emailService;
             _configuration = configuration;
-            _cache = cache;  // Asignamos IMemoryCache
+            _cache = cache;
         }
 
-
-        // Crear usuario desde un empleado con rol asignado
         public async Task CreateUserFromEmployeeAsync(int dniEmployee, int idRole)
         {
             var employee = await _employeeRepository.GetByIdAsync(dniEmployee);
             if (employee == null) throw new KeyNotFoundException($"Employee with DNI {dniEmployee} not found.");
 
+            // Asignar rol al empleado
             var employeeRole = new EmployeeRole { Dni_Employee = dniEmployee, Id_Role = idRole };
             await _employeeRoleRepository.AddAsync(employeeRole);
             await _employeeRoleRepository.SaveChangesAsync();
 
+            // Generar contraseña temporal
             var randomPassword = PasswordGenerator.GenerateRandomPassword();
             var user = new User
             {
                 Dni_Employee = dniEmployee,
                 Password = HashPassword(randomPassword),
-                Is_Active = true
+                Is_Active = true,
+                PasswordExpiration = DateTime.Now.AddDays(10)  // Contraseña válida por 10 días
             };
 
             await _userRepository.AddAsync(user);
             await _userRepository.SaveChangesAsync();
 
+            // Enviar correo con el link para cambiar la contraseña
             var changePasswordLink = GenerateChangePasswordLink(dniEmployee);
-            await _emailService.SendEmailAsync(employee.Email, "New Account",
-                $"Your temporary password is: {randomPassword}. Click [here]({changePasswordLink}) to change your password.");
+
+            // Crear el cuerpo del correo con HTML y estilos
+            var body = $@"
+<html>
+<head>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            font-size: 16px;
+            color: #333;
+        }}
+        .container {{
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }}
+        h1 {{
+            color: #333;
+        }}
+        p {{
+            font-size: 16px;
+            line-height: 1.5;
+        }}
+        a {{
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }}
+        .footer {{
+            margin-top: 20px;
+            font-size: 12px;
+            color: #999;
+        }}
+    </style>
+    <title>Tu Cuenta Ha Sido Creada</title>
+</head>
+<body>
+    <div class='container'>
+        <h1>¡Bienvenido!</h1>
+        <p>
+            Tu cuenta ha sido creada exitosamente. Tu contraseña temporal es: <strong>{randomPassword}</strong>.
+        </p>
+        <p>
+            Por favor, haz clic en el siguiente enlace para cambiar tu contraseña:
+        </p>
+        <p>
+            <a href='{changePasswordLink}' target='_blank'>Cambiar Contraseña</a>
+        </p>
+        <p>Este enlace es válido por 60 minutos. Después de este tiempo, necesitarás solicitar uno nuevo.</p>
+        <div class='footer'>
+            <p>Si no solicitaste la creación de esta cuenta, puedes ignorar este correo.</p>
+        </div>
+    </div>
+</body>
+</html>";
+
+            // Enviar el correo electrónico
+            await _emailService.SendEmailAsync(employee.Email, "Tu Cuenta Ha Sido Creada", body);
         }
 
-        // Generar el link para cambiar contraseña
+
+        // Generar link para cambio de contraseña
         private string GenerateChangePasswordLink(int dniEmployee)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -97,85 +162,54 @@ namespace Services.Administrative.Users
             return $"{_configuration["App:FrontendUrl"]}/change-password?dni={dniEmployee}&token={tokenString}";
         }
 
-        // Obtener usuario por ID
-        public async Task<IEnumerable<UserGetDTO>> GetAllUsersAsync()
-        {
-            // Incluir las relaciones necesarias para Employee y EmployeeRole
-            var users = await _userRepository.Query()
-                .Include(u => u.Employee) // Incluir la relación con Employee
-                .ThenInclude(e => e.EmployeeRoles) // Incluir la relación con EmployeeRoles
-                .ThenInclude(er => er.Rol) // Incluir la relación con Rol
-                .ToListAsync();
-
-            // Mapear a DTO usando AutoMapper
-            return _mapper.Map<IEnumerable<UserGetDTO>>(users);
-        }
-
-        public async Task<UserGetDTO> GetUserByIdAsync(int id)
-        {
-            // Incluir las relaciones necesarias para Employee y EmployeeRole
-            var user = await _userRepository.Query()
-                .Include(u => u.Employee) // Incluir la relación con Employee
-                .ThenInclude(e => e.EmployeeRoles) // Incluir la relación con EmployeeRoles
-                .ThenInclude(er => er.Rol) // Incluir la relación con Rol
-                .FirstOrDefaultAsync(u => u.Id_User == id);
-
-            // Si el usuario no existe, retorna null
-            if (user == null)
-                return null;
-
-            // Mapear a DTO usando AutoMapper
-            return _mapper.Map<UserGetDTO>(user);
-        }
-
-
-        // Método para hashear contraseñas
-        private string HashPassword(string password) => BCrypt.Net.BCrypt.HashPassword(password);
-
+        // Verificar expiración de la contraseña temporal en el login
         public async Task<string> LoginAsync(UserLoginDTO loginDTO)
         {
-            // Iniciar el cronómetro
             var stopwatch = Stopwatch.StartNew();
 
-            // Obtener al usuario por DNI antes de cualquier operación
+            // Obtener al usuario por DNI
             var user = await _userRepository.GetByDniAsync(loginDTO.DniEmployee);
             if (user == null)
             {
                 throw new UnauthorizedAccessException("Credenciales inválidas.");
             }
 
-            // Verificar la contraseña antes de hacer operaciones costosas
+            // Verificar si la contraseña temporal ha expirado
+            if (user.PasswordExpiration.HasValue && DateTime.Now > user.PasswordExpiration.Value)
+            {
+                throw new UnauthorizedAccessException("Tu contraseña temporal ha expirado. Debes cambiarla para continuar.");
+            }
+
+            // Verificar la contraseña
             if (!BCrypt.Net.BCrypt.Verify(loginDTO.Password, user.Password))
             {
                 throw new UnauthorizedAccessException("Credenciales inválidas.");
             }
 
-            // Intentamos obtener los roles desde la caché
+            // Caching de roles y generación de JWT
             var cacheKey = $"UserRoles_{loginDTO.DniEmployee}";
             if (!_cache.TryGetValue(cacheKey, out List<string> employeeRoles))
             {
-                employeeRoles = await _employeeRoleRepository
-                    .Query()
+                employeeRoles = await _employeeRoleRepository.Query()
                     .Include(er => er.Rol)
                     .Where(er => er.Dni_Employee == loginDTO.DniEmployee && er.Rol != null)
                     .Select(er => er.Rol.Name_Role)
                     .ToListAsync();
 
-                var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(30))
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(10));
-
-                _cache.Set(cacheKey, employeeRoles, cacheEntryOptions);
+                _cache.Set(cacheKey, employeeRoles, new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30),
+                    SlidingExpiration = TimeSpan.FromMinutes(10)
+                });
             }
 
             // Crear los claims del token JWT
             var claims = new List<Claim>
-    {
-        new Claim(JwtRegisteredClaimNames.Sub, loginDTO.DniEmployee.ToString()),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        new Claim("id", loginDTO.DniEmployee.ToString())
-    };
-
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, loginDTO.DniEmployee.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim("id", loginDTO.DniEmployee.ToString())
+            };
             employeeRoles.ForEach(role => claims.Add(new Claim(ClaimTypes.Role, role)));
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -189,13 +223,36 @@ namespace Services.Administrative.Users
                 signingCredentials: creds
             );
 
-            // Paramos el cronómetro
             stopwatch.Stop();
-
-            // Logueamos el tiempo total en milisegundos
             Console.WriteLine($"Login completed in {stopwatch.ElapsedMilliseconds} ms");
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        // Obtener usuarios con información adicional
+        public async Task<IEnumerable<UserGetDTO>> GetAllUsersAsync()
+        {
+            var users = await _userRepository.Query()
+                .Include(u => u.Employee)
+                .ThenInclude(e => e.EmployeeRoles)
+                .ThenInclude(er => er.Rol)
+                .ToListAsync();
+
+            return _mapper.Map<IEnumerable<UserGetDTO>>(users);
+        }
+
+        public async Task<UserGetDTO> GetUserByIdAsync(int id)
+        {
+            var user = await _userRepository.Query()
+                .Include(u => u.Employee)
+                .ThenInclude(e => e.EmployeeRoles)
+                .ThenInclude(er => er.Rol)
+                .FirstOrDefaultAsync(u => u.Id_User == id);
+
+            return user == null ? null : _mapper.Map<UserGetDTO>(user);
+        }
+
+        // Método para hashear contraseñas
+        private string HashPassword(string password) => BCrypt.Net.BCrypt.HashPassword(password);
     }
 }
