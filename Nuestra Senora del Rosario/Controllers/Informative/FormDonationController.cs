@@ -1,12 +1,10 @@
-﻿using AutoMapper;
-using Entities.Informative;
-using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Services.Informative.DTOS;
 using Services.Informative.DTOS.CreatesDto;
 using Services.Informative.FormDonationService;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoMapper;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -26,54 +24,58 @@ public class FormDonationController : ControllerBase
     public async Task<IActionResult> GetFormDonations()
     {
         var formDonations = await _formDonationService.GetFormDonationsWithDetailsAsync();
-        var formDonationDtos = _mapper.Map<IEnumerable<FormDonationDto>>(formDonations);
-        return Ok(formDonationDtos);
-    }
-
-    // POST: api/FormDonation
-    [HttpPost]
-    public async Task<IActionResult> AddFormDonation(FormDonationCreateDto formDonationCreateDto)
-    {
-        var formDonation = _mapper.Map<FormDonation>(formDonationCreateDto);
-        await _formDonationService.AddAsync(formDonation);
-        await _formDonationService.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetFormDonation), new { id = formDonation.Id_FormDonation }, formDonation);
+        return Ok(formDonations);
     }
 
     // GET: api/FormDonation/{id}
     [HttpGet("{id}")]
     public async Task<IActionResult> GetFormDonation(int id)
     {
-        var formDonation = await _formDonationService.GetByIdAsync(id);
+        var formDonation = await _formDonationService.GetFormDonationWithDetailsByIdAsync(id);
         if (formDonation == null)
         {
             return NotFound();
         }
 
-        var formDonationDto = _mapper.Map<FormDonationDto>(formDonation);
-        return Ok(formDonationDto);
+        return Ok(formDonation);
     }
 
-    // PATCH: api/FormDonation/{id}
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchFormDonation(int id, [FromBody] JsonPatchDocument<FormDonation> patchDoc)
+    // POST: api/FormDonation
+    [HttpPost]
+    public async Task<IActionResult> CreateFormDonation([FromBody] FormDonationCreateDto formDonationCreateDto)
     {
-        if (patchDoc == null)
+        if (!ModelState.IsValid)
         {
-            return BadRequest();
+            return BadRequest(ModelState);
         }
 
-        await _formDonationService.PatchAsync(id, patchDoc);
-        await _formDonationService.SaveChangesAsync();
-        return NoContent();
+        try
+        {
+            await _formDonationService.CreateFormDonationAsync(formDonationCreateDto);
+            return StatusCode(201); // Devuelve código 201 Created
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message); // Si ocurre error de validación, se devuelve un BadRequest
+        }
     }
 
-    // DELETE: api/FormDonation/{id}
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteFormDonation(int id)
+    // PATCH: api/FormDonation/{id}/status
+    [HttpPatch("{id}/status")]
+    public async Task<IActionResult> UpdateFormDonationStatus(int id, [FromBody] int statusId)
     {
-        await _formDonationService.DeleteAsync(id);
-        await _formDonationService.SaveChangesAsync();
-        return NoContent();
+        try
+        {
+            await _formDonationService.UpdateFormDonationStatusAsync(id, statusId);
+            return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }

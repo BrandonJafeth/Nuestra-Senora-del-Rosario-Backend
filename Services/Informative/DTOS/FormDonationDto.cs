@@ -12,8 +12,9 @@
         public string Dn_Phone { get; set; }
         public DateTime Delivery_date { get; set; }
 
-        // Solo nombres de DonationType y MethodDonation
+        // Solo nombres de DonationType, MethodDonation, y el Estado
         public string DonationType { get; set; }
         public string MethodDonation { get; set; }
+        public string Status_Name { get; set; }  // Nombre del estado, como "Pendiente", "Aprobado", etc.
     }
 }

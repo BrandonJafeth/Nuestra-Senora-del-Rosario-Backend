@@ -185,6 +185,12 @@ namespace Services.MyDbContext
                 .Property(d => d.Id_DonationType)
                 .ValueGeneratedOnAdd();  // Auto-incremental
 
+            modelBuilder.Entity<FormDonation>()
+            .HasOne(f => f.Status)  // Relación con Status
+              .WithMany()  // Sin necesidad de navegación inversa
+              .HasForeignKey(f => f.Id_Status)  // La clave foránea es Id_Status
+              .OnDelete(DeleteBehavior.Restrict);  // Evitar eliminación en cascada
+
             // Configuración para MethodDonation
             modelBuilder.Entity<MethodDonation>()
                 .HasKey(m => m.Id_MethodDonation);  // Llave primaria
@@ -195,9 +201,9 @@ namespace Services.MyDbContext
             // Relación entre MethodDonation y DonationType
             modelBuilder.Entity<MethodDonation>()
                 .HasOne(m => m.DonationType)  // Relación con DonationType
-                .WithMany(d => d.MethodDonations)  // Relación uno a muchos (requiere propiedad de colección en DonationType)
+                .WithMany(d => d.MethodDonations)  // Relación uno a muchos
                 .HasForeignKey(m => m.DonationTypeId)
-                .OnDelete(DeleteBehavior.Cascade);  // Borrar en cascada si el DonationType es eliminado
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Configuración para FormDonation
             modelBuilder.Entity<FormDonation>()
@@ -209,16 +215,32 @@ namespace Services.MyDbContext
             // Relación entre FormDonation y DonationType
             modelBuilder.Entity<FormDonation>()
                 .HasOne(f => f.DonationType)  // Relación con DonationType
-                .WithMany(d => d.FormDonations)  // Relación uno a muchos (requiere propiedad de colección en DonationType)
+                .WithMany(d => d.FormDonations)  // Relación uno a muchos
                 .HasForeignKey(f => f.Id_DonationType)
-                .OnDelete(DeleteBehavior.Cascade);  // Borrar en cascada si el DonationType es eliminado
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Relación entre FormDonation y MethodDonation
             modelBuilder.Entity<FormDonation>()
                 .HasOne(f => f.MethodDonation)  // Relación con MethodDonation
-                .WithMany(m => m.FormDonations)  // Relación uno a muchos (requiere propiedad de colección en MethodDonation)
+                .WithMany(m => m.FormDonations)  // Relación uno a muchos
                 .HasForeignKey(f => f.Id_MethodDonation)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // -- Configuración adicional para Voluntariados --
+
+            // Relación entre FormVoluntarie y VoluntarieType
+            modelBuilder.Entity<FormVoluntarie>()
+                .HasOne(f => f.VoluntarieType)
+                .WithMany(v => v.FormVoluntaries)  // Relación inversa
+                .HasForeignKey(f => f.Id_VoluntarieType)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Relación entre FormVoluntarie y Status (nuevo)
+            modelBuilder.Entity<FormVoluntarie>()
+                .HasOne(f => f.Status)
+                .WithMany()  // Sin relación inversa necesaria
+                .HasForeignKey(f => f.Id_Status)
+                .OnDelete(DeleteBehavior.Restrict);  // No eliminar estado al eliminar el FormVoluntarie
 
 
             // Configuración para VoluntarieType

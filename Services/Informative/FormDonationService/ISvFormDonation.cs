@@ -1,16 +1,24 @@
 ﻿using Entities.Informative;
 using Services.GenericService;
-using System;
+using Services.Informative.DTOS;
+using Services.Informative.DTOS.CreatesDto;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Services.Informative.FormDonationService
 {
     public interface ISvFormDonation : ISvGenericRepository<FormDonation>
     {
-        Task<IEnumerable<FormDonation>> GetFormDonationsWithDetailsAsync();
+        // Obtener todas las donaciones con sus detalles (DonationType, MethodDonation, Status)
+        Task<IEnumerable<FormDonationDto>> GetFormDonationsWithDetailsAsync();
+
+        // Obtener una donación por ID con sus detalles
+        Task<FormDonationDto> GetFormDonationWithDetailsByIdAsync(int id);
+
+        // Crear una nueva donación con estado por defecto
+        Task CreateFormDonationAsync(FormDonationCreateDto formDonationCreateDto);
+
+        // Actualizar el estado de una donación
+        Task UpdateFormDonationStatusAsync(int id, int statusId);
     }
 }
-
