@@ -48,6 +48,8 @@ namespace Services.MyDbContext
 
         public DbSet<ApplicationStatus> ApplicationStatuses { get; set; }
 
+        public DbSet<Status> Statuses { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
@@ -239,6 +241,22 @@ namespace Services.MyDbContext
                 .WithMany(v => v.FormVoluntaries)  // Relación inversa
                 .HasForeignKey(f => f.Id_VoluntarieType)
                 .OnDelete(DeleteBehavior.Cascade);  // Borrar en cascada si se elimina VoluntarieType
+
+            // Relación entre FormVoluntarie y Status (nuevo)
+            modelBuilder.Entity<FormVoluntarie>()
+        .HasOne(f => f.Status)
+        .WithMany()  // No necesitas navegación inversa desde Status
+        .HasForeignKey(f => f.Id_Status)  // Usar el nombre correcto de la columna en la base de datos
+        .OnDelete(DeleteBehavior.Restrict);
+
+            // Configuración para Status
+            modelBuilder.Entity<Status>()
+                .HasKey(s => s.Id_Status);
+            modelBuilder.Entity<Status>()
+                .Property(s => s.Id_Status)
+                .ValueGeneratedOnAdd();
+
+
 
             // Configuración para Applicant
             modelBuilder.Entity<Applicant>()

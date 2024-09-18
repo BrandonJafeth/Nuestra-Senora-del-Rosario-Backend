@@ -59,6 +59,7 @@ builder.Services.AddScoped<ISvGenericRepository<MethodDonation>, SvGenericReposi
 builder.Services.AddScoped<ISvGenericRepository<DonationType>, SvGenericRepository<DonationType, MyInformativeContext>>();
 builder.Services.AddScoped<ISvGenericRepository<FormDonation>, SvGenericRepository<FormDonation, MyInformativeContext>>();
 builder.Services.AddScoped<ISvGenericRepository<ApplicationForm>, SvGenericRepository<ApplicationForm, MyInformativeContext>>();
+builder.Services.AddScoped<ISvGenericRepository<Status>, SvGenericRepository<Status, MyInformativeContext>>();
 
 // Registros genéricos para entidades en AdministrativeContext
 builder.Services.AddScoped<ISvGenericRepository<User>, SvGenericRepository<User, AdministrativeContext>>();
