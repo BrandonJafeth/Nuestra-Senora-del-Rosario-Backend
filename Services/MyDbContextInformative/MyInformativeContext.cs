@@ -178,6 +178,10 @@ namespace Services.MyDbContext
             modelBuilder.Entity<ImportantInformation>().Property(ii => ii.Id_ImportantInformation).ValueGeneratedOnAdd();
 
 
+
+
+
+
             // Configuración para DonationType
             modelBuilder.Entity<DonationType>()
                 .HasKey(d => d.Id_DonationType);  // Llave primaria
