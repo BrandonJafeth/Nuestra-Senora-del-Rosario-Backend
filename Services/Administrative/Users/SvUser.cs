@@ -159,7 +159,7 @@ namespace Services.Administrative.Users
             );
 
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-            return $"{_configuration["App:FrontendUrl"]}/change-password?dni={dniEmployee}&token={tokenString}";
+            return $"{_configuration["App:FrontendUrl"]}/cambio-contraseña?dni={dniEmployee}&token={tokenString}";
         }
 
         // Verificar expiración de la contraseña temporal en el login
