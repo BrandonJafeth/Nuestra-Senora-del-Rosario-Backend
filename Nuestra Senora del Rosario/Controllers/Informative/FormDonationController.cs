@@ -78,4 +78,15 @@ public class FormDonationController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+
+
+
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteDonation(int id)
+    {
+        await _formDonationService.DeleteAsync(id);
+        await _formDonationService.SaveChangesAsync();
+        return NoContent();
+    }
 }
