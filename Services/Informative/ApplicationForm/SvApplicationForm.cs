@@ -122,5 +122,28 @@ namespace Services.Informative.ApplicationFormService
             _context.ApplicationForms.Remove(form);
             await _context.SaveChangesAsync();
         }
+
+
+        // Método para actualizar solo el estado de un formulario
+        public async Task UpdateFormStatusAsync(int id, int statusId)
+        {
+            // Buscar el formulario de aplicación por ID
+            var applicationForm = await _context.ApplicationForms.FindAsync(id);
+            if (applicationForm == null)
+            {
+                throw new KeyNotFoundException($"Formulario de aplicación con ID {id} no encontrado.");
+            }
+
+            // Verificar si el estado proporcionado existe en la tabla ApplicationStatus
+            var statusExists = await _context.ApplicationStatuses.AnyAsync(s => s.Id_Status == statusId);
+            if (!statusExists)
+            {
+                throw new ArgumentException("El estado proporcionado no existe.");
+            }
+
+            // Actualizar el estado del formulario
+            applicationForm.Id_Status = statusId;
+            await _context.SaveChangesAsync();
+        }
     }
 }

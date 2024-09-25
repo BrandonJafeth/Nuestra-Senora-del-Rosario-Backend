@@ -12,5 +12,7 @@ namespace Services.Informative.ApplicationFormService
         Task<ApplicationFormDto> GetFormByIdAsync(int id);        // Devuelve un DTO específico por ID
         Task AddFormAsync(ApplicationFormCreateDto formCreateDto); // Agregar una nueva solicitud usando el DTO
         Task DeleteAsync(int id);                                 // Eliminar una solicitud
+
+        Task UpdateFormStatusAsync(int id, int statusId);
     }
 }
