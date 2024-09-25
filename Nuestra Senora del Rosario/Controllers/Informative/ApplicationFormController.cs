@@ -57,8 +57,6 @@ public class ApplicationFormController : ControllerBase
         return CreatedAtAction(nameof(GetApplicationForm), new { id = applicationFormCreateDto.Id_ApplicationForm }, applicationFormCreateDto);
     }
 
-
-
     // DELETE: api/ApplicationForm/{id}
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteApplicationForm(int id)
@@ -71,5 +69,29 @@ public class ApplicationFormController : ControllerBase
 
         await _applicationFormService.DeleteAsync(id);
         return NoContent();
+    }
+
+    // PATCH: api/ApplicationForm/{id}/status
+    [HttpPatch("{id}/status")]
+    public async Task<IActionResult> UpdateApplicationFormStatus(int id, [FromBody] int statusId)
+    {
+        if (statusId <= 0)
+        {
+            return BadRequest("El estado proporcionado no es válido.");
+        }
+
+        try
+        {
+            await _applicationFormService.UpdateFormStatusAsync(id, statusId);
+            return NoContent(); // Retorna 204 No Content si se actualizó correctamente
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message); // Retorna 404 Not Found si el formulario no existe
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message); // Retorna 400 Bad Request si el estado no es válido
+        }
     }
 }
