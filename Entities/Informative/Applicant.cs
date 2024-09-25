@@ -21,6 +21,10 @@ public class Applicant
     [Required, MaxLength(50)]
     public string Cedula_AP { get; set; }       // Cédula del solicitante
 
+
+    [Required, MaxLength(250)]                  // Agregando la propiedad Location
+    public string Location { get; set; }        // Localización del solicitante
+
     // Relación con el Guardian
     [ForeignKey("Guardian")]
     public int Id_Guardian { get; set; }        // Foreign key al guardián
