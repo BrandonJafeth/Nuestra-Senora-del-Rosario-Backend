@@ -37,12 +37,14 @@ namespace Services.Informative.ApplicationFormService
                 .AsNoTracking()
                 .Include(af => af.Applicant)
                 .Include(af => af.Guardian)
+                .Include(af => af.ApplicationStatus)  // Incluir ApplicationStatus
                 .FirstOrDefaultAsync(af => af.Id_ApplicationForm == id);
 
             if (applicationForm == null) return null;
 
             return _mapper.Map<ApplicationFormDto>(applicationForm);
         }
+
 
         public async Task AddFormAsync(ApplicationFormCreateDto formCreateDto)
         {
