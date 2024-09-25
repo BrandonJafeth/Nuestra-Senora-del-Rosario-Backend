@@ -17,6 +17,8 @@ namespace Services.Informative.DTOS
         public int Age_AP { get; set; }
         public string Cedula_AP { get; set; }
 
+        public string Location { get; set; }
+
         // Datos del Guardian
 
         public int Id_Guardian { get; set; }

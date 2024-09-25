@@ -13,6 +13,8 @@ namespace Services.Informative.DTOS.CreatesDto
         public int Age_AP { get; set; }
         public string Cedula_AP { get; set; }
 
+         public string Location { get; set; }
+
         // Datos del Guardian (nuevo o ya existente)
         public string Name_GD { get; set; }
         public string Lastname1_GD { get; set; }
