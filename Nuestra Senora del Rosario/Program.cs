@@ -94,7 +94,7 @@ builder.Services.AddScoped<ISvGenericRepository<VoluntarieType>, SvGenericReposi
 builder.Services.AddScoped<ISvGenericRepository<VolunteeringSection>, SvGenericRepository<VolunteeringSection, MyInformativeContext>>();
 builder.Services.AddScoped<ISvGenericRepository<VolunteerProfile>, SvGenericRepository<VolunteerProfile, MyInformativeContext>>();
 builder.Services.AddScoped<ISvGenericRepository<AboutUsSection>, SvGenericRepository<AboutUsSection, MyInformativeContext>>();
-
+builder.Services.AddScoped<ISvGenericRepository<ApplicationStatus>, SvGenericRepository<ApplicationStatus, MyInformativeContext>>();
 // Registros de servicios específicos
 builder.Services.AddScoped<ISvNavbarItemService, SvNavbarItem>();
 builder.Services.AddScoped<ISvGalleryItem, SvGalleryItem>();
