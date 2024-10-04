@@ -1,4 +1,6 @@
-﻿public class Employee
+﻿using Entities.Administration;
+
+public class Employee
 {
     public int Dni { get; set; }  // Usamos el DNI como clave primaria
     public string First_Name { get; set; }
@@ -17,5 +19,7 @@
 
     // Relación M:N con Rol
     public ICollection<EmployeeRole> EmployeeRoles { get; set; }
- 
+
+    public ICollection<PaymentReceipt> PaymentReceipts { get; set; }  // Relación 1:N con PaymentReceipt
+
 }

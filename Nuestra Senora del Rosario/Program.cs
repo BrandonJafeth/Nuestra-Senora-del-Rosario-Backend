@@ -8,6 +8,7 @@ using Services.Administrative.EmployeeRoleServices;
 using Services.Administrative.Employees;
 using Services.Administrative.FormVoluntarieService;
 using Services.Administrative.PasswordResetServices;
+using Services.Administrative.PaymentReceiptService;
 using Services.Administrative.Users;
 using Services.GenericService;
 using Services.Informative.ApplicationFormService;
@@ -72,6 +73,7 @@ builder.Services.AddScoped<ISvGenericRepository<Profession>, SvGenericRepository
 builder.Services.AddScoped<ISvGenericRepository<PasswordResetToken>, SvGenericRepository<PasswordResetToken, AdministrativeContext>>();
 builder.Services.AddScoped<ISvPasswordResetService, SvPasswordResetService>();
 builder.Services.AddScoped<ISvGenericRepository<Rol>, SvGenericRepository<Rol, AdministrativeContext>>();
+builder.Services.AddScoped<ISvPaymentReceipt, SvPaymentReceipt>();
 
 
 
