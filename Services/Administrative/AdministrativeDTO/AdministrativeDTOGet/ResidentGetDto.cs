@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services.Administrative.AdministrativeDTO.AdministrativeDTOGet
 {
@@ -19,7 +15,10 @@ namespace Services.Administrative.AdministrativeDTO.AdministrativeDTOGet
         public string RoomNumber { get; set; }  // Número de la habitación
         public string Status { get; set; }  // Activo o Inactivo
         public DateTime EntryDate { get; set; }
-        public string DependencyLevel { get; set; }  // Nivel de dependencia (nuevo campo)
+        public string DependencyLevel { get; set; }  // Nivel de dependencia
+
+        // Nueva propiedad Location
+        public string Location { get; set; }  // Localización del residente
 
         public int Edad
         {

@@ -18,5 +18,8 @@ namespace Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate
         public int Id_Room { get; set; }  // ID de la habitación
         public DateTime EntryDate { get; set; }
         public int Id_DependencyLevel { get; set; }  // ID del nivel de dependencia
+
+        // Nueva propiedad Location
+        public string Location { get; set; }  // Localización del residente
     }
 }
