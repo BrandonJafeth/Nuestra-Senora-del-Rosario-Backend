@@ -76,12 +76,48 @@ namespace Services.Administrative.PaymentReceiptService
         public async Task<IEnumerable<PaymentReceiptDto>> GetPaymentReceiptsByEmployeeAsync(int employeeDni)
         {
             var receipts = await _context.PaymentReceipts
-                .Include(r => r.Employee)
-                .Where(r => r.EmployeeDni == employeeDni)
+                .Include(r => r.Employee)                  // Incluye el empleado
+                .ThenInclude(e => e.Profession)            // Incluye la profesión del empleado
+                .Include(r => r.Employee.TypeOfSalary)     // Incluye el tipo de salario del empleado
+                .Include(r => r.DeductionsList)            // Incluye la lista de deducciones
+                .Where(r => r.EmployeeDni == employeeDni)  // Filtra por el DNI del empleado
                 .ToListAsync();
 
-            return _mapper.Map<IEnumerable<PaymentReceiptDto>>(receipts);
+            // Verificar los datos en la consola
+            foreach (var receipt in receipts)
+            {
+                Console.WriteLine($"Empleado: {receipt.Employee?.First_Name} {receipt.Employee?.Last_Name1}, Profesión: {receipt.Employee?.Profession?.Name_Profession}, Tipo de salario: {receipt.Employee?.TypeOfSalary?.Name_TypeOfSalary}");
+            }
+
+            var result = receipts.Select(r => new PaymentReceiptDto
+            {
+                Id = r.Id,
+                EmployeeDni = r.EmployeeDni,
+                EmployeeFullName = $"{r.Employee.First_Name} {r.Employee.Last_Name1} {r.Employee.Last_Name2}",
+                EmployeeEmail = r.Employee?.Email,
+                Profession = r.Employee?.Profession?.Name_Profession,
+                SalaryType = r.Employee?.TypeOfSalary?.Name_TypeOfSalary,
+                PaymentDate = r.PaymentDate,
+                Salary = r.Salary,
+                Overtime = r.Overtime,
+                GrossAmount = r.GrossAmount,
+                NetAmount = r.NetAmount,
+                TotalDeductions = r.TotalDeductions,
+                Notes = r.Notes,
+                CreatedAt = r.CreatedAt,
+                DeductionsList = r.DeductionsList.Select(d => new DeductionDto
+                {
+                    Id = d.Id,
+                    PaymentReceiptId = d.PaymentReceiptId,
+                    Type = d.Type,
+                    Amount = d.Amount
+                }).ToList()
+            }).ToList();
+
+            return result;
         }
+
+
 
         public async Task<PaymentReceiptDto> GetPaymentReceiptByIdAsync(int id)
         {

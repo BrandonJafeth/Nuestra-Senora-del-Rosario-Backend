@@ -49,13 +49,14 @@ public class AdministrativeMappingProfile : Profile
 
         // Mapear PaymentReceipt a PaymentReceiptDto
         CreateMap<PaymentReceipt, PaymentReceiptDto>()
-     .ForMember(dest => dest.EmployeeFullName, opt => opt.MapFrom(src => $"{src.Employee.First_Name} {src.Employee.Last_Name1} {src.Employee.Last_Name2}"))
-     .ForMember(dest => dest.EmployeeEmail, opt => opt.MapFrom(src => src.Employee.Email))  // Mapeo del correo del empleado
-     .ForMember(dest => dest.Profession, opt => opt.MapFrom(src => src.Employee.Profession.Name_Profession))  // Mapeo del nombre de la profesión
-     .ForMember(dest => dest.SalaryType, opt => opt.MapFrom(src => src.Employee.TypeOfSalary.Name_TypeOfSalary))  // Mapeo del tipo de salario
-     .ForMember(dest => dest.DeductionsList, opt => opt.MapFrom(src => src.DeductionsList))
-     .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
-     .ReverseMap();
+            .ForMember(dest => dest.EmployeeFullName, opt => opt.MapFrom(src => $"{src.Employee.First_Name} {src.Employee.Last_Name1} {src.Employee.Last_Name2}"))
+            .ForMember(dest => dest.EmployeeEmail, opt => opt.MapFrom(src => src.Employee.Email))
+            .ForMember(dest => dest.Profession, opt => opt.MapFrom(src => src.Employee.Profession.Name_Profession))
+            .ForMember(dest => dest.SalaryType, opt => opt.MapFrom(src => src.Employee.TypeOfSalary.Name_TypeOfSalary))
+            .ForMember(dest => dest.DeductionsList, opt => opt.MapFrom(src => src.DeductionsList))
+            .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
+            .ReverseMap();
+
 
 
 
@@ -84,6 +85,24 @@ public class AdministrativeMappingProfile : Profile
             .ForMember(dest => dest.PaymentReceiptId, opt => opt.Ignore())  // Se asigna al agregar a un PaymentReceipt
             .ReverseMap();
 
+
+
+        // Mapeo de ResidentCreateDto a Resident
+        CreateMap<ResidentCreateDto, Resident>()
+            .ForMember(dest => dest.Sexo, opt => opt.MapFrom(src => src.Sexo));
+
+        // Mapeo para obtener información completa de un residente
+        CreateMap<Resident, ResidentGetDto>()
+        .ForMember(dest => dest.GuardianName, opt => opt.MapFrom(src => $"{src.Guardian.Name_GD} {src.Guardian.Lastname1_GD} {src.Guardian.Lastname2_GD}"))
+        .ForMember(dest => dest.RoomNumber, opt => opt.MapFrom(src => src.Room.RoomNumber))
+        .ForMember(dest => dest.DependencyLevel, opt => opt.MapFrom(src => src.DependencyHistories
+            .OrderByDescending(dh => dh.Id_History) // Tomar el nivel más reciente
+            .FirstOrDefault().DependencyLevel.LevelName));
+
+        // Mapeo adicional para añadir un residente desde Applicant
+        CreateMap<ResidentFromApplicantDto, Resident>()
+            .ForMember(dest => dest.Sexo, opt => opt.MapFrom(src => src.Sexo))
+            .ForMember(dest => dest.EntryDate, opt => opt.MapFrom(src => src.EntryDate));
 
     }
 }

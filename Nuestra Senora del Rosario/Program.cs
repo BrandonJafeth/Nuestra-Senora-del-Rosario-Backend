@@ -9,6 +9,7 @@ using Services.Administrative.Employees;
 using Services.Administrative.FormVoluntarieService;
 using Services.Administrative.PasswordResetServices;
 using Services.Administrative.PaymentReceiptService;
+using Services.Administrative.Residents;
 using Services.Administrative.Users;
 using Services.GenericService;
 using Services.Informative.ApplicationFormService;
@@ -73,7 +74,18 @@ builder.Services.AddScoped<ISvGenericRepository<Profession>, SvGenericRepository
 builder.Services.AddScoped<ISvGenericRepository<PasswordResetToken>, SvGenericRepository<PasswordResetToken, AdministrativeContext>>();
 builder.Services.AddScoped<ISvPasswordResetService, SvPasswordResetService>();
 builder.Services.AddScoped<ISvGenericRepository<Rol>, SvGenericRepository<Rol, AdministrativeContext>>();
+builder.Services.AddScoped<ISvGenericRepository<Room>, SvGenericRepository<Room, AdministrativeContext>>();
+builder.Services.AddScoped<ISvGenericRepository<DependencyLevel>, SvGenericRepository<DependencyLevel, AdministrativeContext>>();
+builder.Services.AddScoped<ISvGenericRepository<DependencyHistory>, SvGenericRepository<DependencyHistory, AdministrativeContext>>();
+builder.Services.AddScoped<ISvGenericRepository<ResidentApplication>, SvGenericRepository<ResidentApplication, AdministrativeContext>>();
+builder.Services.AddScoped<ISvGenericRepository<Resident>, SvGenericRepository<Resident, AdministrativeContext>>();
+builder.Services.AddScoped<ISvGenericRepository<Guardian>, SvGenericRepository<Guardian, AdministrativeContext>>();
+builder.Services.AddScoped<ISvGenericRepository<Applicant>, SvGenericRepository<Applicant, AdministrativeContext>>();
+
+
 builder.Services.AddScoped<ISvPaymentReceipt, SvPaymentReceipt>();
+builder.Services.AddScoped<ISvResident, SvResident>();
+
 
 
 

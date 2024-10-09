@@ -37,6 +37,13 @@ namespace Services.MyDbContext
         public DbSet<PaymentReceipt> PaymentReceipts { get; set; }
         public DbSet<Deduction> Deductions { get; set; }
 
+
+        public DbSet<Room> Rooms { get; set; }
+        public DbSet<Resident> Residents { get; set; }
+        public DbSet<DependencyLevel> DependencyLevels { get; set; }
+        public DbSet<DependencyHistory> DependencyHistories { get; set; }
+        public DbSet<ResidentApplication> Residents_Applications { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configuración para TypeOfSalary
@@ -250,6 +257,60 @@ namespace Services.MyDbContext
             // Configuración adicional para PasswordResetToken
             modelBuilder.Entity<PasswordResetToken>()
                 .HasKey(p => p.Id);
+
+
+
+            modelBuilder.Entity<Room>().HasKey(r => r.Id_Room);
+            modelBuilder.Entity<Resident>().HasKey(r => r.Id_Resident);
+            modelBuilder.Entity<DependencyLevel>().HasKey(dl => dl.Id_DependencyLevel);
+            modelBuilder.Entity<DependencyHistory>().HasKey(dh => dh.Id_History);
+            modelBuilder.Entity<ResidentApplication>().HasKey(ra => ra.Id_Relation);
+
+            // Relaciones
+            modelBuilder.Entity<Resident>()
+                .HasOne(r => r.Guardian)
+                .WithMany()
+                .HasForeignKey(r => r.Id_Guardian);
+
+            modelBuilder.Entity<Resident>()
+                .HasOne(r => r.Room)
+                .WithMany()
+                .HasForeignKey(r => r.Id_Room);
+
+            modelBuilder.Entity<DependencyHistory>()
+                .HasOne(dh => dh.Resident)
+                .WithMany()
+                .HasForeignKey(dh => dh.Id_Resident);
+
+            modelBuilder.Entity<DependencyHistory>()
+                .HasOne(dh => dh.DependencyLevel)
+                .WithMany()
+                .HasForeignKey(dh => dh.Id_DependencyLevel);
+
+            modelBuilder.Entity<ResidentApplication>()
+                .HasOne(ra => ra.Resident)
+                .WithMany()
+                .HasForeignKey(ra => ra.Id_Resident);
+
+            modelBuilder.Entity<ResidentApplication>()
+                .HasOne(ra => ra.Applicant)
+                .WithMany()
+                .HasForeignKey(ra => ra.Id_Applicant);
+
+
+
+            modelBuilder.Entity<DependencyHistory>()
+      .HasOne(d => d.Resident)
+      .WithMany(r => r.DependencyHistories)
+      .HasForeignKey(d => d.Id_Resident)
+      .OnDelete(DeleteBehavior.Cascade);  // Configura el comportamiento de eliminación en cascada si es necesario
+
+            modelBuilder.Entity<DependencyHistory>()
+                .HasOne(d => d.DependencyLevel)
+                .WithMany()
+                .HasForeignKey(d => d.Id_DependencyLevel)
+                .OnDelete(DeleteBehavior.Restrict);  // Restricción de eliminación para mantener la consistencia
+
         }
     }
 }
