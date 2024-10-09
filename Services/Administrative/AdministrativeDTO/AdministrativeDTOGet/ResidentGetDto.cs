@@ -20,5 +20,16 @@ namespace Services.Administrative.AdministrativeDTO.AdministrativeDTOGet
         public string Status { get; set; }  // Activo o Inactivo
         public DateTime EntryDate { get; set; }
         public string DependencyLevel { get; set; }  // Nivel de dependencia (nuevo campo)
+
+        public int Edad
+        {
+            get
+            {
+                var today = DateTime.Today;
+                var age = today.Year - FechaNacimiento.Year;
+                if (FechaNacimiento.Date > today.AddYears(-age)) age--;  // Si aún no ha cumplido este año, resta 1
+                return age;
+            }
+        }
     }
 }
