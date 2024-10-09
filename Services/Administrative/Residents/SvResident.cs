@@ -56,8 +56,17 @@ namespace Services.Administrative.Residents
         // Método para obtener un residente por ID
         public async Task<ResidentGetDto> GetResidentByIdAsync(int id)
         {
-            var resident = await _residentRepository.GetByIdAsync(id);
-            if (resident == null) throw new KeyNotFoundException($"Resident with ID {id} not found");
+            var resident = await _residentRepository.Query()
+                .Include(r => r.Guardian)
+                .Include(r => r.Room)
+                .Include(r => r.DependencyHistories) // Incluir el historial de dependencias
+                .ThenInclude(dh => dh.DependencyLevel) // Incluir el nivel de dependencia
+                .FirstOrDefaultAsync(r => r.Id_Resident == id); // Filtrar por ID del residente
+
+            if (resident == null)
+                throw new KeyNotFoundException($"Resident with ID {id} not found");
+
+            // Mapear el resultado a ResidentGetDto
             return _mapper.Map<ResidentGetDto>(resident);
         }
 
@@ -72,7 +81,6 @@ namespace Services.Administrative.Residents
             if (room == null)
                 throw new KeyNotFoundException($"Room with ID {residentDto.Id_Room} not found");
 
-            // Verificar que el nivel de dependencia existe en el repositorio correcto
             var dependencyLevel = await _dependencyLevelRepository.GetByIdAsync(residentDto.Id_DependencyLevel);
             if (dependencyLevel == null)
                 throw new KeyNotFoundException($"DependencyLevel with ID {residentDto.Id_DependencyLevel} not found");
@@ -89,7 +97,6 @@ namespace Services.Administrative.Residents
                 Id_DependencyLevel = residentDto.Id_DependencyLevel
             };
 
-            // Guardar el historial de dependencia
             await _dependencyHistoryRepository.AddAsync(dependencyHistory);
             await _dependencyHistoryRepository.SaveChangesAsync();
         }
@@ -118,6 +125,7 @@ namespace Services.Administrative.Residents
                 Id_Guardian = applicant.Id_Guardian,
                 Id_Room = dto.Id_Room,
                 EntryDate = dto.EntryDate,
+                Location = applicant.Location,
                 Status = "Activo"
             };
 

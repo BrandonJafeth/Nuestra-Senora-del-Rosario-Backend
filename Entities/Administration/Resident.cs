@@ -26,7 +26,7 @@ namespace Entities.Administration
 
         [Required]
         public DateTime FechaNacimiento { get; set; }  // Fecha de nacimiento
-
+        
         [ForeignKey("Guardian")]
         public int Id_Guardian { get; set; }
         public Guardian Guardian { get; set; }  // Relación con Guardian
@@ -40,6 +40,11 @@ namespace Entities.Administration
 
         [Required]
         public DateTime EntryDate { get; set; }  // Fecha de ingreso
+
+
+
+        [Required, MaxLength(250)]
+        public string Location { get; set; }  // Localización del residente
 
         // Relación con el historial de dependencia
         public ICollection<DependencyHistory> DependencyHistories { get; set; }  // Historial de dependencia (colección de registros)

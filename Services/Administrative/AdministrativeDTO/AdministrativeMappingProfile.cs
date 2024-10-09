@@ -89,16 +89,16 @@ public class AdministrativeMappingProfile : Profile
 
         // Mapeo de ResidentCreateDto a Resident
         CreateMap<ResidentCreateDto, Resident>()
-            .ForMember(dest => dest.Sexo, opt => opt.MapFrom(src => src.Sexo));
+            .ForMember(dest => dest.Sexo, opt => opt.MapFrom(src => src.Sexo))
+               .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location)); 
 
         // Mapeo para obtener información completa de un residente
         CreateMap<Resident, ResidentGetDto>()
-        .ForMember(dest => dest.GuardianName, opt => opt.MapFrom(src => $"{src.Guardian.Name_GD} {src.Guardian.Lastname1_GD} {src.Guardian.Lastname2_GD}"))
-        .ForMember(dest => dest.Edad, opt => opt.Ignore())  // No se necesita mapear porque es calculado
-        .ForMember(dest => dest.RoomNumber, opt => opt.MapFrom(src => src.Room.RoomNumber))
-        .ForMember(dest => dest.DependencyLevel, opt => opt.MapFrom(src => src.DependencyHistories
-            .OrderByDescending(dh => dh.Id_History) // Tomar el nivel más reciente
-            .FirstOrDefault().DependencyLevel.LevelName));
+         .ForMember(dest => dest.GuardianName, opt => opt.MapFrom(src => $"{src.Guardian.Name_GD} {src.Guardian.Lastname1_GD} {src.Guardian.Lastname2_GD}"))
+         .ForMember(dest => dest.RoomNumber, opt => opt.MapFrom(src => src.Room.RoomNumber))
+         .ForMember(dest => dest.DependencyLevel, opt => opt.MapFrom(src => src.DependencyHistories.OrderByDescending(dh => dh.Id_History).FirstOrDefault().DependencyLevel.LevelName))
+         .ForMember(dest => dest.Edad, opt => opt.Ignore())  // Calculado dinámicamente
+         .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location));  // Mapeo de la nueva propiedad Location
 
         // Mapeo adicional para añadir un residente desde Applicant
         CreateMap<ResidentFromApplicantDto, Resident>()
