@@ -10,28 +10,45 @@ namespace Services.MyDbContext
         {
         }
 
-        // DbSet para las tablas independientes
+        // DbSet para tablas independientes
         public DbSet<TypeOfSalary> TypeOfSalaries { get; set; }
         public DbSet<Profession> Professions { get; set; }
         public DbSet<Rol> Roles { get; set; }
 
-        // DbSet para FormVoluntarie
+        // DbSet para Application Form
+        public DbSet<ApplicationForm> ApplicationForms { get; set; }
+        public DbSet<ApplicationStatus> ApplicationStatuses { get; set; }
+        public DbSet<Applicant> Applicants { get; set; }
+        public DbSet<Guardian> Guardians { get; set; }
+
+        // DbSet para FormVoluntarie y VoluntarieType
         public DbSet<FormVoluntarie> FormVoluntaries { get; set; }
         public DbSet<VoluntarieType> VoluntarieTypes { get; set; }
 
-        // DbSet para las tablas que dependen de otras
+        // DbSet para tablas relacionadas
         public DbSet<Employee> Employees { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<EmployeeRole> EmployeeRoles { get; set; }
 
+        // DbSet para PasswordResetToken
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+
+        // DbSet para PaymentReceipt y Deduction
+        public DbSet<PaymentReceipt> PaymentReceipts { get; set; }
+        public DbSet<Deduction> Deductions { get; set; }
+
+
+        public DbSet<Room> Rooms { get; set; }
+        public DbSet<Resident> Residents { get; set; }
+        public DbSet<DependencyLevel> DependencyLevels { get; set; }
+        public DbSet<DependencyHistory> DependencyHistories { get; set; }
+        public DbSet<ResidentApplication> Residents_Applications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configuración para TypeOfSalary
             modelBuilder.Entity<TypeOfSalary>()
                 .HasKey(t => t.Id_TypeOfSalary);
-
             modelBuilder.Entity<TypeOfSalary>()
                 .Property(t => t.Id_TypeOfSalary)
                 .ValueGeneratedOnAdd();
@@ -39,7 +56,6 @@ namespace Services.MyDbContext
             // Configuración para Profession
             modelBuilder.Entity<Profession>()
                 .HasKey(p => p.Id_Profession);
-
             modelBuilder.Entity<Profession>()
                 .Property(p => p.Id_Profession)
                 .ValueGeneratedOnAdd();
@@ -47,7 +63,6 @@ namespace Services.MyDbContext
             // Configuración para Rol
             modelBuilder.Entity<Rol>()
                 .HasKey(r => r.Id_Role);
-
             modelBuilder.Entity<Rol>()
                 .Property(r => r.Id_Role)
                 .ValueGeneratedOnAdd();
@@ -55,7 +70,6 @@ namespace Services.MyDbContext
             // Configuración para Employee
             modelBuilder.Entity<Employee>()
                 .HasKey(e => e.Dni);
-
             modelBuilder.Entity<Employee>()
                 .Property(e => e.Dni)
                 .ValueGeneratedNever();  // No auto-incremento, ya que es una identificación externa
@@ -75,7 +89,6 @@ namespace Services.MyDbContext
             // Configuración para User (1:1 con Employee)
             modelBuilder.Entity<User>()
                 .HasKey(u => u.Id_User);
-
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Employee)
                 .WithOne()
@@ -85,85 +98,149 @@ namespace Services.MyDbContext
             // Configuración para EmployeeRole (relación M:N entre Employee y Rol)
             modelBuilder.Entity<EmployeeRole>()
                 .HasKey(er => new { er.Dni_Employee, er.Id_Role });
-
             modelBuilder.Entity<EmployeeRole>()
                 .HasOne(er => er.Employee)
                 .WithMany(e => e.EmployeeRoles)
                 .HasForeignKey(er => er.Dni_Employee)
                 .OnDelete(DeleteBehavior.Cascade);
-
             modelBuilder.Entity<EmployeeRole>()
                 .HasOne(er => er.Rol)
                 .WithMany(r => r.EmployeeRoles)
                 .HasForeignKey(er => er.Id_Role)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Configuración para DonationType
-            modelBuilder.Entity<DonationType>()
-                .HasKey(d => d.Id_DonationType);  // Llave primaria
-            modelBuilder.Entity<DonationType>()
-                .Property(d => d.Id_DonationType)
-                .ValueGeneratedOnAdd();  // Auto-incremental
+            // Configuración para ApplicationStatus
+            modelBuilder.Entity<ApplicationStatus>()
+                .HasKey(s => s.Id_Status);
+            modelBuilder.Entity<ApplicationStatus>()
+                .Property(s => s.Id_Status)
+                .ValueGeneratedOnAdd();
 
-            modelBuilder.Entity<FormDonation>()
-            .HasOne(f => f.Status)  // Relación con Status
-              .WithMany()  // Sin necesidad de navegación inversa
-              .HasForeignKey(f => f.Id_Status)  // La clave foránea es Id_Status
-              .OnDelete(DeleteBehavior.Restrict);  // Evitar eliminación en cascada
+            // Configuración para Applicant
+            modelBuilder.Entity<Applicant>()
+                .HasKey(a => a.Id_Applicant);
+            modelBuilder.Entity<Applicant>()
+                .Property(a => a.Id_Applicant)
+                .ValueGeneratedOnAdd();
 
-            // Configuración para MethodDonation
-            modelBuilder.Entity<MethodDonation>()
-                .HasKey(m => m.Id_MethodDonation);  // Llave primaria
-            modelBuilder.Entity<MethodDonation>()
-                .Property(m => m.Id_MethodDonation)
-                .ValueGeneratedOnAdd();  // Auto-incremental
+            // Configuración para Guardian
+            modelBuilder.Entity<Guardian>()
+                .HasKey(g => g.Id_Guardian);
+            modelBuilder.Entity<Guardian>()
+                .Property(g => g.Id_Guardian)
+                .ValueGeneratedOnAdd();
 
-            // Relación entre MethodDonation y DonationType
-            modelBuilder.Entity<MethodDonation>()
-                .HasOne(m => m.DonationType)  // Relación con DonationType
-                .WithMany(d => d.MethodDonations)  // Relación uno a muchos
-                .HasForeignKey(m => m.DonationTypeId)
+            // Configuración para ApplicationForm
+            modelBuilder.Entity<ApplicationForm>()
+                .HasKey(af => af.Id_ApplicationForm);
+            modelBuilder.Entity<ApplicationForm>()
+                .Property(af => af.Id_ApplicationForm)
+                .ValueGeneratedOnAdd();
+            modelBuilder.Entity<ApplicationForm>()
+                .HasOne(af => af.Applicant)
+                .WithMany()
+                .HasForeignKey(af => af.Id_Applicant)
+                .OnDelete(DeleteBehavior.Cascade);  // Borrar en cascada si el Applicant es eliminado
+            modelBuilder.Entity<ApplicationForm>()
+                .HasOne(af => af.Guardian)
+                .WithMany()
+                .HasForeignKey(af => af.Id_Guardian)
+                .OnDelete(DeleteBehavior.Cascade);  // Borrar en cascada si el Guardian es eliminado
+            modelBuilder.Entity<ApplicationForm>()
+                .HasOne(af => af.ApplicationStatus)
+                .WithMany()
+                .HasForeignKey(af => af.Id_Status)
+                .OnDelete(DeleteBehavior.Restrict);  // No eliminar el estado si está asignado a solicitudes
+
+
+            // Configuración para Status
+            modelBuilder.Entity<Status>()
+                .HasKey(s => s.Id_Status);  // Clave primaria
+            modelBuilder.Entity<Status>()
+                .Property(s => s.Id_Status)
+                .ValueGeneratedOnAdd();  // Auto incremento
+
+            modelBuilder.Entity<PaymentReceipt>()
+          .HasKey(pr => pr.Id);
+            modelBuilder.Entity<PaymentReceipt>()
+                .Property(pr => pr.Salary)
+                .HasColumnType("decimal(10, 2)")
+                .IsRequired();
+            modelBuilder.Entity<PaymentReceipt>()
+                .Property(pr => pr.Overtime)
+                .HasColumnType("decimal(10, 2)")
+                .IsRequired()
+                .HasDefaultValue(0);
+            modelBuilder.Entity<PaymentReceipt>()
+                .Property(pr => pr.TotalDeductions)
+                .HasColumnType("decimal(10, 2)")
+                .IsRequired();
+            modelBuilder.Entity<PaymentReceipt>()
+                .Property(pr => pr.NetAmount)
+                .HasColumnType("decimal(10, 2)")
+                .IsRequired();
+            modelBuilder.Entity<PaymentReceipt>()
+                .Property(pr => pr.GrossAmount)
+                .HasColumnType("decimal(10, 2)")
+                .IsRequired();
+            modelBuilder.Entity<PaymentReceipt>()
+                .Property(pr => pr.Notes)
+                .HasMaxLength(500);
+            modelBuilder.Entity<PaymentReceipt>()
+                .Property(pr => pr.PdfFilePath)
+                .HasMaxLength(255);
+
+            // Relación con Employee
+            modelBuilder.Entity<PaymentReceipt>()
+                .HasOne(pr => pr.Employee)
+                .WithMany(e => e.PaymentReceipts)
+                .HasForeignKey(pr => pr.EmployeeDni)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Configuración para FormDonation
-            modelBuilder.Entity<FormDonation>()
-                .HasKey(f => f.Id_FormDonation);  // Llave primaria
-            modelBuilder.Entity<FormDonation>()
-                .Property(f => f.Id_FormDonation)
-                .ValueGeneratedOnAdd();  // Auto-incremental
+            // Índices
+            modelBuilder.Entity<PaymentReceipt>()
+                .HasIndex(pr => new { pr.EmployeeDni, pr.PaymentDate })
+                .HasDatabaseName("IX_PaymentReceipt_EmployeeDni_PaymentDate");
 
-            // Relación entre FormDonation y DonationType
-            modelBuilder.Entity<FormDonation>()
-                .HasOne(f => f.DonationType)  // Relación con DonationType
-                .WithMany(d => d.FormDonations)  // Relación uno a muchos
-                .HasForeignKey(f => f.Id_DonationType)
+            modelBuilder.Entity<Deduction>()
+                .HasKey(d => d.Id);
+            modelBuilder.Entity<Deduction>()
+                .Property(d => d.Type)
+                .HasMaxLength(100)
+                .IsRequired();
+            modelBuilder.Entity<Deduction>()
+                .Property(d => d.Amount)
+                .HasColumnType("decimal(10, 2)")
+                .IsRequired();
+
+            // Relación con PaymentReceipt
+            modelBuilder.Entity<Deduction>()
+                .HasOne(d => d.PaymentReceipt)
+                .WithMany(pr => pr.DeductionsList)
+                .HasForeignKey(d => d.PaymentReceiptId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Relación entre FormDonation y MethodDonation
-            modelBuilder.Entity<FormDonation>()
-                .HasOne(f => f.MethodDonation)  // Relación con MethodDonation
-                .WithMany(m => m.FormDonations)  // Relación uno a muchos
-                .HasForeignKey(f => f.Id_MethodDonation)
-                .OnDelete(DeleteBehavior.Cascade);
+            // Índices
+            modelBuilder.Entity<Deduction>()
+                .HasIndex(d => d.PaymentReceiptId)
+                .HasDatabaseName("IX_Deduction_PaymentReceiptId");
 
-            // -- Configuración adicional para Voluntariados --
 
             // Relación entre FormVoluntarie y VoluntarieType
             modelBuilder.Entity<FormVoluntarie>()
                 .HasOne(f => f.VoluntarieType)
-                .WithMany(v => v.FormVoluntaries)  // Relación inversa
+                .WithMany(v => v.FormVoluntaries)
                 .HasForeignKey(f => f.Id_VoluntarieType)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Relación entre FormVoluntarie y Status (nuevo)
+            // Relación entre FormVoluntarie y Status
             modelBuilder.Entity<FormVoluntarie>()
                 .HasOne(f => f.Status)
-                .WithMany()  // Sin relación inversa necesaria
+                .WithMany()
                 .HasForeignKey(f => f.Id_Status)
-                .OnDelete(DeleteBehavior.Restrict);  // No eliminar estado al eliminar el FormVoluntarie
+                .OnDelete(DeleteBehavior.Restrict);
 
-
-            // Configuración para VoluntarieType
+            // Configuración adicional para VoluntarieType
             modelBuilder.Entity<VoluntarieType>()
                 .HasKey(v => v.Id_VoluntarieType);
             modelBuilder.Entity<VoluntarieType>()
@@ -177,91 +254,63 @@ namespace Services.MyDbContext
                 .Property(f => f.Id_FormVoluntarie)
                 .ValueGeneratedOnAdd();
 
-            // Relación entre FormVoluntarie y VoluntarieType
-            modelBuilder.Entity<FormVoluntarie>()
-                .HasOne(f => f.VoluntarieType)
-                .WithMany(v => v.FormVoluntaries)  // Relación inversa
-                .HasForeignKey(f => f.Id_VoluntarieType)
-                .OnDelete(DeleteBehavior.Cascade);  // Borrar en cascada si se elimina VoluntarieType
-
-            // Relación entre FormVoluntarie y Status (nuevo)
-            modelBuilder.Entity<FormVoluntarie>()
-        .HasOne(f => f.Status)
-        .WithMany()  // No necesitas navegación inversa desde Status
-        .HasForeignKey(f => f.Id_Status)  // Usar el nombre correcto de la columna en la base de datos
-        .OnDelete(DeleteBehavior.Restrict);
-
-            // Configuración para Status
-            modelBuilder.Entity<Status>()
-                .HasKey(s => s.Id_Status);
-            modelBuilder.Entity<Status>()
-                .Property(s => s.Id_Status)
-                .ValueGeneratedOnAdd();
+            // Configuración adicional para PasswordResetToken
+            modelBuilder.Entity<PasswordResetToken>()
+                .HasKey(p => p.Id);
 
 
 
-            // Configuración para Applicant
-            modelBuilder.Entity<Applicant>()
-                .HasKey(a => a.Id_Applicant);  // Llave primaria
-            modelBuilder.Entity<Applicant>()
-                .Property(a => a.Id_Applicant)
-                .ValueGeneratedOnAdd();  // Auto incremento
+            modelBuilder.Entity<Room>().HasKey(r => r.Id_Room);
+            modelBuilder.Entity<Resident>().HasKey(r => r.Id_Resident);
+            modelBuilder.Entity<DependencyLevel>().HasKey(dl => dl.Id_DependencyLevel);
+            modelBuilder.Entity<DependencyHistory>().HasKey(dh => dh.Id_History);
+            modelBuilder.Entity<ResidentApplication>().HasKey(ra => ra.Id_Relation);
 
-            // Configuración para Guardian
-            modelBuilder.Entity<Guardian>()
-                .HasKey(g => g.Id_Guardian);  // Llave primaria
-            modelBuilder.Entity<Guardian>()
-                .Property(g => g.Id_Guardian)
-                .ValueGeneratedOnAdd();  // Auto incremento
+            // Relaciones
+            modelBuilder.Entity<Resident>()
+                .HasOne(r => r.Guardian)
+                .WithMany()
+                .HasForeignKey(r => r.Id_Guardian);
 
-            // Configuración para ApplicationStatus
-            modelBuilder.Entity<ApplicationStatus>()
-                .HasKey(s => s.Id_Status);  // Llave primaria
-            modelBuilder.Entity<ApplicationStatus>()
-                .Property(s => s.Id_Status)
-                .ValueGeneratedOnAdd();  // Auto incremento
-            modelBuilder.Entity<ApplicationStatus>()
-                .Property(s => s.Status_Name)
-                .IsRequired()  // Campo requerido
-                .HasMaxLength(50);  // Longitud máxima del estado
+            modelBuilder.Entity<Resident>()
+                .HasOne(r => r.Room)
+                .WithMany()
+                .HasForeignKey(r => r.Id_Room);
 
-            // Configuración para ApplicationForm
-            modelBuilder.Entity<ApplicationForm>()
-                .HasKey(af => af.Id_ApplicationForm);  // Llave primaria
-            modelBuilder.Entity<ApplicationForm>()
-                .Property(af => af.Id_ApplicationForm)
-                .ValueGeneratedOnAdd();  // Auto incremento
+            modelBuilder.Entity<DependencyHistory>()
+                .HasOne(dh => dh.Resident)
+                .WithMany()
+                .HasForeignKey(dh => dh.Id_Resident);
 
-            // Relación entre ApplicationForm y Applicant
-            modelBuilder.Entity<ApplicationForm>()
-                .HasOne(af => af.Applicant)  // Relación con Applicant
-                .WithMany()  // Un Applicant puede tener varias solicitudes
-                .HasForeignKey(af => af.Id_Applicant)
-                .OnDelete(DeleteBehavior.Cascade);  // Borrar en cascada si el Applicant es eliminado
+            modelBuilder.Entity<DependencyHistory>()
+                .HasOne(dh => dh.DependencyLevel)
+                .WithMany()
+                .HasForeignKey(dh => dh.Id_DependencyLevel);
 
-            // Relación entre ApplicationForm y Guardian
-            modelBuilder.Entity<ApplicationForm>()
-                .HasOne(af => af.Guardian)  // Relación con Guardian
-                .WithMany()  // Un Guardian puede tener varias solicitudes
-                .HasForeignKey(af => af.Id_Guardian)
-                .OnDelete(DeleteBehavior.Cascade);  // Borrar en cascada si el Guardian es eliminado
+            modelBuilder.Entity<ResidentApplication>()
+                .HasOne(ra => ra.Resident)
+                .WithMany()
+                .HasForeignKey(ra => ra.Id_Resident);
 
-            // Relación entre ApplicationForm y ApplicationStatus
-            modelBuilder.Entity<ApplicationForm>()
-                .HasOne(af => af.ApplicationStatus)  // Relación con ApplicationStatus
-                .WithMany()  // Un estado puede estar asignado a muchas solicitudes
-                .HasForeignKey(af => af.Id_Status)
+            modelBuilder.Entity<ResidentApplication>()
+                .HasOne(ra => ra.Applicant)
+                .WithMany()
+                .HasForeignKey(ra => ra.Id_Applicant);
 
 
 
-                .OnDelete(DeleteBehavior.Restrict);  // No eliminar el estado si está asignado a solicitudes
+            modelBuilder.Entity<DependencyHistory>()
+      .HasOne(d => d.Resident)
+      .WithMany(r => r.DependencyHistories)
+      .HasForeignKey(d => d.Id_Resident)
+      .OnDelete(DeleteBehavior.Cascade);  // Configura el comportamiento de eliminación en cascada si es necesario
 
+            modelBuilder.Entity<DependencyHistory>()
+                .HasOne(d => d.DependencyLevel)
+                .WithMany()
+                .HasForeignKey(d => d.Id_DependencyLevel)
+                .OnDelete(DeleteBehavior.Restrict);  // Restricción de eliminación para mantener la consistencia
 
-
-
-
-            // Configuración adicional (si la necesitas)
-            modelBuilder.Entity<PasswordResetToken>().HasKey(p => p.Id);
         }
     }
 }
