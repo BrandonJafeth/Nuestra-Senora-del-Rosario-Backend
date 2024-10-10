@@ -5,19 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            font-size: 12px;
+            font-family: 'Noto Sans', sans-serif; /* Cambiamos a 'Noto Sans' como en React */
+            font-size: 10px; /* Ajustamos el tamaño de la fuente */
             margin: 0;
-            padding: 20px;
+            padding: 40px; /* Ajuste de padding similar a React */
+            background-color: #fff;
         }
 
+        /* Encabezado */
         .header {
-            text-align: center;
             font-size: 18px;
             font-weight: bold;
+            text-align: center;
             margin-bottom: 20px;
+            position: relative;
         }
 
+            /* Imagen en el encabezado */
+            .header img {
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 70px;
+                height: 70px;
+            }
+
+        /* Secciones generales */
         .details {
             margin-bottom: 20px;
         }
@@ -26,32 +39,46 @@
                 margin: 5px 0;
             }
 
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px; /* Espaciado entre filas */
+        }
+
+        .label {
+            font-weight: bold; /* Etiquetas en negrita */
+        }
+
+        /* Tablas */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ccc; /* Estilo de borde inferior */
         }
 
             table th, table td {
-                border: 1px solid #ddd;
-                padding: 8px;
-                text-align: left;
+                padding: 4px 8px; /* Espaciado en las celdas */
+                border-bottom: 1px solid #ddd;
             }
 
             table th {
-                background-color: #f4f4f4;
+                background-color: #f0f0f0; /* Fondo similar al de React */
+                font-weight: bold;
             }
 
+        /* Totales */
         .total {
             font-weight: bold;
             font-size: 14px;
             text-align: right;
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
+        /* Firma */
         .signature {
             text-align: center;
-            margin-top: 40px;
+            margin-top: 30px;
             border-top: 1px solid #000;
             width: 50%;
             margin-left: auto;
@@ -60,7 +87,13 @@
     </style>
 </head>
 <body>
-    <div class="header">Comprobante de Pago</div>
+    <!-- Encabezado con imagen -->
+    <div class="header">
+        Comprobante de Pago
+        <img src="https://i.ibb.co/D5xXgD5/Icon-whitout-fondo.png" alt="Logo">
+    </div>
+
+    <!-- Detalles del pago -->
     <div class="details">
         <p><strong>Fecha de Pago:</strong> {{PaymentDate}}</p>
         <p><strong>Empleado:</strong> {{EmployeeFullName}}</p>
@@ -68,9 +101,14 @@
         <p><strong>Salario:</strong> {{SalaryType}}</p>
     </div>
 
+    <!-- Tabla de valores -->
     <table>
         <thead>
-            <tr><th>Descripción</th><th>Valor</th><th>Monto</th></tr>
+            <tr>
+                <th>Descripción</th>
+                <th>Valor</th>
+                <th>Monto</th>
+            </tr>
         </thead>
         <tbody>
             <tr><td>Salario ({{WorkedDays}} días)</td><td>{{WorkedDays}}</td><td>₡{{Salary}}</td></tr>
@@ -82,12 +120,16 @@
         </tbody>
     </table>
 
+    <!-- Deducciones -->
     <div class="details">
         <p><strong>Deducciones:</strong></p>
         <p>CCSS: ₡{{TotalDeductions}}</p>
     </div>
 
+    <!-- Total Devengado Neto -->
     <div class="total">Total Devengado Neto: ₡{{NetAmount}}</div>
+
+    <!-- Firma -->
     <div class="signature">Firma de recibido</div>
 </body>
 </html>
