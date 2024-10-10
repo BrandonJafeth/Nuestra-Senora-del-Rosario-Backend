@@ -161,70 +161,77 @@ namespace Services.MyDbContext
                 .ValueGeneratedOnAdd();  // Auto incremento
 
             modelBuilder.Entity<PaymentReceipt>()
-          .HasKey(pr => pr.Id);
+       .HasKey(pr => pr.Id);
+
+            // Configuración de propiedades para PaymentReceipt
             modelBuilder.Entity<PaymentReceipt>()
                 .Property(pr => pr.Salary)
                 .HasColumnType("decimal(10, 2)")
                 .IsRequired();
+
             modelBuilder.Entity<PaymentReceipt>()
                 .Property(pr => pr.Overtime)
                 .HasColumnType("decimal(10, 2)")
                 .IsRequired()
                 .HasDefaultValue(0);
+
             modelBuilder.Entity<PaymentReceipt>()
                 .Property(pr => pr.TotalDeductions)
                 .HasColumnType("decimal(10, 2)")
                 .IsRequired();
+
             modelBuilder.Entity<PaymentReceipt>()
                 .Property(pr => pr.NetAmount)
                 .HasColumnType("decimal(10, 2)")
                 .IsRequired();
+
             modelBuilder.Entity<PaymentReceipt>()
-                .Property(pr => pr.GrossAmount)
+                .Property(pr => pr.GrossIncome)  // Cambié de GrossAmount a GrossIncome si es el término que usas
                 .HasColumnType("decimal(10, 2)")
                 .IsRequired();
+
             modelBuilder.Entity<PaymentReceipt>()
                 .Property(pr => pr.Notes)
                 .HasMaxLength(500);
-            modelBuilder.Entity<PaymentReceipt>()
-                .Property(pr => pr.PdfFilePath)
-                .HasMaxLength(255);
 
-            // Relación con Employee
+       
+            // Relación con Employee (uno a muchos)
             modelBuilder.Entity<PaymentReceipt>()
                 .HasOne(pr => pr.Employee)
                 .WithMany(e => e.PaymentReceipts)
                 .HasForeignKey(pr => pr.EmployeeDni)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade);  // Eliminar los recibos si se elimina el empleado
 
-            // Índices
+            // Índice en EmployeeDni y PaymentDate para consultas más rápidas
             modelBuilder.Entity<PaymentReceipt>()
                 .HasIndex(pr => new { pr.EmployeeDni, pr.PaymentDate })
                 .HasDatabaseName("IX_PaymentReceipt_EmployeeDni_PaymentDate");
 
+            // Configuración de propiedades para Deduction
             modelBuilder.Entity<Deduction>()
                 .HasKey(d => d.Id);
+
             modelBuilder.Entity<Deduction>()
                 .Property(d => d.Type)
                 .HasMaxLength(100)
                 .IsRequired();
+
             modelBuilder.Entity<Deduction>()
                 .Property(d => d.Amount)
                 .HasColumnType("decimal(10, 2)")
                 .IsRequired();
 
-            // Relación con PaymentReceipt
+            // Relación entre Deduction y PaymentReceipt (uno a muchos)
             modelBuilder.Entity<Deduction>()
                 .HasOne(d => d.PaymentReceipt)
                 .WithMany(pr => pr.DeductionsList)
                 .HasForeignKey(d => d.PaymentReceiptId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade);  // Eliminar deducciones si se elimina el recibo de pago
 
-            // Índices
+            // Índice en PaymentReceiptId para mejorar las consultas
             modelBuilder.Entity<Deduction>()
                 .HasIndex(d => d.PaymentReceiptId)
                 .HasDatabaseName("IX_Deduction_PaymentReceiptId");
-
 
             // Relación entre FormVoluntarie y VoluntarieType
             modelBuilder.Entity<FormVoluntarie>()
