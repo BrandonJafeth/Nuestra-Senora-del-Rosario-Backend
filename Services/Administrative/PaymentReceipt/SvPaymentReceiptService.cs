@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 
 using PuppeteerSharp.Media;
 using PuppeteerSharp;
+using System.Text;
 
 
 namespace Services.Administrative.PaymentReceiptService
@@ -176,6 +177,7 @@ namespace Services.Administrative.PaymentReceiptService
         // Generar PDF del comprobante de pago
         public async Task<MemoryStream> GeneratePaymentReceiptPdf(PaymentReceiptDto receiptDto)
         {
+            // Ruta de la plantilla HTML
             string templatePath = @"C:\Nuestra Señora del Rosario back\Services\Administrative\PaymentReceipt\Plantilla HTML\ComprobantePagoTemplate.html";
 
             if (!File.Exists(templatePath))
@@ -183,29 +185,56 @@ namespace Services.Administrative.PaymentReceiptService
                 throw new FileNotFoundException($"No se encontró la plantilla HTML en la ruta: {templatePath}");
             }
 
+            // Leer la plantilla HTML
             string htmlTemplate = await File.ReadAllTextAsync(templatePath);
 
+            // Generar dinámicamente la tabla de deducciones
+            var deduccionesHtml = new StringBuilder();
+            deduccionesHtml.Append("<table><thead><tr><th>Tipo de Deducción</th><th>Monto</th></tr></thead><tbody>");
+
+            if (receiptDto.DeductionsList != null && receiptDto.DeductionsList.Any())
+            {
+                foreach (var deduction in receiptDto.DeductionsList)
+                {
+                    deduccionesHtml.Append($"<tr><td>{deduction.Type}</td><td>₡{deduction.Amount:N2}</td></tr>");
+                }
+            }
+            else
+            {
+                deduccionesHtml.Append("<tr><td colspan='2'>No hay deducciones aplicadas</td></tr>");
+            }
+
+            deduccionesHtml.Append("</tbody></table>");
+
+            // Reemplazar los placeholders en el HTML
             string htmlContent = htmlTemplate
                 .Replace("{{PaymentDate}}", receiptDto.PaymentDate.ToString("dd/MM/yyyy"))
                 .Replace("{{EmployeeFullName}}", receiptDto.EmployeeFullName)
                 .Replace("{{Profession}}", receiptDto.Profession)
                 .Replace("{{SalaryType}}", receiptDto.SalaryType)
                 .Replace("{{WorkedDays}}", receiptDto.WorkedDays.ToString())
-                .Replace("{{Salary}}", receiptDto.Salary.ToString("C"))
-                .Replace("{{ExtrasHours}}", receiptDto.ExtrasHours.ToString())
-                .Replace("{{TotalExtraHoursAmount}}", receiptDto.TotalExtraHoursAmount.ToString("C"))
-                .Replace("{{DoubleExtras}}", receiptDto.DoubleExtras.ToString())
-                .Replace("{{NightHours}}", receiptDto.NightHours.ToString())
-                .Replace("{{Adjustments}}", receiptDto.Adjustments.ToString("C"))
-                .Replace("{{GrossIncome}}", receiptDto.GrossIncome.ToString("C"))
-                .Replace("{{TotalDeductions}}", receiptDto.TotalDeductions.ToString("C"))
-                .Replace("{{NetAmount}}", receiptDto.NetAmount.ToString("C"));
+                .Replace("{{Salary}}", receiptDto.Salary.ToString("N2"))
+                .Replace("{{ExtrasHours}}", receiptDto.ExtrasHours.ToString("N2"))
+                .Replace("{{TotalExtraHoursAmount}}", receiptDto.TotalExtraHoursAmount.ToString("N2"))
+                .Replace("{{DoublesHours}}", receiptDto.DoublesHours.ToString("N2"))
+                .Replace("{{DoubleExtras}}", receiptDto.DoubleExtras.ToString("N2"))
+                .Replace("{{NightHours}}", receiptDto.NightHours.ToString("N2"))
+                .Replace("{{MixedHours}}", receiptDto.MixedHours.ToString("N2"))
+                .Replace("{{MandatoryHolidays}}", receiptDto.MandatoryHolidays.ToString("N2"))
+                .Replace("{{MandatoryHolidaysAmount}}", (receiptDto.MandatoryHolidays * receiptDto.Salary / 30).ToString("N2")) // Asumiendo que el pago es diario
+                .Replace("{{Adjustments}}", receiptDto.Adjustments.ToString("N2"))
+                .Replace("{{Incapacity}}", receiptDto.Incapacity.ToString("N2"))
+                .Replace("{{Absence}}", receiptDto.Absence.ToString("N2"))
+                .Replace("{{VacationDays}}", receiptDto.VacationDays.ToString("N2"))
+                .Replace("{{VacationAmount}}", (receiptDto.VacationDays * receiptDto.Salary / 30).ToString("N2")) // Asumiendo que el pago es diario
+                .Replace("{{GrossIncome}}", receiptDto.GrossIncome.ToString("N2"))
+                .Replace("{{NetAmount}}", receiptDto.NetAmount.ToString("N2"))
+                .Replace("{{DeduccionesTable}}", deduccionesHtml.ToString());
 
             var pdfStream = new MemoryStream();
 
             try
             {
-                // Descargar el navegador si no está ya descargado
                 var browserFetcher = new BrowserFetcher();
                 await browserFetcher.DownloadAsync();
 
@@ -229,6 +258,7 @@ namespace Services.Administrative.PaymentReceiptService
 
             return pdfStream;
         }
+
 
 
     }
