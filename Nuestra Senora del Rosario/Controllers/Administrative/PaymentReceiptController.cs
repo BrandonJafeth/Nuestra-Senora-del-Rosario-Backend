@@ -61,18 +61,17 @@ public class PaymentReceiptController : ControllerBase
     }
 
     // Endpoint para descargar el PDF del PaymentReceipt
-    [HttpGet("{id}/download-pdf")]
+    [HttpGet("DownloadPaymentReceiptPdf/{id}")]
     public async Task<IActionResult> DownloadPaymentReceiptPdf(int id)
     {
-        var paymentReceipt = await _paymentReceiptService.GetPaymentReceiptByIdAsync(id);
-        if (paymentReceipt == null)
+        var receiptDto = await _paymentReceiptService.GetPaymentReceiptByIdAsync(id);
+        if (receiptDto == null)
         {
-            return NotFound("Recibo de pago no encontrado.");
+            return NotFound();
         }
 
-        var pdfData = await _paymentReceiptService.GeneratePaymentReceiptPdf(paymentReceipt);
+        var pdfStream = await _paymentReceiptService.GeneratePaymentReceiptPdf(receiptDto);
 
-        // Devolver el archivo PDF generado
-        return File(pdfData, "application/pdf", "payment_receipt.pdf");
+        return File(pdfStream, "application/pdf", "ComprobantePago.pdf");
     }
 }

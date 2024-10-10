@@ -55,10 +55,20 @@ public class AdministrativeMappingProfile : Profile
             .ForMember(dest => dest.SalaryType, opt => opt.MapFrom(src => src.Employee.TypeOfSalary.Name_TypeOfSalary))
             .ForMember(dest => dest.DeductionsList, opt => opt.MapFrom(src => src.DeductionsList))
             .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
+
+            // Mapeo de los nuevos campos
+            .ForMember(dest => dest.WorkedDays, opt => opt.MapFrom(src => src.WorkedDays))
+            .ForMember(dest => dest.GrossIncome, opt => opt.MapFrom(src => src.GrossIncome))  // Ahora se mapea desde GrossIncome
+            .ForMember(dest => dest.TotalExtraHoursAmount, opt => opt.MapFrom(src => src.TotalExtraHoursAmount))
+            .ForMember(dest => dest.ExtraHourRate, opt => opt.MapFrom(src => src.ExtraHourRate))
+            .ForMember(dest => dest.DoubleExtras, opt => opt.MapFrom(src => src.DoubleExtras))
+            .ForMember(dest => dest.NightHours, opt => opt.MapFrom(src => src.NightHours))
+            .ForMember(dest => dest.Adjustments, opt => opt.MapFrom(src => src.Adjustments))
+            .ForMember(dest => dest.Incapacity, opt => opt.MapFrom(src => src.Incapacity))
+            .ForMember(dest => dest.Absence, opt => opt.MapFrom(src => src.Absence))
+            .ForMember(dest => dest.VacationDays, opt => opt.MapFrom(src => src.VacationDays))
+
             .ReverseMap();
-
-
-
 
         // Mapear Deduction a DeductionDto
         CreateMap<Deduction, DeductionDto>()
@@ -73,8 +83,19 @@ public class AdministrativeMappingProfile : Profile
             .ForMember(dest => dest.PaymentDate, opt => opt.MapFrom(src => src.PaymentDate))
             .ForMember(dest => dest.Salary, opt => opt.MapFrom(src => src.Salary))
             .ForMember(dest => dest.Overtime, opt => opt.MapFrom(src => src.Overtime))
-            .ForMember(dest => dest.GrossAmount, opt => opt.MapFrom(src => src.GrossAmount))
-            .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes))
+
+            // Mapeo de los nuevos campos
+            .ForMember(dest => dest.WorkedDays, opt => opt.MapFrom(src => src.WorkedDays))
+            .ForMember(dest => dest.GrossIncome, opt => opt.MapFrom(src => src.GrossIncome))  // Mapeado directamente a GrossIncome
+            .ForMember(dest => dest.TotalExtraHoursAmount, opt => opt.MapFrom(src => src.TotalExtraHoursAmount))
+            .ForMember(dest => dest.ExtraHourRate, opt => opt.MapFrom(src => src.ExtraHourRate))
+            .ForMember(dest => dest.DoubleExtras, opt => opt.MapFrom(src => src.DoubleExtras))
+            .ForMember(dest => dest.NightHours, opt => opt.MapFrom(src => src.NightHours))
+            .ForMember(dest => dest.Adjustments, opt => opt.MapFrom(src => src.Adjustments))
+            .ForMember(dest => dest.Incapacity, opt => opt.MapFrom(src => src.Incapacity))
+            .ForMember(dest => dest.Absence, opt => opt.MapFrom(src => src.Absence))
+            .ForMember(dest => dest.VacationDays, opt => opt.MapFrom(src => src.VacationDays))
+
             .ForMember(dest => dest.DeductionsList, opt => opt.Ignore())  // Las deducciones se gestionan por separado
             .ReverseMap();
 
@@ -84,6 +105,7 @@ public class AdministrativeMappingProfile : Profile
             .ForMember(dest => dest.Amount, opt => opt.MapFrom(src => src.Amount))
             .ForMember(dest => dest.PaymentReceiptId, opt => opt.Ignore())  // Se asigna al agregar a un PaymentReceipt
             .ReverseMap();
+
 
 
 

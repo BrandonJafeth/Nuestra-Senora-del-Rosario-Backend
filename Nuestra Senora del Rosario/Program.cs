@@ -3,12 +3,15 @@ using Entities.Informative;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using PdfSharp.Charting;
 using Services.Administrative.EmailServices;
 using Services.Administrative.EmployeeRoleServices;
 using Services.Administrative.Employees;
 using Services.Administrative.FormVoluntarieService;
 using Services.Administrative.PasswordResetServices;
 using Services.Administrative.PaymentReceiptService;
+using Services.Administrative.PdfReceiver;
+using Services.Administrative.PdfReceiverService;
 using Services.Administrative.Residents;
 using Services.Administrative.Users;
 using Services.GenericService;
@@ -71,6 +74,7 @@ builder.Services.AddScoped<ISvEmployeeRole, SvEmployeeRole>();
 builder.Services.AddScoped<ISvGenericRepository<EmployeeRole>, SvGenericRepository<EmployeeRole, AdministrativeContext>>();
 builder.Services.AddScoped<ISvGenericRepository<TypeOfSalary>, SvGenericRepository<TypeOfSalary, AdministrativeContext>>();
 builder.Services.AddScoped<ISvGenericRepository<Profession>, SvGenericRepository<Profession, AdministrativeContext>>();
+
 builder.Services.AddScoped<ISvGenericRepository<PasswordResetToken>, SvGenericRepository<PasswordResetToken, AdministrativeContext>>();
 builder.Services.AddScoped<ISvPasswordResetService, SvPasswordResetService>();
 builder.Services.AddScoped<ISvGenericRepository<Rol>, SvGenericRepository<Rol, AdministrativeContext>>();
@@ -81,6 +85,7 @@ builder.Services.AddScoped<ISvGenericRepository<ResidentApplication>, SvGenericR
 builder.Services.AddScoped<ISvGenericRepository<Resident>, SvGenericRepository<Resident, AdministrativeContext>>();
 builder.Services.AddScoped<ISvGenericRepository<Guardian>, SvGenericRepository<Guardian, AdministrativeContext>>();
 builder.Services.AddScoped<ISvGenericRepository<Applicant>, SvGenericRepository<Applicant, AdministrativeContext>>();
+builder.Services.AddScoped<ISvPdfReceiverService, SvPdfReceiverService>();
 
 
 builder.Services.AddScoped<ISvPaymentReceipt, SvPaymentReceipt>();

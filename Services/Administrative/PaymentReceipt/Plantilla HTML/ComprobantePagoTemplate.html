@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 12px;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .details {
+            margin-bottom: 20px;
+        }
+
+            .details p {
+                margin: 5px 0;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+            table th, table td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
+
+            table th {
+                background-color: #f4f4f4;
+            }
+
+        .total {
+            font-weight: bold;
+            font-size: 14px;
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        .signature {
+            text-align: center;
+            margin-top: 40px;
+            border-top: 1px solid #000;
+            width: 50%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">Comprobante de Pago</div>
+    <div class="details">
+        <p><strong>Fecha de Pago:</strong> {{PaymentDate}}</p>
+        <p><strong>Empleado:</strong> {{EmployeeFullName}}</p>
+        <p><strong>Profesión:</strong> {{Profession}}</p>
+        <p><strong>Salario:</strong> {{SalaryType}}</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr><th>Descripción</th><th>Valor</th><th>Monto</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Salario ({{WorkedDays}} días)</td><td>{{WorkedDays}}</td><td>₡{{Salary}}</td></tr>
+            <tr><td>Horas extras</td><td>{{ExtrasHours}} hrs</td><td>₡{{TotalExtraHoursAmount}}</td></tr>
+            <tr><td>Horas dobles</td><td>{{DoubleExtras}} hrs</td><td>₡{{DoubleExtras}}</td></tr>
+            <tr><td>Horas nocturnas</td><td>{{NightHours}} hrs</td><td>₡{{NightHours}}</td></tr>
+            <tr><td>Ajustes</td><td>N/A</td><td>₡{{Adjustments}}</td></tr>
+            <tr><td>Total Bruto</td><td></td><td>₡{{GrossIncome}}</td></tr>
+        </tbody>
+    </table>
+
+    <div class="details">
+        <p><strong>Deducciones:</strong></p>
+        <p>CCSS: ₡{{TotalDeductions}}</p>
+    </div>
+
+    <div class="total">Total Devengado Neto: ₡{{NetAmount}}</div>
+    <div class="signature">Firma de recibido</div>
+</body>
+</html>
