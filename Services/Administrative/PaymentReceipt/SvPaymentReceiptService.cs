@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using PdfSharp.Pdf;
+using PdfSharp.Drawing;
 
 namespace Services.Administrative.PaymentReceiptService
 {
@@ -29,47 +31,87 @@ namespace Services.Administrative.PaymentReceiptService
             _logger = logger;
         }
 
-    public async Task<PaymentReceiptDto> CreatePaymentReceiptAsync(PaymentReceiptCreateDto paymentReceiptCreateDto)
-{
-    using var transaction = await _context.Database.BeginTransactionAsync();
-
-    try
-    {
-        // Crear el comprobante de pago
-        var paymentReceipt = _mapper.Map<PaymentReceipt>(paymentReceiptCreateDto);
-        paymentReceipt.CreatedAt = DateTime.UtcNow;
-
-        // Calcular el total de deducciones
-        paymentReceipt.TotalDeductions = paymentReceiptCreateDto.DeductionsList.Sum(d => d.Amount);
-
-        // Calcular el monto neto
-        paymentReceipt.NetAmount = paymentReceipt.GrossAmount - paymentReceipt.TotalDeductions;
-
-        await _context.PaymentReceipts.AddAsync(paymentReceipt);
-        await _context.SaveChangesAsync();
-
-        // Registrar las deducciones
-        if (paymentReceiptCreateDto.DeductionsList != null && paymentReceiptCreateDto.DeductionsList.Any())
+        public async Task<PaymentReceiptDto> CreatePaymentReceiptAsync(PaymentReceiptCreateDto paymentReceiptCreateDto)
         {
-            var deductions = _mapper.Map<List<Deduction>>(paymentReceiptCreateDto.DeductionsList);
-            foreach (var deduction in deductions)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
             {
-                deduction.PaymentReceiptId = paymentReceipt.Id;
+                // Crear el comprobante de pago
+                var paymentReceipt = _mapper.Map<PaymentReceipt>(paymentReceiptCreateDto);
+                paymentReceipt.CreatedAt = DateTime.UtcNow;
+
+                // Calcular el total de deducciones
+                paymentReceipt.TotalDeductions = paymentReceiptCreateDto.DeductionsList.Sum(d => d.Amount);
+
+                // Calcular el monto neto
+                paymentReceipt.NetAmount = paymentReceipt.GrossAmount - paymentReceipt.TotalDeductions;
+
+                await _context.PaymentReceipts.AddAsync(paymentReceipt);
+                await _context.SaveChangesAsync();
+
+                // Registrar las deducciones
+                if (paymentReceiptCreateDto.DeductionsList != null && paymentReceiptCreateDto.DeductionsList.Any())
+                {
+                    var deductions = _mapper.Map<List<Deduction>>(paymentReceiptCreateDto.DeductionsList);
+                    foreach (var deduction in deductions)
+                    {
+                        deduction.PaymentReceiptId = paymentReceipt.Id;
+                    }
+                    await _context.Deductions.AddRangeAsync(deductions);
+                }
+
+                await _context.SaveChangesAsync();
+
+                // Recargar el PaymentReceipt desde la base de datos para obtener las relaciones del empleado
+                var fullPaymentReceipt = await _context.PaymentReceipts
+                    .Include(r => r.Employee)
+                        .ThenInclude(e => e.Profession)      // Incluir la profesión del empleado
+                    .Include(r => r.Employee.TypeOfSalary)   // Incluir el tipo de salario del empleado
+                    .Include(r => r.DeductionsList)          // Incluir la lista de deducciones
+                    .FirstOrDefaultAsync(r => r.Id == paymentReceipt.Id); // Recargar usando el ID recién generado
+
+                if (fullPaymentReceipt == null)
+                {
+                    throw new Exception("Error al cargar el comprobante de pago después de la creación.");
+                }
+
+                // Mapear el PaymentReceipt con las relaciones cargadas a PaymentReceiptDto
+                var paymentReceiptDto = new PaymentReceiptDto
+                {
+                    Id = fullPaymentReceipt.Id,
+                    EmployeeDni = fullPaymentReceipt.EmployeeDni,
+                    EmployeeFullName = $"{fullPaymentReceipt.Employee.First_Name} {fullPaymentReceipt.Employee.Last_Name1} {fullPaymentReceipt.Employee.Last_Name2}",
+                    EmployeeEmail = fullPaymentReceipt.Employee?.Email,
+                    Profession = fullPaymentReceipt.Employee?.Profession?.Name_Profession,
+                    SalaryType = fullPaymentReceipt.Employee?.TypeOfSalary?.Name_TypeOfSalary,
+                    PaymentDate = fullPaymentReceipt.PaymentDate,
+                    Salary = fullPaymentReceipt.Salary,
+                    Overtime = fullPaymentReceipt.Overtime,
+                    GrossAmount = fullPaymentReceipt.GrossAmount,
+                    NetAmount = fullPaymentReceipt.NetAmount,
+                    TotalDeductions = fullPaymentReceipt.TotalDeductions,
+                    Notes = fullPaymentReceipt.Notes,
+                    CreatedAt = fullPaymentReceipt.CreatedAt,
+                    DeductionsList = fullPaymentReceipt.DeductionsList.Select(d => new DeductionDto
+                    {
+                        Id = d.Id,
+                        PaymentReceiptId = d.PaymentReceiptId,
+                        Type = d.Type,
+                        Amount = d.Amount
+                    }).ToList()
+                };
+
+                await transaction.CommitAsync();
+
+                return paymentReceiptDto;
             }
-            await _context.Deductions.AddRangeAsync(deductions);
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception("Error al crear el comprobante de pago: " + ex.Message);
+            }
         }
-
-        await _context.SaveChangesAsync();
-        await transaction.CommitAsync();
-
-        return _mapper.Map<PaymentReceiptDto>(paymentReceipt);
-    }
-    catch (Exception ex)
-    {
-        await transaction.RollbackAsync();
-        throw new Exception("Error al crear el comprobante de pago: " + ex.Message);
-    }
-}
 
 
 
@@ -118,16 +160,14 @@ namespace Services.Administrative.PaymentReceiptService
         }
 
 
-
         public async Task<PaymentReceiptDto> GetPaymentReceiptByIdAsync(int id)
         {
             var receipt = await _context.PaymentReceipts
-                .Include(r => r.Employee)              // Incluir el empleado
-                .ThenInclude(e => e.Profession)        // Incluir la profesión del empleado
-                .Include(r => r.Employee)              // Repetimos el Include para otra relación
-                .ThenInclude(e => e.TypeOfSalary)      // Incluir el tipo de salario del empleado
-                .Include(r => r.DeductionsList)        // Incluir la lista de deducciones
-                .FirstOrDefaultAsync(r => r.Id == id); // Buscar por ID
+                .Include(r => r.Employee)               // Incluir el empleado
+                    .ThenInclude(e => e.Profession)     // Incluir la profesión del empleado
+                .Include(r => r.Employee.TypeOfSalary)  // Incluir el tipo de salario del empleado
+                .Include(r => r.DeductionsList)         // Incluir la lista de deducciones
+                .FirstOrDefaultAsync(r => r.Id == id);  // Buscar por ID del recibo de pago
 
             if (receipt == null)
                 throw new KeyNotFoundException($"Comprobante de pago con ID {id} no encontrado.");
@@ -139,6 +179,7 @@ namespace Services.Administrative.PaymentReceiptService
 
             return _mapper.Map<PaymentReceiptDto>(receipt);
         }
+
 
 
 
@@ -160,17 +201,32 @@ namespace Services.Administrative.PaymentReceiptService
         }
 
         // Implementación de la generación del PDF
-        public async Task<MemoryStream> GeneratePaymentReceiptPdf(PaymentReceiptDto receiptDto)
-        {
-            // Aquí debes generar el PDF en base al contenido de `receiptDto`.
-            // Usarías una librería de PDF como iTextSharp, PdfSharp o cualquier otra.
+public async Task<MemoryStream> GeneratePaymentReceiptPdf(PaymentReceiptDto receiptDto)
+{
+    // Crear un nuevo documento PDF
+    var document = new PdfDocument();
+    var page = document.AddPage();
+    var graphics = XGraphics.FromPdfPage(page);
+    
+    // No necesitamos especificar el estilo 'Regular', ya que es el valor por defecto
+    var font = new XFont("Verdana", 12);
 
-            // Por ahora, un placeholder:
-            var pdfStream = new MemoryStream();
-            // Aquí iría el código de generación del PDF
-            // Escribir los datos en el stream
+    // Escribir información en el PDF
+    graphics.DrawString("Comprobante de Pago", font, XBrushes.Black, new XRect(0, 0, page.Width, page.Height), XStringFormats.TopCenter);
+    graphics.DrawString($"Empleado: {receiptDto.EmployeeFullName}", font, XBrushes.Black, new XPoint(20, 60));
+    graphics.DrawString($"Profesión: {receiptDto.Profession}", font, XBrushes.Black, new XPoint(20, 80));
+    graphics.DrawString($"Fecha de Pago: {receiptDto.PaymentDate:dd/MM/yyyy}", font, XBrushes.Black, new XPoint(20, 100));
+    graphics.DrawString($"Salario Bruto: {receiptDto.GrossAmount:C}", font, XBrushes.Black, new XPoint(20, 120));
+    graphics.DrawString($"Deducciones: {receiptDto.TotalDeductions:C}", font, XBrushes.Black, new XPoint(20, 140));
+    graphics.DrawString($"Salario Neto: {receiptDto.NetAmount:C}", font, XBrushes.Black, new XPoint(20, 160));
 
-            return pdfStream;
-        }
+    // Guardar el documento en un MemoryStream
+    var pdfStream = new MemoryStream();
+    document.Save(pdfStream, false);
+    pdfStream.Position = 0;  // Reiniciar el stream para su lectura posterior
+
+    return pdfStream;
+}
+
     }
 }
