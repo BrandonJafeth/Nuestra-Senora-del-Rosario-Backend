@@ -43,25 +43,26 @@ namespace Services.Administrative.Residents
         public async Task<IEnumerable<ResidentGetDto>> GetAllResidentsAsync()
         {
             var residents = await _residentRepository.Query()
-                .Include(r => r.Guardian)
-                .Include(r => r.Room)
-                .Include(r => r.DependencyHistories) // Incluir el historial de dependencias
-                .ThenInclude(dh => dh.DependencyLevel) // Incluir el nivel de dependencia
+                .Include(r => r.Guardian)  // Incluir los detalles del guardián
+                .Include(r => r.Room)  // Incluir los detalles de la habitación
+                .Include(r => r.DependencyHistories)  // Incluir el historial de dependencias
+                .ThenInclude(dh => dh.DependencyLevel)  // Incluir el nivel de dependencia
                 .ToListAsync();
 
             // Mapear los resultados a ResidentGetDto
             return _mapper.Map<IEnumerable<ResidentGetDto>>(residents);
         }
 
+
         // Método para obtener un residente por ID
         public async Task<ResidentGetDto> GetResidentByIdAsync(int id)
         {
             var resident = await _residentRepository.Query()
-                .Include(r => r.Guardian)
-                .Include(r => r.Room)
-                .Include(r => r.DependencyHistories) // Incluir el historial de dependencias
-                .ThenInclude(dh => dh.DependencyLevel) // Incluir el nivel de dependencia
-                .FirstOrDefaultAsync(r => r.Id_Resident == id); // Filtrar por ID del residente
+                .Include(r => r.Guardian)  // Incluir los detalles del guardián
+                .Include(r => r.Room)  // Incluir los detalles de la habitación
+                .Include(r => r.DependencyHistories)  // Incluir el historial de dependencias
+                .ThenInclude(dh => dh.DependencyLevel)  // Incluir el nivel de dependencia
+                .FirstOrDefaultAsync(r => r.Id_Resident == id);  // Filtrar por ID del residente
 
             if (resident == null)
                 throw new KeyNotFoundException($"Resident with ID {id} not found");
@@ -69,6 +70,7 @@ namespace Services.Administrative.Residents
             // Mapear el resultado a ResidentGetDto
             return _mapper.Map<ResidentGetDto>(resident);
         }
+
 
         // Método para añadir un residente desde cero
         public async Task AddResidentAsync(ResidentCreateDto residentDto)
