@@ -43,15 +43,15 @@ namespace Services.Administrative.PaymentReceiptService
                 var paymentReceipt = _mapper.Map<PaymentReceipt>(paymentReceiptCreateDto);
                 paymentReceipt.CreatedAt = DateTime.UtcNow;
 
-                // Calcular el total de horas extras
-                decimal totalExtraHoursAmount = paymentReceiptCreateDto.ExtraHourRate * paymentReceiptCreateDto.TotalExtraHoursAmount;
+                decimal totalExtraHoursAmount = paymentReceiptCreateDto.ExtraHourRate * paymentReceiptCreateDto.Overtime;
                 paymentReceipt.TotalExtraHoursAmount = totalExtraHoursAmount;
 
                 // Calcular el monto bruto (GrossAmount) sumando salario base y horas extras
                 paymentReceipt.GrossAmount = paymentReceiptCreateDto.Salary + totalExtraHoursAmount;
 
                 // Calcular el ingreso bruto (GrossIncome)
-                paymentReceipt.GrossIncome = paymentReceiptCreateDto.GrossIncome + totalExtraHoursAmount;
+                // Nota: Asegúrate de que este valor esté correctamente asignado o eliminado si no es necesario
+                paymentReceipt.GrossIncome = paymentReceipt.GrossAmount;
 
                 // Calcular el total de deducciones
                 paymentReceipt.TotalDeductions = paymentReceiptCreateDto.DeductionsList?.Sum(d => d.Amount) ?? 0;
@@ -62,7 +62,6 @@ namespace Services.Administrative.PaymentReceiptService
                 // Guardar el comprobante de pago
                 await _context.PaymentReceipts.AddAsync(paymentReceipt);
                 await _context.SaveChangesAsync();
-
                 // Registrar las deducciones
                 if (paymentReceiptCreateDto.DeductionsList != null && paymentReceiptCreateDto.DeductionsList.Any())
                 {
@@ -129,6 +128,7 @@ namespace Services.Administrative.PaymentReceiptService
                 Overtime = r.Overtime,
                 GrossIncome = r.GrossIncome,
                 NetAmount = r.NetAmount,
+                TotalExtraHoursAmount = r.TotalExtraHoursAmount,
                 TotalDeductions = r.TotalDeductions,
                 Notes = r.Notes,
                 CreatedAt = r.CreatedAt,
@@ -178,7 +178,7 @@ namespace Services.Administrative.PaymentReceiptService
         public async Task<MemoryStream> GeneratePaymentReceiptPdf(PaymentReceiptDto receiptDto)
         {
             // Ruta de la plantilla HTML
-            string templatePath = @"C:\Nuestra Señora del Rosario back\Services\Administrative\PaymentReceipt\Plantilla HTML\ComprobantePagoTemplate.html";
+            string templatePath = @"D:\VI Semestre\Ingenieria II\Desarrollo\Backend\Services\Administrative\PaymentReceipt\Plantilla HTML\ComprobantePagoTemplate.html";
 
             if (!File.Exists(templatePath))
             {
@@ -214,8 +214,8 @@ namespace Services.Administrative.PaymentReceiptService
                 .Replace("{{SalaryType}}", receiptDto.SalaryType)
                 .Replace("{{WorkedDays}}", receiptDto.WorkedDays.ToString())
                 .Replace("{{Salary}}", receiptDto.Salary.ToString("N2"))
-                .Replace("{{ExtrasHours}}", receiptDto.ExtrasHours.ToString("N2"))
-                .Replace("{{TotalExtraHoursAmount}}", receiptDto.TotalExtraHoursAmount.ToString("N2"))
+                .Replace("{{Overtime}}", receiptDto.Overtime.ToString("N2"))
+                .Replace("{{ExtraHourRate}}", receiptDto.ExtraHourRate.ToString("N2"))
                 .Replace("{{DoublesHours}}", receiptDto.DoublesHours.ToString("N2"))
                 .Replace("{{DoubleExtras}}", receiptDto.DoubleExtras.ToString("N2"))
                 .Replace("{{NightHours}}", receiptDto.NightHours.ToString("N2"))
@@ -229,6 +229,7 @@ namespace Services.Administrative.PaymentReceiptService
                 .Replace("{{VacationAmount}}", (receiptDto.VacationDays * receiptDto.Salary / 30).ToString("N2")) // Asumiendo que el pago es diario
                 .Replace("{{GrossIncome}}", receiptDto.GrossIncome.ToString("N2"))
                 .Replace("{{NetAmount}}", receiptDto.NetAmount.ToString("N2"))
+                .Replace("{{TotalExtraHoursAmount}}", receiptDto.TotalExtraHoursAmount.ToString())
                 .Replace("{{DeduccionesTable}}", deduccionesHtml.ToString());
 
             var pdfStream = new MemoryStream();
