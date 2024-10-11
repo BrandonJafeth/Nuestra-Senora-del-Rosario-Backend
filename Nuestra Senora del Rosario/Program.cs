@@ -24,6 +24,8 @@ using Services.Informative.MethodDonationService;
 using Services.Informative.NavbarItemServices;
 using Services.MyDbContext;
 using System.Text;
+using Swashbuckle.AspNetCore.Filters;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +55,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
     });
+
 
 
 
@@ -126,6 +129,14 @@ builder.Services.AddScoped<IAdministrativeFormVoluntarieService, AdministrativeF
 builder.Services.AddScoped<ISvEmailService, SvEmailService>();
 builder.Services.AddAutoMapper(typeof(AdministrativeMappingProfile));
 builder.Services.AddScoped<ISvUser, SvUser>();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Mi API", Version = "v1" });
+
+    // Configuración para manejar IFormFile
+    c.OperationFilter<FileUploadOperationFilter>();
+});
 
 // Registrar el servicio de caché en memoria
 builder.Services.AddMemoryCache(); // Aquí se añade el servicio de caché
