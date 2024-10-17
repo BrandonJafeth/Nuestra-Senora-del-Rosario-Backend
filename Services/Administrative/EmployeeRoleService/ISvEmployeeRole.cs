@@ -10,5 +10,6 @@ namespace Services.Administrative.EmployeeRoleServices
     public interface ISvEmployeeRole
     {
         Task AssignRoleToEmployeeAsync(EmployeeRoleCreateDTO employeeRoleDto);
+        Task<bool> RoleAlreadyAssignedAsync(int dniEmployee, int roleId);//nuevo método
     }
 }
