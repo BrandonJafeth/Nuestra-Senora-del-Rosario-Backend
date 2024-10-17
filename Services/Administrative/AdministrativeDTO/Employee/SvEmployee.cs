@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using Services.Administrative.EmployeeRoleServices;
 
 namespace Services.Administrative.Employees
 {
@@ -13,11 +14,18 @@ namespace Services.Administrative.Employees
     {
         private readonly ISvGenericRepository<Employee> _employeeRepository;
         private readonly IMapper _mapper;
+        private readonly ISvEmployeeRole _employeeRoleService;
 
-        public SvEmployee(ISvGenericRepository<Employee> employeeRepository, IMapper mapper)
+        public SvEmployee(ISvGenericRepository<Employee> employeeRepository, IMapper mapper, ISvEmployeeRole employeeRoleService)
         {
             _employeeRepository = employeeRepository;
             _mapper = mapper;
+            _employeeRoleService = employeeRoleService;
+        }
+        ///codigo nuevo
+        public async Task AssignRoleToEmployeeAsync(EmployeeRoleCreateDTO employeeRoleDto)
+        {
+            await _employeeRoleService.AssignRoleToEmployeeAsync(employeeRoleDto);
         }
 
         // Método para crear un empleado

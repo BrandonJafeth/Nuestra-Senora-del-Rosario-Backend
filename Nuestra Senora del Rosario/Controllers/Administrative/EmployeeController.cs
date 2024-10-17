@@ -34,6 +34,28 @@ public class EmployeeController : ControllerBase
             return StatusCode(500, ex.InnerException?.Message ?? ex.Message);
         }
     }
+    [HttpPost("{dni}/assign-role")]
+    public async Task<IActionResult> AssignRoleToEmployee(int dni, [FromBody] EmployeeRoleCreateDTO roleDto)
+    {
+        if (roleDto == null || dni != roleDto.DniEmployee)
+        {
+            return BadRequest("Datos inválidos.");
+        }
+
+        try
+        {
+            await _employeeService.AssignRoleToEmployeeAsync(roleDto);
+            return Ok("Rol asignado exitosamente.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(ex.Message);  // Error por duplicado o empleado inexistente
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error interno: {ex.Message}");
+        }
+    }
 
     // Obtener un empleado por su DNI
     [HttpGet("{dni}")]

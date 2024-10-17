@@ -72,5 +72,16 @@ namespace Services.GenericService
         {
             return await _dbSet.FirstOrDefaultAsync(u => EF.Property<int>(u, "Dni_Employee") == dniEmployee);
         }
+
+        //nuevo codigo
+        public async Task<bool> ExistsAsync(Func<T, bool> predicate)
+        {
+            return await Task.FromResult(_dbSet.Any(predicate));
+        }
+
+        public async Task<T> FirstOrDefaultAsync(Func<T, bool> predicate)
+        {
+            return await Task.FromResult(_dbSet.FirstOrDefault(predicate));
+        }
     }
 }

@@ -15,5 +15,8 @@ namespace Services.GenericService
         Task SaveChangesAsync();
         IQueryable<T> Query();  // Este método devuelve un IQueryable para poder hacer "Include
         Task<T> GetByDniAsync(int dniEmployee);
+        ///nuevo codigo 
+        Task<bool> ExistsAsync(Func<T, bool> predicate);
+        Task<T> FirstOrDefaultAsync(Func<T, bool> predicate);
     }
 }
