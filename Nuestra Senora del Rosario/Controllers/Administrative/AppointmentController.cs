@@ -68,6 +68,24 @@ public class AppointmentController : ControllerBase
         }
     }
 
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> PatchAppointment(int id, [FromBody] AppointmentUpdateDto appointmentDto)
+    {
+        try
+        {
+            await _appointmentService.PatchAppointmentAsync(id, appointmentDto);
+            return Ok(new { message = "Cita actualizada correctamente." });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
     // DELETE: api/appointment/{id}
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAppointment(int id)

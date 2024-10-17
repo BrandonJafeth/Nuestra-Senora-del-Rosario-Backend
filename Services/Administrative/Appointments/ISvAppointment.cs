@@ -9,6 +9,7 @@ namespace Services.Administrative.AppointmentService
     {
         Task CreateAppointmentAsync(AppointmentPostDto appointmentDto);
         Task UpdateAppointmentAsync(AppointmentUpdateDto appointmentDto);
+        Task PatchAppointmentAsync(int id, AppointmentUpdateDto appointmentDto);
         Task<AppointmentGetDto> GetAppointmentByIdAsync(int id);
         Task<IEnumerable<AppointmentGetDto>> GetAllAppointmentsAsync();
         Task DeleteAppointmentAsync(int id);

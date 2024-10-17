@@ -133,6 +133,39 @@ namespace Services.Administrative.AppointmentService
             await _appointmentRepository.SaveChangesAsync();
         }
 
+
+        public async Task PatchAppointmentAsync(int id, AppointmentUpdateDto appointmentDto)
+        {
+            var existingAppointment = await _appointmentRepository.GetByIdAsync(id);
+            if (existingAppointment == null)
+                throw new KeyNotFoundException($"No se encontró la cita con ID {id}");
+
+            // Actualizar solo los campos proporcionados en el DTO
+            if (appointmentDto.Date.HasValue)
+                existingAppointment.Date = appointmentDto.Date.Value;
+
+            if (appointmentDto.Time.HasValue)
+                existingAppointment.Time = appointmentDto.Time.Value;
+
+            if (appointmentDto.Id_Companion.HasValue)
+            {
+                var companion = await _employeeRepository.GetByIdAsync(appointmentDto.Id_Companion.Value);
+                if (companion == null)
+                    throw new KeyNotFoundException($"No se encontró el acompañante con DNI {appointmentDto.Id_Companion}");
+
+                existingAppointment.Id_Companion = appointmentDto.Id_Companion.Value;
+            }
+
+            if (appointmentDto.Id_StatusAP.HasValue)
+                existingAppointment.Id_StatusAP = appointmentDto.Id_StatusAP.Value;
+
+            if (appointmentDto.Notes != null)
+                existingAppointment.Notes = appointmentDto.Notes;
+
+            // Guardar los cambios
+            await _appointmentRepository.SaveChangesAsync();
+        }
+
         // Eliminar cita
         public async Task DeleteAppointmentAsync(int id)
         {
