@@ -49,6 +49,8 @@ namespace Services.MyDbContext
         public DbSet<AppointmentStatus> AppointmentStatuses { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
 
+        public DbSet<Notification> Notifications { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configuración para TypeOfSalary
@@ -380,6 +382,20 @@ namespace Services.MyDbContext
                 .HasForeignKey(a => a.Id_StatusAP);
 
 
+            // Configuración de clave primaria para Notifications
+            modelBuilder.Entity<Notification>()
+                .HasKey(n => n.Id); // Clave primaria
+
+            modelBuilder.Entity<Notification>()
+                .Property(n => n.Id)
+                .ValueGeneratedOnAdd(); // Auto-incremento
+
+            // Relación Notification -> Appointment (1:1)
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.Appointment)
+                .WithMany() // No necesitamos la colección en Appointment
+                .HasForeignKey(n => n.AppointmentId)
+                .OnDelete(DeleteBehavior.Cascade); // Eliminar notificación si se elimina la cita
 
 
         }
