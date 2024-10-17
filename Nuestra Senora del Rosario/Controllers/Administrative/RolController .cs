@@ -5,7 +5,8 @@ using Services.GenericService;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
-using Entities.Informative;  // Asegúrate de usar el namespace correcto para Rol
+using Entities.Informative;
+using Microsoft.EntityFrameworkCore;  // Asegúrate de usar el namespace correcto para Rol
 
 [ApiController]
 [Route("api/[controller]")]
@@ -48,15 +49,20 @@ public class RolController : ControllerBase
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState);
+            return BadRequest(ModelState);  // Devuelve errores de validación
         }
 
-        var rol = _mapper.Map<Rol>(rolCreateDto);
+        var rol = _mapper.Map<Rol>(rolCreateDto);  // Mapea de DTO a entidad Rol
+
+        // Verificar el mapeo
+        Console.WriteLine($"Mapped Role Name: {rol.Name_Role}");
+
         await _rolService.AddAsync(rol);
         await _rolService.SaveChangesAsync();
 
         return Ok(_mapper.Map<RolGetDTO>(rol));
     }
+
 
     // PUT: api/rol/{id}
     [HttpPut("{id}")]
@@ -64,18 +70,31 @@ public class RolController : ControllerBase
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState);
+            return BadRequest(ModelState);  // Devuelve los errores de validación si los hay
         }
 
         var existingRol = await _rolService.GetByIdAsync(id);
         if (existingRol == null)
         {
-            return NotFound($"Rol with ID {id} not found.");
+            return NotFound($"Rol with ID {id} not found.");  // Devuelve 404 si no se encuentra el rol
         }
 
+        // Mapeo de los cambios desde el DTO hacia la entidad existente
         _mapper.Map(rolCreateDto, existingRol);
-        await _rolService.SaveChangesAsync();
 
+        // Verificación del mapeo
+        Console.WriteLine($"Updated Role Name: {existingRol.Name_Role}");
+
+        try
+        {
+            await _rolService.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            return StatusCode(500, $"Error al actualizar el rol: {ex.InnerException?.Message ?? ex.Message}");
+        }
+
+        // Retorna el DTO actualizado
         return Ok(_mapper.Map<RolGetDTO>(existingRol));
     }
 

@@ -15,6 +15,7 @@ public class EmployeeController : ControllerBase
         _employeeService = employeeService;
     }
 
+    // Crear empleado sin rol
     [HttpPost]
     public async Task<IActionResult> CreateEmployee([FromBody] EmployeeCreateDTO employeeCreateDTO)
     {
@@ -25,9 +26,29 @@ public class EmployeeController : ControllerBase
 
         try
         {
-            // Llamar al servicio para crear un nuevo empleado
             await _employeeService.CreateEmployeeAsync(employeeCreateDTO);
-            return Ok();
+            return Ok(new { message = "Empleado creado exitosamente." });
+        }
+        catch (DbUpdateException ex)
+        {
+            return StatusCode(500, ex.InnerException?.Message ?? ex.Message);
+        }
+    }
+
+    [HttpPost("with-role")]
+    public async Task<IActionResult> CreateEmployeeWithRole(
+    [FromBody] EmployeeCreateDTO employeeCreateDTO,
+    [FromQuery] int? roleId)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            await _employeeService.CreateEmployeeAsync(employeeCreateDTO, roleId);
+            return Ok(new { message = "Empleado creado con rol asignado." });
         }
         catch (DbUpdateException ex)
         {

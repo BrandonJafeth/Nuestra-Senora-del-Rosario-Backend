@@ -26,6 +26,12 @@ using Services.MyDbContext;
 using System.Text;
 using Swashbuckle.AspNetCore.Filters;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
+using Services.ConverterService;
+using Services.Administrative.AppointmentService;
+using Nuestra_Senora_del_Rosario.Hubs;
+using Services.Administrative.Notifications;
+using Services.Administrative.NotificationServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +60,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience = builder.Configuration["Jwt:Audience"], // Del appsettings.json
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
+    });
+
+builder.Services.AddSignalR(); // Agregar SignalR
+
+builder.Services.AddHostedService<NotificationHostedService>();
+
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+        options.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Local);
+
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Unspecified;
+        options.SerializerSettings.Converters.Add(new CostaRicaDateTimeConverter());
     });
 
 
@@ -89,6 +110,17 @@ builder.Services.AddScoped<ISvGenericRepository<Resident>, SvGenericRepository<R
 builder.Services.AddScoped<ISvGenericRepository<Guardian>, SvGenericRepository<Guardian, AdministrativeContext>>();
 builder.Services.AddScoped<ISvGenericRepository<Applicant>, SvGenericRepository<Applicant, AdministrativeContext>>();
 builder.Services.AddScoped<ISvPdfReceiverService, SvPdfReceiverService>();
+builder.Services.AddScoped<ISvGenericRepository<Notification>, SvGenericRepository<Notification, AdministrativeContext>>();
+builder.Services.AddScoped<ISvNotification, SvNotification>(); // Registro del servicio de notificaciones
+
+// Registros genéricos y servicios adicionales para citas y sus entidades relacionadas
+
+builder.Services.AddScoped<ISvGenericRepository<Appointment>, SvGenericRepository<Appointment, AdministrativeContext>>();
+builder.Services.AddScoped<ISvAppointment, SvAppointment>();  // Servicio de Citas
+
+builder.Services.AddScoped<ISvGenericRepository<Specialty>, SvGenericRepository<Specialty, AdministrativeContext>>();
+builder.Services.AddScoped<ISvGenericRepository<HealthcareCenter>, SvGenericRepository<HealthcareCenter, AdministrativeContext>>();
+builder.Services.AddScoped<ISvGenericRepository<AppointmentStatus>, SvGenericRepository<AppointmentStatus, AdministrativeContext>>();
 
 
 builder.Services.AddScoped<ISvPaymentReceipt, SvPaymentReceipt>();
@@ -117,6 +149,8 @@ builder.Services.AddScoped<ISvGenericRepository<VolunteeringSection>, SvGenericR
 builder.Services.AddScoped<ISvGenericRepository<VolunteerProfile>, SvGenericRepository<VolunteerProfile, MyInformativeContext>>();
 builder.Services.AddScoped<ISvGenericRepository<AboutUsSection>, SvGenericRepository<AboutUsSection, MyInformativeContext>>();
 builder.Services.AddScoped<ISvGenericRepository<ApplicationStatus>, SvGenericRepository<ApplicationStatus, MyInformativeContext>>();
+
+
 // Registros de servicios específicos
 builder.Services.AddScoped<ISvNavbarItemService, SvNavbarItem>();
 builder.Services.AddScoped<ISvGalleryItem, SvGalleryItem>();
@@ -170,10 +204,25 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Habilitar CORS antes de la autenticación
 app.UseCors("AllowAll");
-app.UseAuthentication();
-app.UseHttpsRedirection();
-app.UseAuthorization();
-app.MapControllers();
 
+// Habilitar HTTPS y autenticación
+app.UseHttpsRedirection();
+app.UseAuthentication();
+
+// 1️⃣ Habilitar enrutamiento
+app.UseRouting();
+
+// 2️⃣ Autorización después del enrutamiento
+app.UseAuthorization();
+
+// 3️⃣ Mapeo de controladores y SignalR
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers(); // Mapea los controladores
+    endpoints.MapHub<NotificationHub>("/notificationHub"); // Mapea el Hub de SignalR
+});
+
+// Ejecutar la aplicación
 app.Run();

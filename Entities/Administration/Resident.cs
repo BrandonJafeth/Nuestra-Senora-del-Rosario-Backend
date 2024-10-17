@@ -49,6 +49,8 @@ namespace Entities.Administration
         // Relación con el historial de dependencia
         public ICollection<DependencyHistory> DependencyHistories { get; set; }  // Historial de dependencia (colección de registros)
 
+        public ICollection<Appointment> Appointments { get; set; }
+
         // Esta propiedad es opcional si deseas cargar el último nivel de dependencia
         [NotMapped]
         public DependencyHistory LatestDependencyHistory => DependencyHistories?.OrderByDescending(d => d.Id_History).FirstOrDefault();
