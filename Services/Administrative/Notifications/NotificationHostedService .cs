@@ -19,12 +19,14 @@ namespace Services.Administrative.NotificationServices
             _serviceProvider = serviceProvider;
         }
 
+        // Iniciar el servicio con un temporizador que se ejecuta cada hora
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _timer = new Timer(CheckAppointments, null, TimeSpan.Zero, TimeSpan.FromDays(1));
+            _timer = new Timer(CheckAppointments, null, TimeSpan.Zero, TimeSpan.FromHours(1));
             return Task.CompletedTask;
         }
 
+        // Método que verifica las citas y envía notificaciones
         private async void CheckAppointments(object state)
         {
             using var scope = _serviceProvider.CreateScope();
@@ -32,15 +34,28 @@ namespace Services.Administrative.NotificationServices
             var appointmentService = scope.ServiceProvider.GetRequiredService<ISvAppointment>();
 
             var upcomingAppointments = await appointmentService.GetAllAppointmentsAsync();
-            var appointmentsIn3Days = upcomingAppointments
-                .Where(a => a.Date == DateTime.UtcNow.AddDays(3).Date);
 
-            foreach (var appointment in appointmentsIn3Days)
+            // Obtener las citas en los próximos 3 días
+            var now = DateTime.UtcNow;
+            var relevantAppointments = upcomingAppointments
+                .Where(a => a.Date >= now.Date && a.Date <= now.AddDays(3).Date) // Citas dentro de 3 días
+                .ToList();
+
+            foreach (var appointment in relevantAppointments)
             {
+                var daysLeft = (appointment.Date - now.Date).Days; // Días restantes
+                var message = daysLeft switch
+                {
+                    0 => $"La cita con {appointment.ResidentFullName} es hoy.",
+                    1 => $"La cita con {appointment.ResidentFullName} es mañana.",
+                    _ => $"La cita con {appointment.ResidentFullName} es en {daysLeft} días."
+                };
+
                 await notificationService.CreateNotificationAsync(
                     "Recordatorio de Cita",
-                    $"La cita con {appointment.ResidentFullName} es en 3 días.",
-                    appointment.Id_Appointment);
+                    message,
+                    appointment.Id_Appointment
+                );
             }
         }
 
