@@ -38,9 +38,12 @@ namespace Services.Administrative.NotificationServices
             // Obtener las citas en los próximos 3 días
             var now = DateTime.UtcNow;
             var relevantAppointments = upcomingAppointments
-                .Where(a => a.Date >= now.Date && a.Date <= now.AddDays(3).Date) // Citas dentro de 3 días
+                .Where(a => a.Date >= now.Date && a.Date <= now.AddDays(3).Date)
+                .OrderBy(a => a.Date).ThenBy(a => a.Time) // Ordenar por fecha y hora
+                .Take(2) // Limitar a 2 notificaciones por ejecución
                 .ToList();
 
+            // Enviar un máximo de 2 notificaciones por día
             foreach (var appointment in relevantAppointments)
             {
                 var daysLeft = (appointment.Date - now.Date).Days; // Días restantes
