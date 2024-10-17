@@ -13,10 +13,10 @@ namespace Services.Administrative.Employees
     public class SvEmployee : ISvEmployee
     {
         private readonly ISvGenericRepository<Employee> _employeeRepository;
-        private readonly ISvEmployeeRole _employeeRoleService; // Nuevo
-        private readonly IMapper _mapper;
         private readonly ISvEmployeeRole _employeeRoleService;
+        private readonly IMapper _mapper;
 
+        // Constructor
         public SvEmployee(
             ISvGenericRepository<Employee> employeeRepository,
             ISvEmployeeRole employeeRoleService,
@@ -25,15 +25,15 @@ namespace Services.Administrative.Employees
             _employeeRepository = employeeRepository;
             _employeeRoleService = employeeRoleService;
             _mapper = mapper;
-            _employeeRoleService = employeeRoleService;
         }
-        ///codigo nuevo
+
+        // Asignar un rol a un empleado.
         public async Task AssignRoleToEmployeeAsync(EmployeeRoleCreateDTO employeeRoleDto)
         {
             await _employeeRoleService.AssignRoleToEmployeeAsync(employeeRoleDto);
         }
 
-        // Método para crear un empleado
+        // Crear un empleado sin rol.
         public async Task CreateEmployeeAsync(EmployeeCreateDTO employeeCreateDTO)
         {
             var employee = _mapper.Map<Employee>(employeeCreateDTO);
@@ -41,35 +41,7 @@ namespace Services.Administrative.Employees
             await _employeeRepository.SaveChangesAsync();
         }
 
-        public async Task<EmployeeGetDTO> GetEmployeeByIdAsync(int dni)
-        {
-            var employee = await _employeeRepository
-                .Query()  // Usamos el método "Query" que devuelve IQueryable para poder hacer Include
-                .Include(e => e.Profession)
-                .Include(e => e.TypeOfSalary)
-                .FirstOrDefaultAsync(e => e.Dni == dni);  // Filtrar por DNI
-
-            if (employee == null)
-            {
-                return null;
-            }
-
-            // Mapeamos la entidad a DTO
-            return _mapper.Map<EmployeeGetDTO>(employee);
-        }
-
-        public async Task<IEnumerable<EmployeeGetDTO>> GetAllEmployeesAsync()
-        {
-            var employees = await _employeeRepository
-                .Query()  // Usamos el método "Query" que devuelve IQueryable para poder hacer Include
-                .Include(e => e.Profession)
-                .Include(e => e.TypeOfSalary)
-                .ToListAsync();
-
-            return _mapper.Map<IEnumerable<EmployeeGetDTO>>(employees);
-        }
-
-        // Método para crear un empleado con rol opcional
+        // Crear un empleado con un rol opcional.
         public async Task CreateEmployeeAsync(EmployeeCreateDTO employeeCreateDTO, int? roleId)
         {
             var employee = _mapper.Map<Employee>(employeeCreateDTO);
@@ -78,9 +50,42 @@ namespace Services.Administrative.Employees
 
             if (roleId.HasValue)
             {
-                var roleDto = new EmployeeRoleCreateDTO { DniEmployee = employee.Dni, IdRole = roleId.Value };
+                var roleDto = new EmployeeRoleCreateDTO
+                {
+                    DniEmployee = employee.Dni,
+                    IdRole = roleId.Value
+                };
                 await _employeeRoleService.AssignRoleToEmployeeAsync(roleDto);
             }
+        }
+
+        // Obtener un empleado por DNI.
+        public async Task<EmployeeGetDTO> GetEmployeeByIdAsync(int dni)
+        {
+            var employee = await _employeeRepository
+                .Query()
+                .Include(e => e.Profession)
+                .Include(e => e.TypeOfSalary)
+                .FirstOrDefaultAsync(e => e.Dni == dni);
+
+            if (employee == null)
+            {
+                return null;
+            }
+
+            return _mapper.Map<EmployeeGetDTO>(employee);
+        }
+
+        // Obtener todos los empleados.
+        public async Task<IEnumerable<EmployeeGetDTO>> GetAllEmployeesAsync()
+        {
+            var employees = await _employeeRepository
+                .Query()
+                .Include(e => e.Profession)
+                .Include(e => e.TypeOfSalary)
+                .ToListAsync();
+
+            return _mapper.Map<IEnumerable<EmployeeGetDTO>>(employees);
         }
     }
 }

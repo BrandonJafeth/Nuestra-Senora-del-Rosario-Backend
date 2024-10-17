@@ -55,10 +55,12 @@ public class EmployeeController : ControllerBase
             return StatusCode(500, ex.InnerException?.Message ?? ex.Message);
         }
     }
-    [HttpPost("{dni}/assign-role")]
-    public async Task<IActionResult> AssignRoleToEmployee(int dni, [FromBody] EmployeeRoleCreateDTO roleDto)
+
+    //agragarle otro rol a un empleado  
+    [HttpPost("assign-role")]
+    public async Task<IActionResult> AssignRoleToEmployee([FromBody] EmployeeRoleCreateDTO roleDto)
     {
-        if (roleDto == null || dni != roleDto.DniEmployee)
+        if (roleDto == null)
         {
             return BadRequest("Datos inválidos.");
         }
@@ -77,6 +79,7 @@ public class EmployeeController : ControllerBase
             return StatusCode(500, $"Error interno: {ex.Message}");
         }
     }
+
 
     // Obtener un empleado por su DNI
     [HttpGet("{dni}")]
