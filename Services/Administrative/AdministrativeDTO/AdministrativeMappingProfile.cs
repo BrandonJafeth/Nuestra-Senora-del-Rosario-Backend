@@ -192,5 +192,10 @@ public class AdministrativeMappingProfile : Profile
 
         CreateMap<SpecialtyCreateUpdateDto, Specialty>()
             .ForMember(dest => dest.Name_Specialty, opt => opt.MapFrom(src => src.Name_Specialty));
+
+
+
+        // Mapeo para Notificaciones
+        CreateMap<Notification, NotificationGetDto>();
     }
 }
