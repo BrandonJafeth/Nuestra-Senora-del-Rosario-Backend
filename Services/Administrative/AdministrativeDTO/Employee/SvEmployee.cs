@@ -6,17 +6,23 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using Services.Administrative.EmployeeRoleServices;
 
 namespace Services.Administrative.Employees
 {
     public class SvEmployee : ISvEmployee
     {
         private readonly ISvGenericRepository<Employee> _employeeRepository;
+        private readonly ISvEmployeeRole _employeeRoleService; // Nuevo
         private readonly IMapper _mapper;
 
-        public SvEmployee(ISvGenericRepository<Employee> employeeRepository, IMapper mapper)
+        public SvEmployee(
+            ISvGenericRepository<Employee> employeeRepository,
+            ISvEmployeeRole employeeRoleService,
+            IMapper mapper)
         {
             _employeeRepository = employeeRepository;
+            _employeeRoleService = employeeRoleService;
             _mapper = mapper;
         }
 
@@ -56,5 +62,18 @@ namespace Services.Administrative.Employees
             return _mapper.Map<IEnumerable<EmployeeGetDTO>>(employees);
         }
 
+        // Método para crear un empleado con rol opcional
+        public async Task CreateEmployeeAsync(EmployeeCreateDTO employeeCreateDTO, int? roleId)
+        {
+            var employee = _mapper.Map<Employee>(employeeCreateDTO);
+            await _employeeRepository.AddAsync(employee);
+            await _employeeRepository.SaveChangesAsync();
+
+            if (roleId.HasValue)
+            {
+                var roleDto = new EmployeeRoleCreateDTO { DniEmployee = employee.Dni, IdRole = roleId.Value };
+                await _employeeRoleService.AssignRoleToEmployeeAsync(roleDto);
+            }
+        }
     }
 }

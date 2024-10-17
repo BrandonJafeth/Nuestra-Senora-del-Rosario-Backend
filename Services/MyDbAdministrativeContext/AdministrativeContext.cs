@@ -44,6 +44,11 @@ namespace Services.MyDbContext
         public DbSet<DependencyHistory> DependencyHistories { get; set; }
         public DbSet<ResidentApplication> Residents_Applications { get; set; }
 
+        public DbSet<HealthcareCenter> HealthcareCenters { get; set; }
+        public DbSet<Specialty> Specialties { get; set; }
+        public DbSet<AppointmentStatus> AppointmentStatuses { get; set; }
+        public DbSet<Appointment> Appointments { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configuración para TypeOfSalary
@@ -317,6 +322,65 @@ namespace Services.MyDbContext
                 .WithMany()
                 .HasForeignKey(d => d.Id_DependencyLevel)
                 .OnDelete(DeleteBehavior.Restrict);  // Restricción de eliminación para mantener la consistencia
+
+
+
+
+            modelBuilder.Entity<Appointment>()
+            .HasKey(a => a.Id_Appointment);
+
+            modelBuilder.Entity<AppointmentStatus>()
+     .HasKey(status => status.Id_StatusAP);
+
+
+            modelBuilder.Entity<HealthcareCenter>()
+     .HasKey(hc => hc.Id_HC);
+
+
+            modelBuilder.Entity<Specialty>()
+     .HasKey(s => s.Id_Specialty);
+
+
+            // Índice único para evitar citas duplicadas para el mismo residente a la misma hora
+            modelBuilder.Entity<Appointment>()
+                .HasIndex(a => new { a.Id_Resident, a.Date, a.Time })
+                .IsUnique()
+                .HasDatabaseName("idx_unique_appointment");
+
+            // Relación Resident -> Appointments (1 a muchos)
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.Resident)
+                .WithMany(r => r.Appointments)
+                .HasForeignKey(a => a.Id_Resident)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Relación HealthcareCenter -> Appointments (1 a muchos)
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.HealthcareCenter)
+                .WithMany(hc => hc.Appointments)
+                .HasForeignKey(a => a.Id_HC);
+
+            // Relación Specialty -> Appointments (1 a muchos)
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.Specialty)
+                .WithMany(s => s.Appointments)
+                .HasForeignKey(a => a.Id_Specialty);
+
+            // Relación Employee (acompañante) -> Appointments (1 a muchos)
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.Companion)
+                .WithMany(e => e.CompanionAppointments)
+                .HasForeignKey(a => a.Id_Companion)
+                .OnDelete(DeleteBehavior.Restrict); // No permite eliminar empleados si están como acompañantes
+
+            // Relación AppointmentStatus -> Appointments (1 a muchos)
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.AppointmentStatus)
+                .WithMany(status => status.Appointments)
+                .HasForeignKey(a => a.Id_StatusAP);
+
+
+
 
         }
     }

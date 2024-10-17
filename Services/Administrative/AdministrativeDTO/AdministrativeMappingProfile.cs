@@ -39,7 +39,11 @@ public class AdministrativeMappingProfile : Profile
            .ForMember(dest => dest.Is_Active, opt => opt.MapFrom(src => src.Is_Active));
 
         // Mapping para Rol
-        CreateMap<RolCreateDTO, Rol>();
+        CreateMap<RolCreateDTO, Rol>()
+        .ForMember(dest => dest.Name_Role, opt => opt.MapFrom(src => src.NameRole));
+
+
+
         CreateMap<Rol, RolGetDTO>()
             .ForMember(dest => dest.IdRole, opt => opt.MapFrom(src => src.Id_Role))
             .ForMember(dest => dest.NameRole, opt => opt.MapFrom(src => src.Name_Role));
@@ -128,5 +132,65 @@ public class AdministrativeMappingProfile : Profile
             .ForMember(dest => dest.Sexo, opt => opt.MapFrom(src => src.Sexo))
             .ForMember(dest => dest.EntryDate, opt => opt.MapFrom(src => src.EntryDate));
 
+
+
+        // Mapeo de AppointmentPostDto a Appointment (POST)
+        CreateMap<AppointmentPostDto, Appointment>()
+            .ForMember(dest => dest.Id_Resident, opt => opt.MapFrom(src => src.Id_Resident))
+            .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
+            .ForMember(dest => dest.Time, opt => opt.MapFrom(src => src.Time))
+            .ForMember(dest => dest.Id_HC, opt => opt.MapFrom(src => src.Id_HC))
+            .ForMember(dest => dest.Id_Specialty, opt => opt.MapFrom(src => src.Id_Specialty))
+            .ForMember(dest => dest.Id_Companion, opt => opt.MapFrom(src => src.Id_Companion))
+            .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes));
+
+        // Mapeo de AppointmentUpdateDto a Appointment (PATCH / PUT)
+        CreateMap<AppointmentUpdateDto, Appointment>()
+            .ForMember(dest => dest.Id_Appointment, opt => opt.MapFrom(src => src.Id_Appointment))
+            .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+        // Solo actualiza los valores que no sean nulos.
+
+        // Mapeo de Appointment a AppointmentGetDto (GET)
+        CreateMap<Appointment, AppointmentGetDto>()
+            .ForMember(dest => dest.Id_Appointment, opt => opt.MapFrom(src => src.Id_Appointment))
+            .ForMember(dest => dest.ResidentFullName, opt => opt.MapFrom(src =>
+                $"{src.Resident.Name_AP} {src.Resident.Lastname1_AP} {src.Resident.Lastname2_AP}"))
+            .ForMember(dest => dest.ResidentCedula, opt => opt.MapFrom(src => src.Resident.Cedula_AP))
+            .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
+            .ForMember(dest => dest.Time, opt => opt.MapFrom(src => src.Time))
+            .ForMember(dest => dest.SpecialtyName, opt => opt.MapFrom(src => src.Specialty.Name_Specialty))
+            .ForMember(dest => dest.HealthcareCenterName, opt => opt.MapFrom(src => src.HealthcareCenter.Name_HC))
+            .ForMember(dest => dest.CompanionName, opt => opt.MapFrom(src =>
+                $"{src.Companion.First_Name} {src.Companion.Last_Name1} {src.Companion.Last_Name2}"))
+            .ForMember(dest => dest.StatusName, opt => opt.MapFrom(src => src.AppointmentStatus.Name_StatusAP))
+            .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes));
+
+        // AppointmentStatus Mapping
+        CreateMap<AppointmentStatus, AppointmentStatusGetDto>()
+            .ForMember(dest => dest.Id_StatusAP, opt => opt.MapFrom(src => src.Id_StatusAP))
+            .ForMember(dest => dest.Name_StatusAP, opt => opt.MapFrom(src => src.Name_StatusAP));
+
+        CreateMap<AppointmentStatusCreateUpdateDto, AppointmentStatus>()
+            .ForMember(dest => dest.Name_StatusAP, opt => opt.MapFrom(src => src.Name_StatusAP));
+
+        // HealthcareCenter Mapping
+        CreateMap<HealthcareCenter, HealthcareCenterGetDto>()
+            .ForMember(dest => dest.Id_HC, opt => opt.MapFrom(src => src.Id_HC))
+            .ForMember(dest => dest.Name_HC, opt => opt.MapFrom(src => src.Name_HC))
+            .ForMember(dest => dest.Location_HC, opt => opt.MapFrom(src => src.Location_HC))
+            .ForMember(dest => dest.Type_HC, opt => opt.MapFrom(src => src.Type_HC));
+
+        CreateMap<HealthcareCenterCreateUpdateDto, HealthcareCenter>()
+            .ForMember(dest => dest.Name_HC, opt => opt.MapFrom(src => src.Name_HC))
+            .ForMember(dest => dest.Location_HC, opt => opt.MapFrom(src => src.Location_HC))
+            .ForMember(dest => dest.Type_HC, opt => opt.MapFrom(src => src.Type_HC));
+
+        // Specialty Mapping
+        CreateMap<Specialty, SpecialtyGetDto>()
+            .ForMember(dest => dest.Id_Specialty, opt => opt.MapFrom(src => src.Id_Specialty))
+            .ForMember(dest => dest.Name_Specialty, opt => opt.MapFrom(src => src.Name_Specialty));
+
+        CreateMap<SpecialtyCreateUpdateDto, Specialty>()
+            .ForMember(dest => dest.Name_Specialty, opt => opt.MapFrom(src => src.Name_Specialty));
     }
 }

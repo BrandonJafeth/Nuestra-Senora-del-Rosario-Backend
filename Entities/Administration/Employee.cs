@@ -22,4 +22,6 @@ public class Employee
 
     public ICollection<PaymentReceipt> PaymentReceipts { get; set; }  // Relación 1:N con PaymentReceipt
 
+    public ICollection<Appointment> CompanionAppointments { get; set; }
+
 }

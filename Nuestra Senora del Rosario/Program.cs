@@ -26,6 +26,9 @@ using Services.MyDbContext;
 using System.Text;
 using Swashbuckle.AspNetCore.Filters;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
+using Services.ConverterService;
+using Services.Administrative.AppointmentService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,6 +61,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 
 
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+        options.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Local);
+
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Unspecified;
+        options.SerializerSettings.Converters.Add(new CostaRicaDateTimeConverter());
+    });
+
 
 // Registros genéricos para entidades en MyInformativeContext
 builder.Services.AddScoped<ISvGenericRepository<FormVoluntarie>, SvGenericRepository<FormVoluntarie, MyInformativeContext>>();
@@ -89,6 +103,14 @@ builder.Services.AddScoped<ISvGenericRepository<Resident>, SvGenericRepository<R
 builder.Services.AddScoped<ISvGenericRepository<Guardian>, SvGenericRepository<Guardian, AdministrativeContext>>();
 builder.Services.AddScoped<ISvGenericRepository<Applicant>, SvGenericRepository<Applicant, AdministrativeContext>>();
 builder.Services.AddScoped<ISvPdfReceiverService, SvPdfReceiverService>();
+// Registros genéricos y servicios adicionales para citas y sus entidades relacionadas
+
+builder.Services.AddScoped<ISvGenericRepository<Appointment>, SvGenericRepository<Appointment, AdministrativeContext>>();
+builder.Services.AddScoped<ISvAppointment, SvAppointment>();  // Servicio de Citas
+
+builder.Services.AddScoped<ISvGenericRepository<Specialty>, SvGenericRepository<Specialty, AdministrativeContext>>();
+builder.Services.AddScoped<ISvGenericRepository<HealthcareCenter>, SvGenericRepository<HealthcareCenter, AdministrativeContext>>();
+builder.Services.AddScoped<ISvGenericRepository<AppointmentStatus>, SvGenericRepository<AppointmentStatus, AdministrativeContext>>();
 
 
 builder.Services.AddScoped<ISvPaymentReceipt, SvPaymentReceipt>();

@@ -7,6 +7,7 @@ namespace Services.Administrative.Employees
     public interface ISvEmployee
     {
         Task CreateEmployeeAsync(EmployeeCreateDTO employeeCreateDTO); // Nuevo método para crear un empleado
+        Task CreateEmployeeAsync(EmployeeCreateDTO employeeCreateDTO, int? roleId); // Método con rol opcional
         Task<EmployeeGetDTO> GetEmployeeByIdAsync(int dni);
         Task<IEnumerable<EmployeeGetDTO>> GetAllEmployeesAsync();
     }
