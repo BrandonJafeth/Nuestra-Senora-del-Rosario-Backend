@@ -197,5 +197,25 @@ public class AdministrativeMappingProfile : Profile
 
         // Mapeo para Notificaciones
         CreateMap<Notification, NotificationGetDto>();
+
+
+
+
+
+        // Mapping para Employee -> EmployeeWithRolesGetDto
+        CreateMap<Employee, EmployeeWithRolesGetDto>()
+            .ForMember(dest => dest.Dni, opt => opt.MapFrom(src => src.Dni))
+            .ForMember(dest => dest.FullName,
+                opt => opt.MapFrom(src => $"{src.First_Name} {src.Last_Name1} {src.Last_Name2}"))
+            .ForMember(dest => dest.Roles,
+                opt => opt.MapFrom(src => src.EmployeeRoles.Select(er => er.Rol.Name_Role).ToList()));
+
+        // Mapping para Employee -> EmployeeByRoleGetDto
+        CreateMap<Employee, EmployeeByRoleGetDto>()
+            .ForMember(dest => dest.Dni, opt => opt.MapFrom(src => src.Dni))
+            .ForMember(dest => dest.FullName,
+                opt => opt.MapFrom(src => $"{src.First_Name} {src.Last_Name1} {src.Last_Name2}"))
+            .ForMember(dest => dest.RoleName,
+                opt => opt.MapFrom(src => src.EmployeeRoles.FirstOrDefault().Rol.Name_Role));
     }
 }

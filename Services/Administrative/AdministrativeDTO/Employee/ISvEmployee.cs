@@ -12,5 +12,14 @@ namespace Services.Administrative.Employees
         Task<IEnumerable<EmployeeGetDTO>> GetAllEmployeesAsync();
 
         Task AssignRoleToEmployeeAsync(EmployeeRoleCreateDTO employeeRoleDto);//nuevo método
+
+
+
+
+        // Nuevos métodos
+        Task<IEnumerable<EmployeeWithRolesGetDto>> GetEmployeesWithRolesAsync();
+        Task<IEnumerable<EmployeeByRoleGetDto>> GetEmployeesByRoleAsync(string roleName);
+
+        Task<IEnumerable<EmployeeByRoleGetDto>> GetEncargadosAsync();  // Nuevo método
     }
 }

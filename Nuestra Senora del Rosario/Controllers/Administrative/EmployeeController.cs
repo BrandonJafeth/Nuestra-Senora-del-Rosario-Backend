@@ -100,4 +100,30 @@ public class EmployeeController : ControllerBase
         var employees = await _employeeService.GetAllEmployeesAsync();
         return Ok(employees);
     }
+
+
+    // GET: api/employee/with-roles
+    [HttpGet("with-roles")]
+    public async Task<IActionResult> GetEmployeesWithRoles()
+    {
+        var employees = await _employeeService.GetEmployeesWithRolesAsync();
+        return Ok(employees);
+    }
+
+
+    // GET: api/employee/encargados
+    [HttpGet("encargados")]
+    public async Task<IActionResult> GetEncargados()
+    {
+        var encargados = await _employeeService.GetEncargadosAsync();
+        return Ok(encargados);
+    }
+
+    // GET: api/employee/by-role/{roleName}
+    [HttpGet("by-role/{roleName}")]
+    public async Task<IActionResult> GetEmployeesByRole(string roleName)
+    {
+        var employees = await _employeeService.GetEmployeesByRoleAsync(roleName);
+        return Ok(employees);
+    }
 }
