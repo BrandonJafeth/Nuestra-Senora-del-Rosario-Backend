@@ -76,6 +76,57 @@ namespace Services.Administrative.Employees
             return _mapper.Map<EmployeeGetDTO>(employee);
         }
 
+
+        // Obtener empleados con sus roles
+        public async Task<IEnumerable<EmployeeWithRolesGetDto>> GetEmployeesWithRolesAsync()
+        {
+            var employees = await _employeeRepository.Query()
+                .Include(e => e.EmployeeRoles)
+                    .ThenInclude(er => er.Rol)
+                .ToListAsync();
+
+            return employees.Select(e => new EmployeeWithRolesGetDto
+            {
+                Dni = e.Dni,
+                FullName = $"{e.First_Name} {e.Last_Name1} {e.Last_Name2}",
+                Roles = e.EmployeeRoles.Select(er => er.Rol.Name_Role).ToList()
+            });
+        }
+
+        // Obtener empleados por un rol específico
+        public async Task<IEnumerable<EmployeeByRoleGetDto>> GetEmployeesByRoleAsync(string roleName)
+        {
+            var employees = await _employeeRepository.Query()
+                .Include(e => e.EmployeeRoles)
+                    .ThenInclude(er => er.Rol)
+                .Where(e => e.EmployeeRoles.Any(er => er.Rol.Name_Role == roleName))
+                .ToListAsync();
+
+            return employees.Select(e => new EmployeeByRoleGetDto
+            {
+                Dni = e.Dni,
+                FullName = $"{e.First_Name} {e.Last_Name1} {e.Last_Name2}",
+                RoleName = roleName
+            });
+        }
+
+        public async Task<IEnumerable<EmployeeByRoleGetDto>> GetEncargadosAsync()
+        {
+            var employees = await _employeeRepository.Query()
+                .Include(e => e.EmployeeRoles)
+                    .ThenInclude(er => er.Rol)
+                .Where(e => e.EmployeeRoles.Any(er => er.Rol.Name_Role == "Encargado"))  // Filtro por rol
+                .ToListAsync();
+
+            return employees.Select(e => new EmployeeByRoleGetDto
+            {
+                Dni = e.Dni,
+                FullName = $"{e.First_Name} {e.Last_Name1} {e.Last_Name2}",
+                RoleName = "Encargado"
+            });
+        }
+
+
         // Obtener todos los empleados.
         public async Task<IEnumerable<EmployeeGetDTO>> GetAllEmployeesAsync()
         {
