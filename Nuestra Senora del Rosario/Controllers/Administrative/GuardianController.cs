@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Services.GenericService;
+using Services.Administrative.Guardians;
 using System.Threading.Tasks;
 using Entities.Administration;
 using Microsoft.EntityFrameworkCore;
@@ -11,9 +11,9 @@ namespace Nuestra_Senora_del_Rosario.Controllers.Administrative
     [Route("api/[controller]")]
     public class GuardianController : ControllerBase
     {
-        private readonly ISvGenericRepository<Guardian> _guardianService;
+        private readonly ISvGuardian _guardianService;
 
-        public GuardianController(ISvGenericRepository<Guardian> guardianService)
+        public GuardianController(ISvGuardian guardianService)
         {
             _guardianService = guardianService;
         }
@@ -33,9 +33,28 @@ namespace Nuestra_Senora_del_Rosario.Controllers.Administrative
             var guardian = await _guardianService.GetByIdAsync(id);
             if (guardian == null)
             {
-                return NotFound($"Guardian with ID {id} not found.");
+                return NotFound($"Guardian con ID {id} no encontrado.");
             }
             return Ok(guardian);
+        }
+
+        // **Nuevo**: Buscar guardianes por nombre o apellido
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchGuardiansByName([FromQuery] string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return BadRequest("Debe proporcionar un nombre o apellido para buscar.");
+            }
+
+            var guardians = await _guardianService.SearchGuardiansByNameAsync(name);
+
+            if (guardians == null || !guardians.Any())
+            {
+                return NotFound($"No se encontraron guardianes con el nombre o apellido '{name}'.");
+            }
+
+            return Ok(guardians);
         }
 
         // POST: api/guardian
@@ -59,7 +78,7 @@ namespace Nuestra_Senora_del_Rosario.Controllers.Administrative
         {
             if (patchDoc == null)
             {
-                return BadRequest("Invalid patch document.");
+                return BadRequest("Documento de actualización inválido.");
             }
 
             try
@@ -78,6 +97,12 @@ namespace Nuestra_Senora_del_Rosario.Controllers.Administrative
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGuardian(int id)
         {
+            var guardian = await _guardianService.GetByIdAsync(id);
+            if (guardian == null)
+            {
+                return NotFound($"Guardian con ID {id} no encontrado.");
+            }
+
             await _guardianService.DeleteAsync(id);
             await _guardianService.SaveChangesAsync();
             return NoContent();
