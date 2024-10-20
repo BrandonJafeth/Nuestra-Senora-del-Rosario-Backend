@@ -32,6 +32,7 @@ using Services.Administrative.AppointmentService;
 using Nuestra_Senora_del_Rosario.Hubs;
 using Services.Administrative.Notifications;
 using Services.Administrative.NotificationServices;
+using Services.Administrative.Guardians;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -117,6 +118,7 @@ builder.Services.AddScoped<ISvNotification, SvNotification>(); // Registro del s
 
 builder.Services.AddScoped<ISvGenericRepository<Appointment>, SvGenericRepository<Appointment, AdministrativeContext>>();
 builder.Services.AddScoped<ISvAppointment, SvAppointment>();  // Servicio de Citas
+builder.Services.AddScoped<ISvGuardian, SvGuardian>();
 
 builder.Services.AddScoped<ISvGenericRepository<Specialty>, SvGenericRepository<Specialty, AdministrativeContext>>();
 builder.Services.AddScoped<ISvGenericRepository<HealthcareCenter>, SvGenericRepository<HealthcareCenter, AdministrativeContext>>();
