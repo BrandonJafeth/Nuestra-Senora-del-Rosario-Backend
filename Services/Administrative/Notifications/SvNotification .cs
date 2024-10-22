@@ -31,6 +31,18 @@ namespace Services.Administrative.NotificationServices
                 .ToListAsync();
         }
 
+        public async Task<Notification> GetNotificationByAppointmentIdAsync(int appointmentId)
+        {
+            return await _notificationRepository.Query()
+                .FirstOrDefaultAsync(n => n.AppointmentId == appointmentId);
+        }
+
+        // Nuevo: Obtener notificación por título y cita
+        public async Task<Notification> GetNotificationByTitleAsync(string title, int appointmentId)
+        {
+            return await _notificationRepository.Query()
+                .FirstOrDefaultAsync(n => n.Title == title && n.AppointmentId == appointmentId);
+        }
         public async Task MarkAsReadAsync(int id)
         {
             var notification = await _notificationRepository.GetByIdAsync(id);
