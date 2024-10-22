@@ -12,5 +12,9 @@ namespace Services.Administrative.Notifications
         Task<IEnumerable<Notification>> GetUnreadNotificationsAsync(); // Notificaciones no leídas
         Task MarkAsReadAsync(int id); // Marcar notificación como leída
         Task CreateNotificationAsync(string title, string message, int appointmentId); // Crear notificación
+        Task<Notification> GetNotificationByAppointmentIdAsync(int appointmentId);
+        Task<Notification> GetNotificationByTitleAsync(string title, int appointmentId);
+
+
     }
 }
