@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Runtime.InteropServices; // Detectar sistema operativo
+using System.Runtime.InteropServices;
 
 namespace Services.ConverterService
 {
@@ -10,10 +10,9 @@ namespace Services.ConverterService
 
         private static TimeZoneInfo GetCostaRicaTimeZone()
         {
-        
             string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? "Central America Standard Time"   
-                : "America/Costa_Rica";             
+                ? "Central America Standard Time"
+                : "America/Costa_Rica";
 
             return TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
         }
@@ -22,8 +21,9 @@ namespace Services.ConverterService
         {
             if (value is DateTime dateTime)
             {
-     
-                var localDate = TimeZoneInfo.ConvertTimeFromUtc(dateTime.ToUniversalTime(), _costaRicaTimeZone);
+                // Aseguramos que el DateTime tenga Kind=Utc
+                var utcDate = DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
+                var localDate = TimeZoneInfo.ConvertTimeFromUtc(utcDate, _costaRicaTimeZone);
                 writer.WriteValue(localDate);
             }
             else
@@ -36,12 +36,13 @@ namespace Services.ConverterService
         {
             if (reader.Value is DateTime dateTime)
             {
-                // Convertir de hora local de Costa Rica a UTC
-                return TimeZoneInfo.ConvertTimeToUtc(dateTime, _costaRicaTimeZone);
+                // Aseguramos que el DateTime tenga Kind=Unspecified antes de convertir a UTC
+                var unspecifiedDate = DateTime.SpecifyKind(dateTime, DateTimeKind.Unspecified);
+                return TimeZoneInfo.ConvertTimeToUtc(unspecifiedDate, _costaRicaTimeZone);
             }
             else
             {
-                return DateTime.MinValue; // Valor por defecto si no se puede leer la fecha
+                return DateTime.MinValue;
             }
         }
 

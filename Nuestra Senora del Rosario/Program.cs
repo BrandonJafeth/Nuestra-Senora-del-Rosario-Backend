@@ -74,9 +74,10 @@ builder.Services.AddControllers()
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
     {
-        options.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Unspecified;
+        options.SerializerSettings.DateFormatString = "yyyy-MM-dd";
         options.SerializerSettings.Converters.Add(new CostaRicaDateTimeConverter());
     });
+
 
 
 
@@ -123,7 +124,7 @@ builder.Services.AddScoped<ISvGuardian, SvGuardian>();
 builder.Services.AddScoped<ISvGenericRepository<Specialty>, SvGenericRepository<Specialty, AdministrativeContext>>();
 builder.Services.AddScoped<ISvGenericRepository<HealthcareCenter>, SvGenericRepository<HealthcareCenter, AdministrativeContext>>();
 builder.Services.AddScoped<ISvGenericRepository<AppointmentStatus>, SvGenericRepository<AppointmentStatus, AdministrativeContext>>();
-
+builder.Services.AddScoped<ISvGenericRepository<Note>, SvGenericRepository<Note, AdministrativeContext>>();
 
 builder.Services.AddScoped<ISvPaymentReceipt, SvPaymentReceipt>();
 builder.Services.AddScoped<ISvResident, SvResident>();

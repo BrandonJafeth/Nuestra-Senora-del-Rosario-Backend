@@ -51,6 +51,8 @@ namespace Services.MyDbContext
 
         public DbSet<Notification> Notifications { get; set; }
 
+        public DbSet<Note> Notes { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configuración para TypeOfSalary
@@ -397,6 +399,23 @@ namespace Services.MyDbContext
                 .HasForeignKey(n => n.AppointmentId)
                 .OnDelete(DeleteBehavior.Cascade); // Eliminar notificación si se elimina la cita
 
+
+
+            modelBuilder.Entity<Note>(entity =>
+            {
+                entity.HasKey(n => n.Id_Note);  // Clave primaria
+
+                entity.Property(n => n.Reason)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(n => n.NoteDate)
+                    .IsRequired();
+
+         
+                entity.Property(n => n.Description)
+                    .HasColumnType("text");  
+            });
 
         }
     }
