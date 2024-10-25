@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Entities.Administration;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
@@ -16,26 +18,36 @@ namespace Services.Administrative.AppointmentService
         private readonly ISvGenericRepository<Appointment> _appointmentRepository;
         private readonly ISvGenericRepository<Resident> _residentRepository;
         private readonly ISvGenericRepository<Employee> _employeeRepository;
-        private readonly ISvGenericRepository<AppointmentStatus> _appointmentStatusRepository; // Agregado
+        private readonly ISvGenericRepository<AppointmentStatus> _appointmentStatusRepository;
         private readonly IMapper _mapper;
+        private readonly IValidator<AppointmentPostDto> _appointmentPostDtoValidator;
 
         public SvAppointment(
             ISvGenericRepository<Appointment> appointmentRepository,
             ISvGenericRepository<Resident> residentRepository,
             ISvGenericRepository<Employee> employeeRepository,
-            ISvGenericRepository<AppointmentStatus> appointmentStatusRepository, // Agregado
-            IMapper mapper)
+            ISvGenericRepository<AppointmentStatus> appointmentStatusRepository,
+            IMapper mapper,
+            IValidator<AppointmentPostDto> appointmentPostDtoValidator)
         {
             _appointmentRepository = appointmentRepository;
             _residentRepository = residentRepository;
             _employeeRepository = employeeRepository;
-            _appointmentStatusRepository = appointmentStatusRepository;  // Asignación
+            _appointmentStatusRepository = appointmentStatusRepository;
             _mapper = mapper;
+            _appointmentPostDtoValidator = appointmentPostDtoValidator;
         }
 
         // Crear cita
         public async Task CreateAppointmentAsync(AppointmentPostDto appointmentDto)
         {
+            // Validar el DTO
+            ValidationResult result = await _appointmentPostDtoValidator.ValidateAsync(appointmentDto);
+            if (!result.IsValid)
+            {
+                throw new ValidationException(result.Errors);
+            }
+
             // Validar si el residente existe
             var resident = await _residentRepository.GetByIdAsync(appointmentDto.Id_Resident);
             if (resident == null)
@@ -66,7 +78,7 @@ namespace Services.Administrative.AppointmentService
 
             // Crear la cita y asignar el estado "Pendiente"
             var appointment = _mapper.Map<Appointment>(appointmentDto);
-            appointment.Id_StatusAP = pendingStatus.Id_StatusAP;  // Asignar el estado "Pendiente"
+            appointment.Id_StatusAP = pendingStatus.Id_StatusAP;
 
             // Guardar la cita en la base de datos
             await _appointmentRepository.AddAsync(appointment);
@@ -140,31 +152,61 @@ namespace Services.Administrative.AppointmentService
             if (existingAppointment == null)
                 throw new KeyNotFoundException($"No se encontró la cita con ID {id}");
 
-            // Actualizar solo los campos proporcionados en el DTO
-            if (appointmentDto.Date.HasValue)
-                existingAppointment.Date = appointmentDto.Date.Value;
+            // Validar que la fecha no esté en el pasado
+            if (appointmentDto.Date.HasValue && appointmentDto.Date.Value < DateTime.Today)
+                throw new InvalidOperationException("No se puede actualizar la cita a una fecha pasada.");
 
-            if (appointmentDto.Time.HasValue)
-                existingAppointment.Time = appointmentDto.Time.Value;
+            // Validar conflicto de horario si se proporcionan fecha y hora
+            if (appointmentDto.Date.HasValue && appointmentDto.Time.HasValue)
+            {
+                bool appointmentExists = await _appointmentRepository
+                    .Query()
+                    .AnyAsync(a => a.Id_Resident == existingAppointment.Id_Resident &&
+                                   a.Date == appointmentDto.Date.Value &&
+                                   a.Time == appointmentDto.Time.Value &&
+                                   a.Id_Appointment != id);  // Excluir la cita actual
 
+                if (appointmentExists)
+                    throw new InvalidOperationException("El residente ya tiene otra cita en la misma fecha y hora.");
+            }
+
+            // Validar si el nuevo acompañante existe
             if (appointmentDto.Id_Companion.HasValue)
             {
                 var companion = await _employeeRepository.GetByIdAsync(appointmentDto.Id_Companion.Value);
                 if (companion == null)
                     throw new KeyNotFoundException($"No se encontró el acompañante con DNI {appointmentDto.Id_Companion}");
 
+                if (appointmentDto.Id_Companion == existingAppointment.Id_Resident)
+                    throw new InvalidOperationException("El residente no puede ser su propio acompañante.");
+
                 existingAppointment.Id_Companion = appointmentDto.Id_Companion.Value;
             }
 
+            // Actualizar el estado si se proporciona uno nuevo
             if (appointmentDto.Id_StatusAP.HasValue)
-                existingAppointment.Id_StatusAP = appointmentDto.Id_StatusAP.Value;
+            {
+                var status = await _appointmentStatusRepository.GetByIdAsync(appointmentDto.Id_StatusAP.Value);
+                if (status == null)
+                    throw new KeyNotFoundException($"No se encontró el estado con ID {appointmentDto.Id_StatusAP}");
 
-            if (appointmentDto.Notes != null)
+                existingAppointment.Id_StatusAP = appointmentDto.Id_StatusAP.Value;
+            }
+
+            // Actualizar otros campos proporcionados en el DTO
+            if (appointmentDto.Date.HasValue)
+                existingAppointment.Date = appointmentDto.Date.Value;
+
+            if (appointmentDto.Time.HasValue)
+                existingAppointment.Time = appointmentDto.Time.Value;
+
+            if (!string.IsNullOrEmpty(appointmentDto.Notes))
                 existingAppointment.Notes = appointmentDto.Notes;
 
             // Guardar los cambios
             await _appointmentRepository.SaveChangesAsync();
         }
+
 
         // Eliminar cita
         public async Task DeleteAppointmentAsync(int id)
@@ -176,5 +218,8 @@ namespace Services.Administrative.AppointmentService
             await _appointmentRepository.DeleteAsync(id);
             await _appointmentRepository.SaveChangesAsync();
         }
+
+
+
     }
 }

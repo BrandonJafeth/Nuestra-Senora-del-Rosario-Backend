@@ -13,5 +13,6 @@ namespace Services.Administrative.AppointmentService
         Task<AppointmentGetDto> GetAppointmentByIdAsync(int id);
         Task<IEnumerable<AppointmentGetDto>> GetAllAppointmentsAsync();
         Task DeleteAppointmentAsync(int id);
+
     }
 }
