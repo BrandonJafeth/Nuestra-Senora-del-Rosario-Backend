@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentValidation;
+using FluentValidation.Results;
+using Microsoft.AspNetCore.Mvc;
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
 using Services.Administrative.AppointmentService;
+using Services.Validations.Admistrative;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,10 +13,15 @@ using System.Threading.Tasks;
 public class AppointmentController : ControllerBase
 {
     private readonly ISvAppointment _appointmentService;
+    private readonly IValidator<AppointmentPostDto> _appointmentPostDtoValidator;
 
-    public AppointmentController(ISvAppointment appointmentService)
+    // Inyección de dependencias del servicio y validador
+    public AppointmentController(
+        ISvAppointment appointmentService,
+        IValidator<AppointmentPostDto> appointmentPostDtoValidator)
     {
         _appointmentService = appointmentService;
+        _appointmentPostDtoValidator = appointmentPostDtoValidator;
     }
 
     // GET: api/appointment
@@ -37,17 +45,15 @@ public class AppointmentController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateAppointment([FromBody] AppointmentPostDto appointmentDto)
     {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
+        ValidationResult result = await _appointmentPostDtoValidator.ValidateAsync(appointmentDto);
 
-        try
+        if (!result.IsValid)
         {
-            await _appointmentService.CreateAppointmentAsync(appointmentDto);
-            return Ok(new { message = "Cita creada exitosamente." });
+            return BadRequest(result.Errors); // Retorna errores de validación
         }
-        catch (System.Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
+
+        await _appointmentService.CreateAppointmentAsync(appointmentDto);
+        return Ok("Cita creada exitosamente.");
     }
 
     // PUT: api/appointment/{id}

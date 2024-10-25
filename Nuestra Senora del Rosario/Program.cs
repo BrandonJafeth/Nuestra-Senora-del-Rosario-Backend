@@ -33,6 +33,8 @@ using Nuestra_Senora_del_Rosario.Hubs;
 using Services.Administrative.Notifications;
 using Services.Administrative.NotificationServices;
 using Services.Administrative.Guardians;
+using FluentValidation.AspNetCore;
+using Services.Validations.Admistrative;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,6 +68,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddSignalR(); // Agregar SignalR
 
 builder.Services.AddHostedService<NotificationHostedService>();
+
+// Registrar FluentValidation en Program.cs
+var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+foreach (var assembly in assemblies)
+{
+    builder.Services.AddControllers()
+        .AddFluentValidation(fv =>
+        {
+            fv.RegisterValidatorsFromAssembly(assembly);
+            fv.DisableDataAnnotationsValidation = true;
+        });
+}
 
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
