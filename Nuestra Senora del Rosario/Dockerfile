@@ -1,26 +1,31 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-#Depending on the operating system of the host machines(s) that will build or run the containers, the image specified in the FROM statement may need to be changed.
-#For more information, please see https://aka.ms/containercompat
-
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-nanoserver-1809 AS base
+# Imagen base para ASP.NET en Linux
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0-nanoserver-1809 AS build
+# Imagen SDK para construir el proyecto
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+
+# Copiar todos los archivos de proyecto
 COPY ["Nuestra Senora del Rosario.csproj", "."]
+
+# Restaurar dependencias para todos los proyectos
 RUN dotnet restore "./Nuestra Senora del Rosario.csproj"
+
+# Copiar todo el código fuente
 COPY . .
-WORKDIR "/src/."
-RUN dotnet build "./Nuestra Senora del Rosario.csproj" -c %BUILD_CONFIGURATION% -o /app/build
 
+# Compilar la aplicación
+RUN dotnet build "./Nuestra Senora del Rosario.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+# Publicar la aplicación
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Nuestra Senora del Rosario.csproj" -c %BUILD_CONFIGURATION% -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Nuestra Senora del Rosario.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
+# Imagen final
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
