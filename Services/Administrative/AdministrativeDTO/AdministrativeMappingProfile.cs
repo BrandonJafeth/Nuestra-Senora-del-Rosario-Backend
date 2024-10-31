@@ -226,5 +226,15 @@ public class AdministrativeMappingProfile : Profile
         CreateMap<UnitOfMeasureCreateDTO, UnitOfMeasure>()
             .ForMember(dest => dest.UnitName, opt => opt.MapFrom(src => src.NombreUnidad));
 
+
+        CreateMap<Category, CategoryGetDTO>()
+    .ForMember(dest => dest.CategoryID, opt => opt.MapFrom(src => src.CategoryID))
+    .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.CategoryName));
+
+        CreateMap<CategoryCreateDTO, Category>()
+            .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.CategoryName));
+
+
+
     }
 }
