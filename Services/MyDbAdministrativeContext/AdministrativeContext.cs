@@ -53,6 +53,12 @@ namespace Services.MyDbContext
 
         public DbSet<Note> Notes { get; set; }
 
+        // Inventory Management DbSets
+        public DbSet<UnitOfMeasure> UnitOfMeasures { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<Inventory> Inventories { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configuración para TypeOfSalary
@@ -415,8 +421,95 @@ namespace Services.MyDbContext
          
                 entity.Property(n => n.Description)
                     .HasColumnType("text");  
-            });
+            }
+            );
 
+            ////de aqui para abajo es el inventario
+           
+            // Configuration for UnitOfMeasure
+            modelBuilder.Entity<UnitOfMeasure>()
+                .HasKey(u => u.UnitOfMeasureID);
+
+            modelBuilder.Entity<UnitOfMeasure>()
+                .Property(u => u.UnitOfMeasureID)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<UnitOfMeasure>()
+                .Property(u => u.UnitName)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            // Configuration for Category
+            modelBuilder.Entity<Category>()
+                .HasKey(c => c.CategoryID);
+
+            modelBuilder.Entity<Category>()
+                .Property(c => c.CategoryID)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<Category>()
+                .Property(c => c.CategoryName)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            // Configuration for Product
+            modelBuilder.Entity<Product>()
+                .HasKey(p => p.ProductID);
+
+            modelBuilder.Entity<Product>()
+                .Property(p => p.ProductID)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<Product>()
+                .Property(p => p.Name)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Product>()
+                .Property(p => p.TotalQuantity)
+                .IsRequired()
+                .HasDefaultValue(0);  // Default to 0 for inventory tracking
+
+            // Relationships for Product
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.UnitOfMeasure)
+                .WithMany(u => u.Products)
+                .HasForeignKey(p => p.UnitOfMeasureID)
+                .OnDelete(DeleteBehavior.Restrict);  // Restrict deletion if in use
+
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.Category)
+                .WithMany(c => c.Products)
+                .HasForeignKey(p => p.CategoryID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configuration for Inventory
+            modelBuilder.Entity<Inventory>()
+                .HasKey(i => i.InventoryID);
+
+            modelBuilder.Entity<Inventory>()
+                .Property(i => i.InventoryID)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<Inventory>()
+                .Property(i => i.Quantity)
+                .IsRequired();
+
+            modelBuilder.Entity<Inventory>()
+                .Property(i => i.Date)
+                .IsRequired();
+
+            modelBuilder.Entity<Inventory>()
+                .Property(i => i.MovementType)
+                .IsRequired()
+                .HasConversion<string>();  // Store enum as string in DB
+
+            // Relationships for Inventory
+            modelBuilder.Entity<Inventory>()
+                .HasOne(i => i.Product)
+                .WithMany(p => p.Inventories)
+                .HasForeignKey(i => i.ProductID)
+                .OnDelete(DeleteBehavior.Cascade);  // Cascade deletion to clean up associated inventories
         }
     }
 }

@@ -128,6 +128,7 @@ builder.Services.AddScoped<ISvGenericRepository<Applicant>, SvGenericRepository<
 builder.Services.AddScoped<ISvPdfReceiverService, SvPdfReceiverService>();
 builder.Services.AddScoped<ISvGenericRepository<Notification>, SvGenericRepository<Notification, AdministrativeContext>>();
 builder.Services.AddScoped<ISvNotification, SvNotification>(); // Registro del servicio de notificaciones
+builder.Services.AddScoped<ISvGenericRepository<UnitOfMeasure>, SvGenericRepository<UnitOfMeasure, AdministrativeContext>>();
 
 // Registros genéricos y servicios adicionales para citas y sus entidades relacionadas
 

@@ -217,5 +217,14 @@ public class AdministrativeMappingProfile : Profile
                 opt => opt.MapFrom(src => $"{src.First_Name} {src.Last_Name1} {src.Last_Name2}"))
             .ForMember(dest => dest.RoleName,
                 opt => opt.MapFrom(src => src.EmployeeRoles.FirstOrDefault().Rol.Name_Role));
+
+
+        CreateMap<UnitOfMeasure, UnitOfMeasureGetDTO>()
+    .ForMember(dest => dest.UnitOfMeasureID, opt => opt.MapFrom(src => src.UnitOfMeasureID))
+    .ForMember(dest => dest.NombreUnidad, opt => opt.MapFrom(src => src.UnitName));
+
+        CreateMap<UnitOfMeasureCreateDTO, UnitOfMeasure>()
+            .ForMember(dest => dest.UnitName, opt => opt.MapFrom(src => src.NombreUnidad));
+
     }
 }
