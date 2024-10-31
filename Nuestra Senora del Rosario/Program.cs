@@ -35,6 +35,8 @@ using Services.Administrative.NotificationServices;
 using Services.Administrative.Guardians;
 using FluentValidation.AspNetCore;
 using Services.Validations.Admistrative;
+using Services.Administrative.Product;
+using Services.Administrative.Inventory;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -130,8 +132,10 @@ builder.Services.AddScoped<ISvGenericRepository<Notification>, SvGenericReposito
 builder.Services.AddScoped<ISvNotification, SvNotification>(); // Registro del servicio de notificaciones
 builder.Services.AddScoped<ISvGenericRepository<UnitOfMeasure>, SvGenericRepository<UnitOfMeasure, AdministrativeContext>>();
 builder.Services.AddScoped<ISvGenericRepository<Category>, SvGenericRepository<Category, AdministrativeContext>>();
-
-
+builder.Services.AddScoped<ISvGenericRepository<Product>, SvGenericRepository<Product, AdministrativeContext>>();
+builder.Services.AddScoped<ISvProductService, SvProductService>();
+builder.Services.AddScoped<ISvGenericRepository<Inventory>, SvGenericRepository<Inventory, AdministrativeContext>>();
+builder.Services.AddScoped<ISvInventoryService, SvInventoryService>();
 // Registros genéricos y servicios adicionales para citas y sus entidades relacionadas
 
 builder.Services.AddScoped<ISvGenericRepository<Appointment>, SvGenericRepository<Appointment, AdministrativeContext>>();

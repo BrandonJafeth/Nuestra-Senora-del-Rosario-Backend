@@ -234,6 +234,41 @@ public class AdministrativeMappingProfile : Profile
         CreateMap<CategoryCreateDTO, Category>()
             .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.CategoryName));
 
+        CreateMap<ProductCreateDTO, Product>()
+    .ForMember(dest => dest.TotalQuantity, opt => opt.MapFrom(src => src.InitialQuantity))
+    .ForMember(dest => dest.CategoryID, opt => opt.MapFrom(src => src.CategoryID))
+    .ForMember(dest => dest.UnitOfMeasureID, opt => opt.MapFrom(src => src.UnitOfMeasureID));
+
+
+        CreateMap<Product, ProductGetDTO>()
+      .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.CategoryName : "Unknown"))
+      .ForMember(dest => dest.UnitOfMeasure, opt => opt.MapFrom(src => src.UnitOfMeasure != null ? src.UnitOfMeasure.UnitName : "Unknown"));
+
+
+        CreateMap<InventoryCreateDTO, Inventory>()
+    .ForMember(dest => dest.ProductID, opt => opt.MapFrom(src => src.ProductID))
+    .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
+    .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
+    .ForMember(dest => dest.MovementType, opt => opt.MapFrom(src => src.MovementType));
+
+
+        // Mapeo de Inventory a InventoryGetDTO, eliminando CategoryName y UnitOfMeasure
+        CreateMap<Inventory, InventoryGetDTO>()
+            .ForMember(dest => dest.ProductID, opt => opt.MapFrom(src => src.ProductID))
+            .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
+            .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
+            .ForMember(dest => dest.MovementType, opt => opt.MapFrom(src => src.MovementType))
+            .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name));
+
+        // Mapeo de Inventory a InventoryReportDTO, solo con UnitOfMeasure
+        CreateMap<Inventory, InventoryReportDTO>()
+            .ForMember(dest => dest.ProductID, opt => opt.MapFrom(src => src.ProductID))
+            .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
+            .ForMember(dest => dest.TotalInStock, opt => opt.Ignore()) // Calculado fuera de AutoMapper
+            .ForMember(dest => dest.TotalIngresos, opt => opt.Ignore()) // Calculado fuera de AutoMapper
+            .ForMember(dest => dest.TotalEgresos, opt => opt.Ignore()) // Calculado fuera de AutoMapper
+            .ForMember(dest => dest.UnitOfMeasure, opt => opt.MapFrom(src => src.Product.UnitOfMeasure.UnitName));
+
 
 
     }
