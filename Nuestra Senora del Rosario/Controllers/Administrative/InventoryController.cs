@@ -85,4 +85,28 @@ public class InventoryController : ControllerBase
         return NoContent();
     }
 
+    [HttpGet("movements/daily")]
+    public async Task<IActionResult> GetDailyMovements([FromQuery] DateTime date)
+    {
+        var dailyReport = await _inventoryService.GetDailyMovementsAsync(date);
+        return Ok(dailyReport);
+    }
+
+
+    // GET: api/inventory/movements/day
+    [HttpGet("movements/day")]
+    public async Task<IActionResult> GetMovementsByDay([FromQuery] int day, [FromQuery] int month, [FromQuery] int year)
+    {
+        var movements = await _inventoryService.GetMovementsByDayAsync(day, month, year);
+        return Ok(movements);
+    }
+
+    // GET: api/inventory/report/day
+    [HttpGet("report/day")]
+    public async Task<IActionResult> GetDailyReport([FromQuery] int day, [FromQuery] int month, [FromQuery] int year)
+    {
+        var report = await _inventoryService.GetDailyReportAsync(day, month, year);
+        return Ok(report);
+    }
+
 }

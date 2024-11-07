@@ -83,16 +83,6 @@ foreach (var assembly in assemblies)
         });
 }
 
-builder.Services.AddControllers()
-    .AddNewtonsoftJson(options =>
-        options.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Local);
-
-builder.Services.AddControllers()
-    .AddNewtonsoftJson(options =>
-    {
-        options.SerializerSettings.DateFormatString = "yyyy-MM-dd";
-        options.SerializerSettings.Converters.Add(new CostaRicaDateTimeConverter());
-    });
 
 
 
@@ -248,8 +238,8 @@ app.UseEndpoints(endpoints =>
     endpoints.MapHub<NotificationHub>("/notificationHub"); // Mapea el Hub de SignalR
 });
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-app.Urls.Add($"http://0.0.0.0:{port}");
+//var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+//app.Urls.Add($"http://0.0.0.0:{port}");
 
 // Ejecutar la aplicación
 app.Run();
