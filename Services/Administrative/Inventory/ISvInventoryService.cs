@@ -19,6 +19,11 @@ namespace Services.Administrative.Inventory
         Task PatchInventoryAsync(int inventoryId, JsonPatchDocument<Entities.Administration.Inventory> patchDoc);
 
         Task DeleteInventoryAsync(int inventoryId); // Método de eliminación
+
+        Task<IEnumerable<InventoryDailyReportDTO>> GetDailyMovementsAsync(DateTime date);
+
+        Task<IEnumerable<InventoryGetDTO>> GetMovementsByDayAsync(int day, int month, int year); // Movimientos diarios
+        Task<IEnumerable<InventoryDailyReportDTO>> GetDailyReportAsync(int day, int month, int year); // Resumen de ingresos/egresos por día
     }
 
 }

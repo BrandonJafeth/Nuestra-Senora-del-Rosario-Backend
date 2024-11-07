@@ -199,9 +199,6 @@ public class AdministrativeMappingProfile : Profile
         CreateMap<Notification, NotificationGetDto>();
 
 
-
-
-
         // Mapping para Employee -> EmployeeWithRolesGetDto
         CreateMap<Employee, EmployeeWithRolesGetDto>()
             .ForMember(dest => dest.Dni, opt => opt.MapFrom(src => src.Dni))
@@ -268,6 +265,19 @@ public class AdministrativeMappingProfile : Profile
             .ForMember(dest => dest.TotalIngresos, opt => opt.Ignore()) // Calculado fuera de AutoMapper
             .ForMember(dest => dest.TotalEgresos, opt => opt.Ignore()) // Calculado fuera de AutoMapper
             .ForMember(dest => dest.UnitOfMeasure, opt => opt.MapFrom(src => src.Product.UnitOfMeasure.UnitName));
+
+
+        // Mapeo de Inventory a InventoryDailyReportDTO
+        CreateMap<Inventory, InventoryDailyReportDTO>()
+            .ForMember(dest => dest.ProductID, opt => opt.MapFrom(src => src.ProductID))
+            .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
+            .ForMember(dest => dest.UnitOfMeasure, opt => opt.MapFrom(src => src.Product.UnitOfMeasure.UnitName))
+            // Los campos TotalIngresos y TotalEgresos se calcularán manualmente en el servicio.
+            .ForMember(dest => dest.TotalIngresos, opt => opt.Ignore())
+            .ForMember(dest => dest.TotalEgresos, opt => opt.Ignore());
+
+
+
 
 
 

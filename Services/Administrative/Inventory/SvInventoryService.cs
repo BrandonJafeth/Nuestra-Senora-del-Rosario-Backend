@@ -123,4 +123,78 @@ public class SvInventoryService : ISvInventoryService
         await _inventoryRepository.SaveChangesAsync();
     }
 
+
+
+    public async Task<IEnumerable<InventoryDailyReportDTO>> GetDailyMovementsAsync(DateTime date)
+    {
+        // Filtra movimientos por el día específico y carga las relaciones necesarias
+        var movements = await _inventoryRepository.Query()
+            .Include(m => m.Product)
+            .ThenInclude(p => p.UnitOfMeasure)
+            .Where(i => i.Date.Date == date.Date)
+            .ToListAsync();
+
+        // Agrupa movimientos por ProductID y calcula el total de Ingresos y Egresos por producto
+        var dailyReport = movements
+            .GroupBy(m => m.ProductID)
+            .Select(g =>
+            {
+                var firstItem = g.First();
+                return new InventoryDailyReportDTO
+                {
+                    ProductID = firstItem.ProductID,
+                    ProductName = firstItem.Product.Name,
+                    TotalIngresos = g.Where(x => x.MovementType == "Ingreso").Sum(x => x.Quantity),
+                    TotalEgresos = g.Where(x => x.MovementType == "Egreso").Sum(x => x.Quantity),
+                    UnitOfMeasure = firstItem.Product.UnitOfMeasure.UnitName
+                };
+            }).ToList();
+
+        return dailyReport;
+    }
+
+
+
+    public async Task<IEnumerable<InventoryGetDTO>> GetMovementsByDayAsync(int day, int month, int year)
+    {
+        var movements = await _inventoryRepository
+            .Query()
+            .Include(m => m.Product)
+            .ThenInclude(p => p.Category)
+            .Include(m => m.Product.UnitOfMeasure)
+            .Where(i => i.Date.Day == day && i.Date.Month == month && i.Date.Year == year)
+            .ToListAsync();
+
+        return _mapper.Map<IEnumerable<InventoryGetDTO>>(movements);
+    }
+
+
+    public async Task<IEnumerable<InventoryDailyReportDTO>> GetDailyReportAsync(int day, int month, int year)
+    {
+        var movements = await _inventoryRepository
+            .Query()
+            .Include(i => i.Product)
+            .ThenInclude(p => p.UnitOfMeasure)
+            .Where(i => i.Date.Day == day && i.Date.Month == month && i.Date.Year == year)
+            .ToListAsync();
+
+        var report = movements
+            .GroupBy(m => m.ProductID)
+            .Select(g =>
+            {
+                var firstItem = g.First();
+                return new InventoryDailyReportDTO
+                {
+                    ProductID = firstItem.ProductID,
+                    ProductName = firstItem.Product.Name,
+                    TotalIngresos = g.Where(x => x.MovementType == "Ingreso").Sum(x => x.Quantity),
+                    TotalEgresos = g.Where(x => x.MovementType == "Egreso").Sum(x => x.Quantity),
+                    UnitOfMeasure = firstItem.Product.UnitOfMeasure.UnitName
+                };
+            }).ToList();
+
+        return report;
+    }
+
+
 }
