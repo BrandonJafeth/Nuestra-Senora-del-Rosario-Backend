@@ -49,16 +49,29 @@ public class ProductController : ControllerBase
     }
 
     [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchProduct(int id, [FromBody] JsonPatchDocument<Product> patchDoc)
+    public async Task<IActionResult> PatchProduct(int id, [FromBody] ProductPatchDto patchDto)
     {
-        if (patchDoc == null)
+        if (patchDto == null)
         {
-            return BadRequest("Invalid patch document.");
+            return BadRequest("Invalid patch data.");
         }
 
-        await _productService.PatchProductAsync(id, patchDoc);
-        return NoContent();
+        try
+        {
+            await _productService.PatchProductAsync(id, patchDto);
+            return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
     }
+
+
 
 
     [HttpDelete("{id}")]

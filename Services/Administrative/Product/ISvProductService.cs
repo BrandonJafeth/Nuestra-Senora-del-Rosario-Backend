@@ -16,7 +16,7 @@ namespace Services.Administrative.Product
         Task CreateProductAsync(ProductCreateDTO productCreateDTO);
 
         // Usa el alias ProductEntity para evitar el conflicto
-        Task PatchProductAsync(int productId, JsonPatchDocument<Entities.Administration.Product> patchDoc);
+        Task PatchProductAsync(int productId, ProductPatchDto patchDto);
 
         Task DeleteProductAsync(int productId);
     }
