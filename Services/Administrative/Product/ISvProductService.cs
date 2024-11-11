@@ -11,7 +11,7 @@ namespace Services.Administrative.Product
 {
     public interface ISvProductService
     {
-        Task<IEnumerable<ProductGetDTO>> GetAllProductsAsync();
+        Task<(IEnumerable<ProductGetDTO> Products, int TotalPages)> GetAllProductsAsync(int pageNumber, int pageSize);
         Task<ProductGetDTO> GetProductByIdAsync(int productId);
         Task CreateProductAsync(ProductCreateDTO productCreateDTO);
 
