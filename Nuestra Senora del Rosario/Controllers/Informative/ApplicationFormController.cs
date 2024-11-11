@@ -22,12 +22,17 @@ public class ApplicationFormController : ControllerBase
 
     // GET: api/ApplicationForm
     [HttpGet]
-    public async Task<IActionResult> GetApplicationForms()
+    public async Task<IActionResult> GetAllForms(int pageNumber = 1, int pageSize = 10)
     {
-        var applicationForms = await _applicationFormService.GetAllFormsAsync();
-        var applicationFormDtos = _mapper.Map<IEnumerable<ApplicationFormDto>>(applicationForms);
-        return Ok(applicationFormDtos);
+        var result = await _applicationFormService.GetAllFormsAsync(pageNumber, pageSize);
+
+        return Ok(new
+        {
+            forms = result.Forms,
+            totalPages = result.TotalPages
+        });
     }
+
 
     // GET: api/ApplicationForm/{id}
     [HttpGet("{id}")]

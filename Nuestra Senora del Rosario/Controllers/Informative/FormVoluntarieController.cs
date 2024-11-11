@@ -21,10 +21,15 @@ public class FormVoluntarieController : ControllerBase
 
     // GET: api/FormVoluntarie
     [HttpGet]
-    public async Task<IActionResult> GetFormVoluntaries()
+    public async Task<IActionResult> GetFormVoluntaries(int pageNumber = 1, int pageSize = 10)
     {
-        var formVoluntaries = await _formVoluntarieService.GetAllFormVoluntariesWithTypeAsync();
-        return Ok(formVoluntaries);
+        var result = await _formVoluntarieService.GetAllFormVoluntariesWithTypeAsync(pageNumber, pageSize);
+
+        return Ok(new
+        {
+            formVoluntaries = result.FormVoluntaries,
+            totalPages = result.TotalPages
+        });
     }
 
     // GET: api/FormVoluntarie/{id}

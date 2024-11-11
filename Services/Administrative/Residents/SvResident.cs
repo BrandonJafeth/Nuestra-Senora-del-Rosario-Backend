@@ -40,17 +40,23 @@ namespace Services.Administrative.Residents
         }
 
         // Método para obtener todos los residentes
-        public async Task<IEnumerable<ResidentGetDto>> GetAllResidentsAsync()
+        public async Task<(IEnumerable<ResidentGetDto> Residents, int TotalPages)> GetAllResidentsAsync(int pageNumber, int pageSize)
         {
-            var residents = await _residentRepository.Query()
-                .Include(r => r.Guardian)  // Incluir los detalles del guardián
-                .Include(r => r.Room)  // Incluir los detalles de la habitación
-                .Include(r => r.DependencyHistories)  // Incluir el historial de dependencias
-                .ThenInclude(dh => dh.DependencyLevel)  // Incluir el nivel de dependencia
+            var totalResidents = await _residentRepository.Query().CountAsync();
+
+            var residents = await _residentRepository
+                .Query()
+                .Include(r => r.Guardian)               // Incluir detalles del guardián
+                .Include(r => r.Room)                   // Incluir detalles de la habitación
+                .Include(r => r.DependencyHistories)    // Incluir historial de dependencias
+                .ThenInclude(dh => dh.DependencyLevel)  // Incluir nivel de dependencia
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
-            // Mapear los resultados a ResidentGetDto
-            return _mapper.Map<IEnumerable<ResidentGetDto>>(residents);
+            var totalPages = (int)Math.Ceiling(totalResidents / (double)pageSize);
+
+            return (_mapper.Map<IEnumerable<ResidentGetDto>>(residents), totalPages);
         }
 
 

@@ -8,7 +8,7 @@ namespace Services.Informative.ApplicationFormService
 {
     public interface ISvApplicationForm
     {
-        Task<IEnumerable<ApplicationFormDto>> GetAllFormsAsync(); // Devuelve lista de DTO
+        Task<(IEnumerable<ApplicationFormDto> Forms, int TotalPages)> GetAllFormsAsync(int pageNumber, int pageSize);
         Task<ApplicationFormDto> GetFormByIdAsync(int id);        // Devuelve un DTO específico por ID
         Task AddFormAsync(ApplicationFormCreateDto formCreateDto); // Agregar una nueva solicitud usando el DTO
         Task DeleteAsync(int id);                                 // Eliminar una solicitud
