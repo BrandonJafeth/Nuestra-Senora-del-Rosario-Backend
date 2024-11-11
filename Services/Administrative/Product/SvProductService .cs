@@ -27,15 +27,19 @@ public class SvProductService : ISvProductService
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<ProductGetDTO>> GetAllProductsAsync()
+    public async Task<(IEnumerable<ProductGetDTO> Products, int TotalPages)> GetAllProductsAsync(int pageNumber, int pageSize)
     {
+        var totalProducts = await _productRepository.Query().CountAsync();
         var products = await _productRepository
             .Query()
-            .Include(p => p.Category)        // Incluir Category
-            .Include(p => p.UnitOfMeasure)   // Incluir UnitOfMeasure
+            .Include(p => p.Category)
+            .Include(p => p.UnitOfMeasure)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
 
-        return _mapper.Map<IEnumerable<ProductGetDTO>>(products);
+        var totalPages = (int)Math.Ceiling(totalProducts / (double)pageSize);
+        return (_mapper.Map<IEnumerable<ProductGetDTO>>(products), totalPages);
     }
 
     public async Task<ProductGetDTO> GetProductByIdAsync(int productId)

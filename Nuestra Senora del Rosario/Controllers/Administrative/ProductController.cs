@@ -19,11 +19,16 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllProducts()
+    public async Task<IActionResult> GetAllProducts(int pageNumber = 1, int pageSize = 10)
     {
-        var products = await _productService.GetAllProductsAsync();
-        return Ok(products);
+        var result = await _productService.GetAllProductsAsync(pageNumber, pageSize);
+        return Ok(new
+        {
+            products = result.Products,
+            totalPages = result.TotalPages
+        });
     }
+
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetProductById(int id)
