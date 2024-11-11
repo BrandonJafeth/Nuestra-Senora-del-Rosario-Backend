@@ -30,6 +30,14 @@ namespace Nuestra_Senora_del_Rosario.Controllers.Administrative
             });
         }
 
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllResidentsWithoutPagination()
+        {
+            var residents = await _residentService.GetAllResidentsAsync();
+            return Ok(residents);
+        }
+
+
 
         // GET: api/Residents/5
         [HttpGet("{id}")]

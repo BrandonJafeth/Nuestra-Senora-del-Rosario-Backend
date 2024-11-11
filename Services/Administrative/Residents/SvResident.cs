@@ -59,6 +59,19 @@ namespace Services.Administrative.Residents
             return (_mapper.Map<IEnumerable<ResidentGetDto>>(residents), totalPages);
         }
 
+        public async Task<IEnumerable<ResidentGetDto>> GetAllResidentsAsync()
+        {
+            var residents = await _residentRepository.Query()
+                .Include(r => r.Guardian)
+                .Include(r => r.Room)
+                .Include(r => r.DependencyHistories)
+                .ThenInclude(dh => dh.DependencyLevel)
+                .ToListAsync();
+
+            return _mapper.Map<IEnumerable<ResidentGetDto>>(residents);
+        }
+
+
 
         // Método para obtener un residente por ID
         public async Task<ResidentGetDto> GetResidentByIdAsync(int id)
