@@ -10,7 +10,7 @@ namespace Services.Administrative.Residents
 {
     public interface ISvResident
     {
-        Task<IEnumerable<ResidentGetDto>> GetAllResidentsAsync();
+        Task<(IEnumerable<ResidentGetDto> Residents, int TotalPages)> GetAllResidentsAsync(int pageNumber, int pageSize);
         Task<ResidentGetDto> GetResidentByIdAsync(int id);
         Task AddResidentAsync(ResidentCreateDto residentDto);
         Task AddResidentFromApplicantAsync(ResidentFromApplicantDto dto);  // Nuevo método

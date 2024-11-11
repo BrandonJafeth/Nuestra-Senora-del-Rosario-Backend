@@ -19,11 +19,17 @@ namespace Nuestra_Senora_del_Rosario.Controllers.Administrative
 
         // GET: api/Residents
         [HttpGet]
-        public async Task<IActionResult> GetAllResidents()
+        public async Task<IActionResult> GetAllResidents(int pageNumber = 1, int pageSize = 10)
         {
-            var residents = await _residentService.GetAllResidentsAsync();
-            return Ok(residents);
+            var result = await _residentService.GetAllResidentsAsync(pageNumber, pageSize);
+
+            return Ok(new
+            {
+                residents = result.Residents,
+                totalPages = result.TotalPages
+            });
         }
+
 
         // GET: api/Residents/5
         [HttpGet("{id}")]

@@ -16,13 +16,17 @@ namespace Services.Informative.FormDonationService
         }
 
         // Obtener todas las donaciones con sus detalles (DonationType, MethodDonation, Status)
-        public async Task<IEnumerable<FormDonationDto>> GetFormDonationsWithDetailsAsync()
+        public async Task<(IEnumerable<FormDonationDto> Donations, int TotalPages)> GetFormDonationsWithDetailsAsync(int pageNumber, int pageSize)
         {
-            return await _context.FormDonations
-                .AsNoTracking() // Evitamos el tracking para mejorar rendimiento
-                .Include(fd => fd.DonationType) // Incluir DonationType
-                .Include(fd => fd.MethodDonation) // Incluir MethodDonation
-                .Include(fd => fd.Status) // Incluir Status para evitar el error
+            var totalDonations = await _context.FormDonations.CountAsync();
+
+            var donations = await _context.FormDonations
+                .AsNoTracking()
+                .Include(fd => fd.DonationType)
+                .Include(fd => fd.MethodDonation)
+                .Include(fd => fd.Status)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .Select(fd => new FormDonationDto
                 {
                     Id_FormDonation = fd.Id_FormDonation,
@@ -33,11 +37,14 @@ namespace Services.Informative.FormDonationService
                     Dn_Email = fd.Dn_Email,
                     Dn_Phone = fd.Dn_Phone,
                     Delivery_date = fd.Delivery_date,
-                    DonationType = fd.DonationType.Name_DonationType, // Mapeamos solo los nombres necesarios
+                    DonationType = fd.DonationType.Name_DonationType,
                     MethodDonation = fd.MethodDonation.Name_MethodDonation,
-                    Status_Name = fd.Status.Status_Name // Mapeamos el nombre del estado
+                    Status_Name = fd.Status.Status_Name
                 })
                 .ToListAsync();
+
+            var totalPages = (int)Math.Ceiling(totalDonations / (double)pageSize);
+            return (donations, totalPages);
         }
 
         // Obtener una donación por ID con detalles, incluyendo Status

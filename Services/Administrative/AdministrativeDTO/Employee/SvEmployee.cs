@@ -128,15 +128,22 @@ namespace Services.Administrative.Employees
 
 
         // Obtener todos los empleados.
-        public async Task<IEnumerable<EmployeeGetDTO>> GetAllEmployeesAsync()
+        public async Task<(IEnumerable<EmployeeGetDTO> Employees, int TotalPages)> GetAllEmployeesAsync(int pageNumber, int pageSize)
         {
+            var totalEmployees = await _employeeRepository.Query().CountAsync();
+
             var employees = await _employeeRepository
                 .Query()
-                .Include(e => e.Profession)
-                .Include(e => e.TypeOfSalary)
+                .Include(e => e.Profession)      
+                .Include(e => e.TypeOfSalary)    
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
-            return _mapper.Map<IEnumerable<EmployeeGetDTO>>(employees);
+            var totalPages = (int)Math.Ceiling(totalEmployees / (double)pageSize);
+
+            return (_mapper.Map<IEnumerable<EmployeeGetDTO>>(employees), totalPages);
         }
+
     }
 }

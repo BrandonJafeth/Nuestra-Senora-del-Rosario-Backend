@@ -21,11 +21,17 @@ public class FormDonationController : ControllerBase
 
     // GET: api/FormDonation
     [HttpGet]
-    public async Task<IActionResult> GetFormDonations()
+    public async Task<IActionResult> GetFormDonationsWithDetails(int pageNumber = 1, int pageSize = 10)
     {
-        var formDonations = await _formDonationService.GetFormDonationsWithDetailsAsync();
-        return Ok(formDonations);
+        var result = await _formDonationService.GetFormDonationsWithDetailsAsync(pageNumber, pageSize);
+
+        return Ok(new
+        {
+            donations = result.Donations,
+            totalPages = result.TotalPages
+        });
     }
+
 
     // GET: api/FormDonation/{id}
     [HttpGet("{id}")]

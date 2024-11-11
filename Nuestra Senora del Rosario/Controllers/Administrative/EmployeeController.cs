@@ -93,12 +93,18 @@ public class EmployeeController : ControllerBase
         return Ok(employee);
     }
 
+
     // Obtener todos los empleados
     [HttpGet]
-    public async Task<IActionResult> GetAllEmployees()
+    public async Task<IActionResult> GetAllEmployees(int pageNumber = 1, int pageSize = 10)
     {
-        var employees = await _employeeService.GetAllEmployeesAsync();
-        return Ok(employees);
+        var result = await _employeeService.GetAllEmployeesAsync(pageNumber, pageSize);
+
+        return Ok(new
+        {
+            employees = result.Employees,
+            totalPages = result.TotalPages
+        });
     }
 
 

@@ -20,16 +20,24 @@ namespace Services.Informative.ApplicationFormService
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ApplicationFormDto>> GetAllFormsAsync()
+        public async Task<(IEnumerable<ApplicationFormDto> Forms, int TotalPages)> GetAllFormsAsync(int pageNumber, int pageSize)
         {
-            return await _context.ApplicationForms
-                .AsNoTracking() // Desactiva el seguimiento de cambios
-                .Include(af => af.Applicant) // Mantén esto solo si realmente necesitas los datos de Applicant
-                .Include(af => af.Guardian) // Mantén esto solo si realmente necesitas los datos de Guardian
-                .Include(af => af.ApplicationStatus) // Mantén esto solo si realmente necesitas los datos de ApplicationStatus
-                .Select(af => _mapper.Map<ApplicationFormDto>(af)) // Usa AutoMapper para mapear a DTO
+            var totalForms = await _context.ApplicationForms.CountAsync(); // Total de formularios
+
+            var forms = await _context.ApplicationForms
+                .AsNoTracking()
+                .Include(af => af.Applicant)
+                .Include(af => af.Guardian)
+                .Include(af => af.ApplicationStatus)
+                .Skip((pageNumber - 1) * pageSize) // Saltar elementos para la paginación
+                .Take(pageSize)                    // Limitar los resultados a pageSize
+                .Select(af => _mapper.Map<ApplicationFormDto>(af))
                 .ToListAsync();
+
+            var totalPages = (int)Math.Ceiling(totalForms / (double)pageSize);
+            return (forms, totalPages);
         }
+
 
         public async Task<ApplicationFormDto> GetFormByIdAsync(int id)
         {

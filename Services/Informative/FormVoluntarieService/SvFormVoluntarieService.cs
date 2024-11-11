@@ -17,12 +17,16 @@ namespace Services.Informative.FormVoluntarieServices
         }
 
         // Método para obtener todas las formas de voluntarios con su tipo y estado, optimizado con AsNoTracking
-        public async Task<IEnumerable<FormVoluntarieDto>> GetAllFormVoluntariesWithTypeAsync()
+        public async Task<(IEnumerable<FormVoluntarieDto> FormVoluntaries, int TotalPages)> GetAllFormVoluntariesWithTypeAsync(int pageNumber, int pageSize)
         {
-            return await _context.FormVoluntaries
+            var totalFormVoluntaries = await _context.FormVoluntaries.CountAsync();
+
+            var formVoluntaries = await _context.FormVoluntaries
                 .AsNoTracking()
-                .Include(f => f.VoluntarieType)  // Incluye la relación de tipo de voluntariado
-                .Include(f => f.Status)  // Incluye la relación de estado
+                .Include(f => f.VoluntarieType)
+                .Include(f => f.Status)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .Select(f => new FormVoluntarieDto
                 {
                     Id_FormVoluntarie = f.Id_FormVoluntarie,
@@ -38,7 +42,11 @@ namespace Services.Informative.FormVoluntarieServices
                     Status_Name = f.Status.Status_Name
                 })
                 .ToListAsync();
+
+            var totalPages = (int)Math.Ceiling(totalFormVoluntaries / (double)pageSize);
+            return (formVoluntaries, totalPages);
         }
+
 
         // Método para obtener un formulario de voluntario con su tipo y estado por ID
         public async Task<FormVoluntarieDto> GetFormVoluntarieWithTypeByIdAsync(int id)

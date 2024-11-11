@@ -9,7 +9,7 @@ namespace Services.Administrative.Employees
         Task CreateEmployeeAsync(EmployeeCreateDTO employeeCreateDTO); // Nuevo método para crear un empleado
         Task CreateEmployeeAsync(EmployeeCreateDTO employeeCreateDTO, int? roleId); // Método con rol opcional
         Task<EmployeeGetDTO> GetEmployeeByIdAsync(int dni);
-        Task<IEnumerable<EmployeeGetDTO>> GetAllEmployeesAsync();
+        Task<(IEnumerable<EmployeeGetDTO> Employees, int TotalPages)> GetAllEmployeesAsync(int pageNumber, int pageSize);
 
         Task AssignRoleToEmployeeAsync(EmployeeRoleCreateDTO employeeRoleDto);//nuevo método
 

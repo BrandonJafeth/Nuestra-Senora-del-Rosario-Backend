@@ -9,7 +9,7 @@ namespace Services.Informative.FormVoluntarieServices
 {
     public interface ISvFormVoluntarieService : ISvGenericRepository<FormVoluntarie>
     {
-        Task<IEnumerable<FormVoluntarieDto>> GetAllFormVoluntariesWithTypeAsync();
+        Task<(IEnumerable<FormVoluntarieDto> FormVoluntaries, int TotalPages)> GetAllFormVoluntariesWithTypeAsync(int pageNumber, int pageSize);
 
         // Obtener una solicitud por su ID con el tipo de voluntariado y estado
         Task<FormVoluntarieDto> GetFormVoluntarieWithTypeByIdAsync(int id);

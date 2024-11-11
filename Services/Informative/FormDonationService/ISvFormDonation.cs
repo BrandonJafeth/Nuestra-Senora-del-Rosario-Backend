@@ -10,7 +10,7 @@ namespace Services.Informative.FormDonationService
     public interface ISvFormDonation : ISvGenericRepository<FormDonation>
     {
         // Obtener todas las donaciones con sus detalles (DonationType, MethodDonation, Status)
-        Task<IEnumerable<FormDonationDto>> GetFormDonationsWithDetailsAsync();
+        Task<(IEnumerable<FormDonationDto> Donations, int TotalPages)> GetFormDonationsWithDetailsAsync(int pageNumber, int pageSize);
 
         // Obtener una donación por ID con sus detalles
         Task<FormDonationDto> GetFormDonationWithDetailsByIdAsync(int id);
