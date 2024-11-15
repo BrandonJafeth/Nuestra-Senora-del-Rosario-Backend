@@ -178,7 +178,7 @@ namespace Services.Administrative.PaymentReceiptService
         public async Task<MemoryStream> GeneratePaymentReceiptPdf(PaymentReceiptDto receiptDto)
         {
             // Ruta de la plantilla HTML
-            string templatePath = @"D:\VI Semestre\Ingenieria II\Desarrollo\Backend\Services\Administrative\PaymentReceipt\Plantilla HTML\ComprobantePagoTemplate.html";
+            string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates", "ComprobantePagoTemplate.html");
 
             if (!File.Exists(templatePath))
             {

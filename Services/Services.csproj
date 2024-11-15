@@ -32,6 +32,7 @@
 		<PackageReference Include="PDFsharp" Version="6.1.1" />
 		<PackageReference Include="PuppeteerSharp" Version="20.0.2" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.2" />
+		<PackageReference Include="System.Text.Json" Version="8.0.5" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -39,6 +40,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="Administrative\PaymentReceipt\Plantilla HTML\" />
 	  <Folder Include="Archivitos\" />
 	  <Folder Include="Validations\Informative\" />
 	</ItemGroup>
