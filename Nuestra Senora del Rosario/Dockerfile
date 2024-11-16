@@ -4,8 +4,10 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-# Instalar dependencias necesarias para Puppeteer en Linux
+# Instalar dependencias necesarias para Puppeteer y Google Chrome
 RUN apt-get update && apt-get install -y \
+    wget \
+    gnupg \
     libnss3 \
     libatk-bridge2.0-0 \
     libx11-xcb1 \
@@ -16,19 +18,21 @@ RUN apt-get update && apt-get install -y \
     libpango-1.0-0 \
     libcups2 \
     libxss1 \
-    libgconf-2-4 \
     libasound2 \
     libatk1.0-0 \
     libgtk-3-0 \
     libxshmfence1 \
-    wget \
     fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
 
+# Agregar el repositorio de Google Chrome y su clave
+RUN wget -qO- https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /usr/share/keyrings/google-chrome.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && \
+    apt-get update && apt-get install -y google-chrome-stable && \
+    rm -rf /var/lib/apt/lists/*
+
 # Configurar la variable de entorno para Puppeteer
 ENV PUPPETEER_EXECUTABLE_PATH "/usr/bin/google-chrome-stable"
-
-
 
 # Imagen SDK para construir el proyecto
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
