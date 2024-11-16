@@ -57,9 +57,6 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Configuración para Puppeteer
-ENV PUPPETEER_EXECUTABLE_PATH "/usr/bin/google-chrome-stable"
-
 # Copiar la plantilla HTML a una carpeta conocida dentro del contenedor
 COPY ["Nuestra Senora del Rosario/Templates/", "/app/Templates"]
 
