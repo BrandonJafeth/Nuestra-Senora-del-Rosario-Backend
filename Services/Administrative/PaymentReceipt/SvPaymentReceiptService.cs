@@ -248,10 +248,7 @@ namespace Services.Administrative.PaymentReceiptService
             }
                 };
 
-                var browserFetcher = new BrowserFetcher();
-                await browserFetcher.DownloadAsync(); // Asegurarse de que el navegador esté disponible
-
-                var browser = await Puppeteer.LaunchAsync(launchOptions);
+                var browser = await Puppeteer.LaunchAsync(launchOptions); // Usar opciones de lanzamiento configuradas
                 var page = await browser.NewPageAsync();
                 await page.SetContentAsync(htmlContent);
 
