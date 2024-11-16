@@ -244,6 +244,9 @@ namespace Services.Administrative.PasswordResetServices
                 // Hashear la nueva contraseña
                 user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
 
+                // Reiniciar la expiración de la contraseña
+                user.PasswordExpiration = null;
+
                 // Guardar cambios
                 await _userRepository.SaveChangesAsync();
 
@@ -258,6 +261,7 @@ namespace Services.Administrative.PasswordResetServices
                 throw new ArgumentException("Token inválido: " + ex.Message);
             }
         }
+
 
         public Task UpdatePasswordAsync(string token, string newPassword)
         {
