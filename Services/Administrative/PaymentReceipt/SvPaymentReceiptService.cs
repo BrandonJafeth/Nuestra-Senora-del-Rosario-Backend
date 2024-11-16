@@ -178,7 +178,7 @@ namespace Services.Administrative.PaymentReceiptService
         public async Task<MemoryStream> GeneratePaymentReceiptPdf(PaymentReceiptDto receiptDto)
         {
             // Ruta de la plantilla HTML
-            string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates/ComprobantePagoTemplate.html");
+            string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates", "ComprobantePagoTemplate.html");
 
             if (!File.Exists(templatePath))
             {
@@ -212,19 +212,35 @@ namespace Services.Administrative.PaymentReceiptService
                 .Replace("{{EmployeeFullName}}", receiptDto.EmployeeFullName)
                 .Replace("{{Profession}}", receiptDto.Profession)
                 .Replace("{{SalaryType}}", receiptDto.SalaryType)
+                .Replace("{{WorkedDays}}", receiptDto.WorkedDays.ToString())
+                .Replace("{{Salary}}", receiptDto.Salary.ToString("N2"))
+                .Replace("{{Overtime}}", receiptDto.Overtime.ToString("N2"))
+                .Replace("{{ExtraHourRate}}", receiptDto.ExtraHourRate.ToString("N2"))
+                .Replace("{{DoublesHours}}", receiptDto.DoublesHours.ToString("N2"))
+                .Replace("{{DoubleExtras}}", receiptDto.DoubleExtras.ToString("N2"))
+                .Replace("{{NightHours}}", receiptDto.NightHours.ToString("N2"))
+                .Replace("{{MixedHours}}", receiptDto.MixedHours.ToString("N2"))
+                .Replace("{{MandatoryHolidays}}", receiptDto.MandatoryHolidays.ToString("N2"))
+                .Replace("{{MandatoryHolidaysAmount}}", (receiptDto.MandatoryHolidays * receiptDto.Salary / 30).ToString("N2")) // Asumiendo que el pago es diario
+                .Replace("{{Adjustments}}", receiptDto.Adjustments.ToString("N2"))
+                .Replace("{{Incapacity}}", receiptDto.Incapacity.ToString("N2"))
+                .Replace("{{Absence}}", receiptDto.Absence.ToString("N2"))
+                .Replace("{{VacationDays}}", receiptDto.VacationDays.ToString("N2"))
+                .Replace("{{VacationAmount}}", (receiptDto.VacationDays * receiptDto.Salary / 30).ToString("N2")) // Asumiendo que el pago es diario
                 .Replace("{{GrossIncome}}", receiptDto.GrossIncome.ToString("N2"))
                 .Replace("{{NetAmount}}", receiptDto.NetAmount.ToString("N2"))
+                .Replace("{{TotalExtraHoursAmount}}", receiptDto.TotalExtraHoursAmount.ToString())
                 .Replace("{{DeduccionesTable}}", deduccionesHtml.ToString());
 
             var pdfStream = new MemoryStream();
 
             try
             {
-                // Configuración de Puppeteer con las opciones necesarias
+                // Configurar opciones de Puppeteer con el ejecutable del navegador
                 var launchOptions = new LaunchOptions
                 {
                     Headless = true,
-                    ExecutablePath = Environment.GetEnvironmentVariable("PUPPETEER_EXECUTABLE_PATH"),
+                    ExecutablePath = Environment.GetEnvironmentVariable("PUPPETEER_EXECUTABLE_PATH"), // Usar la variable de entorno configurada en Docker
                     Args = new[]
                     {
                 "--no-sandbox",
@@ -232,26 +248,28 @@ namespace Services.Administrative.PaymentReceiptService
             }
                 };
 
-                // Iniciar Puppeteer y generar el PDF
                 var browserFetcher = new BrowserFetcher();
-                await browserFetcher.DownloadAsync();
+                await browserFetcher.DownloadAsync(); // Asegurarse de que el navegador esté disponible
 
                 var browser = await Puppeteer.LaunchAsync(launchOptions);
                 var page = await browser.NewPageAsync();
                 await page.SetContentAsync(htmlContent);
+
                 var pdfOptions = new PdfOptions
                 {
                     Format = PaperFormat.A4,
                     PrintBackground = true
                 };
+
                 var pdfBytes = await page.PdfDataAsync(pdfOptions);
                 await pdfStream.WriteAsync(pdfBytes, 0, pdfBytes.Length);
                 pdfStream.Position = 0;
+
                 await browser.CloseAsync();
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al convertir HTML a PDF: " + ex.Message, ex);
+                throw new Exception("Error al convertir HTML a PDF: " + ex.Message);
             }
 
             return pdfStream;
