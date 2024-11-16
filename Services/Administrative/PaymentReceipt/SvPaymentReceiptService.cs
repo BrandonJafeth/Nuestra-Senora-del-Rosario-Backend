@@ -236,20 +236,35 @@ namespace Services.Administrative.PaymentReceiptService
 
             try
             {
-                var browserFetcher = new BrowserFetcher();
-                await browserFetcher.DownloadAsync();
+                // Configurar opciones de Puppeteer con el ejecutable del navegador
+                var launchOptions = new LaunchOptions
+                {
+                    Headless = true,
+                    ExecutablePath = Environment.GetEnvironmentVariable("PUPPETEER_EXECUTABLE_PATH"), // Usar la variable de entorno configurada en Docker
+                    Args = new[]
+                    {
+                "--no-sandbox",
+                "--disable-setuid-sandbox"
+            }
+                };
 
-                var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true });
+                var browserFetcher = new BrowserFetcher();
+                await browserFetcher.DownloadAsync(); // Asegurarse de que el navegador esté disponible
+
+                var browser = await Puppeteer.LaunchAsync(launchOptions);
                 var page = await browser.NewPageAsync();
                 await page.SetContentAsync(htmlContent);
+
                 var pdfOptions = new PdfOptions
                 {
                     Format = PaperFormat.A4,
                     PrintBackground = true
                 };
+
                 var pdfBytes = await page.PdfDataAsync(pdfOptions);
                 await pdfStream.WriteAsync(pdfBytes, 0, pdfBytes.Length);
                 pdfStream.Position = 0;
+
                 await browser.CloseAsync();
             }
             catch (Exception ex)
@@ -259,6 +274,7 @@ namespace Services.Administrative.PaymentReceiptService
 
             return pdfStream;
         }
+
 
 
 
