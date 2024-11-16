@@ -22,7 +22,13 @@ RUN apt-get update && apt-get install -y \
     libgtk-3-0 \
     libxshmfence1 \
     wget \
+    fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
+
+# Configurar la variable de entorno para Puppeteer
+ENV PUPPETEER_EXECUTABLE_PATH "/usr/bin/google-chrome-stable"
+
+
 
 # Imagen SDK para construir el proyecto
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
