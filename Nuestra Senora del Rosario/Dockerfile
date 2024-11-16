@@ -23,6 +23,9 @@ RUN apt-get update && apt-get install -y \
     libgtk-3-0 \
     libxshmfence1 \
     fonts-liberation \
+    fonts-noto \
+    fonts-noto-cjk \
+    fonts-noto-color-emoji \
     && rm -rf /var/lib/apt/lists/*
 
 # Agregar el repositorio de Google Chrome y su clave
