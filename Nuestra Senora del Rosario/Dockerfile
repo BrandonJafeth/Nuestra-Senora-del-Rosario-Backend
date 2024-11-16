@@ -4,6 +4,26 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
+# Instalar dependencias necesarias para Puppeteer en Linux
+RUN apt-get update && apt-get install -y \
+    libnss3 \
+    libatk-bridge2.0-0 \
+    libx11-xcb1 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    libgbm1 \
+    libpango-1.0-0 \
+    libcups2 \
+    libxss1 \
+    libgconf-2-4 \
+    libasound2 \
+    libatk1.0-0 \
+    libgtk-3-0 \
+    libxshmfence1 \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
 # Imagen SDK para construir el proyecto
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
@@ -30,4 +50,12 @@ RUN dotnet publish "Nuestra Senora del Rosario.csproj" -c $BUILD_CONFIGURATION -
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+# Configuración para Puppeteer
+ENV PUPPETEER_EXECUTABLE_PATH "/usr/bin/google-chrome-stable"
+
+# Copiar la plantilla HTML a una carpeta conocida dentro del contenedor
+COPY ["Nuestra Senora del Rosario/Templates/", "/app/Templates"]
+
+# Entrypoint
 ENTRYPOINT ["dotnet", "Nuestra Senora del Rosario.dll"]
