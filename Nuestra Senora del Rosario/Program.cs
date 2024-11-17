@@ -37,6 +37,7 @@ using FluentValidation.AspNetCore;
 using Services.Validations.Admistrative;
 using Services.Administrative.Product;
 using Services.Administrative.Inventory;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +52,30 @@ builder.Services.AddDbContext<MyInformativeContext>(options =>
 builder.Services.AddDbContext<AdministrativeContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
+
+
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.OnRejected = (context, token) =>
+    {
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        context.HttpContext.Response.ContentType = "application/json";
+        return new ValueTask(context.HttpContext.Response.WriteAsync("{\"error\": \"Has excedido el número máximo de solicitudes permitidas. Por favor, intenta nuevamente más tarde.\"}", cancellationToken: token));
+    };
+
+    options.AddPolicy("LimiteDeSolicitudes", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "anonimo",
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }));
+});
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -217,29 +242,33 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-// Habilitar CORS antes de la autenticación
-app.UseCors("AllowAll");
-
-// Habilitar HTTPS y autenticación
+// Habilitar HTTPS
 app.UseHttpsRedirection();
-app.UseAuthentication();
 
-// 1️⃣ Habilitar enrutamiento
+// Habilitar enrutamiento
 app.UseRouting();
 
-// 2️⃣ Autorización después del enrutamiento
+// Habilitar CORS
+app.UseCors("AllowAll");
+
+// Habilitar autenticación
+app.UseAuthentication();
+
+// Agregar Rate Limiter
+app.UseRateLimiter();
+
+// Habilitar autorización
 app.UseAuthorization();
 
-// 3️⃣ Mapeo de controladores y SignalR
+// Mapeo de controladores y SignalR
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapControllers(); // Mapea los controladores
-    endpoints.MapHub<NotificationHub>("/notificationHub"); // Mapea el Hub de SignalR
+    endpoints.MapControllers();
+    endpoints.MapHub<NotificationHub>("/notificationHub");
 });
 
+// Configurar el puerto y ejecutar la aplicación
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 app.Urls.Add($"http://0.0.0.0:{port}");
 
-// Ejecutar la aplicación
 app.Run();

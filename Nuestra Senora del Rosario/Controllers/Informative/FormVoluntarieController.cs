@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Services.Informative.DTOS;
 using Services.Informative.DTOS.CreatesDto;
 using Services.Informative.FormVoluntarieServices;
@@ -47,6 +48,7 @@ public class FormVoluntarieController : ControllerBase
 
     // POST: api/FormVoluntarie
     [HttpPost]
+    [EnableRateLimiting("LimiteDeSolicitudes")]
     public async Task<IActionResult> CreateFormVoluntarie([FromBody] FormVoluntarieCreateDto formVoluntarieCreateDto)
     {
         if (!ModelState.IsValid)

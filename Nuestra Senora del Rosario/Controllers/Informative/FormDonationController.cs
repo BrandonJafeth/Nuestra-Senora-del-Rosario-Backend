@@ -5,6 +5,7 @@ using Services.Informative.FormDonationService;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.RateLimiting;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -48,6 +49,7 @@ public class FormDonationController : ControllerBase
 
     // POST: api/FormDonation
     [HttpPost]
+    [EnableRateLimiting("LimiteDeSolicitudes")]
     public async Task<IActionResult> CreateFormDonation([FromBody] FormDonationCreateDto formDonationCreateDto)
     {
         if (!ModelState.IsValid)
