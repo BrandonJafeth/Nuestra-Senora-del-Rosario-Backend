@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Entities.Informative;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Services.Informative.ApplicationFormService;
 using Services.Informative.DTOS;
 using Services.Informative.DTOS.CreatesDto;
@@ -50,6 +51,7 @@ public class ApplicationFormController : ControllerBase
 
     // POST: api/ApplicationForm
     [HttpPost]
+    [EnableRateLimiting("LimiteDeSolicitudes")]
     public async Task<IActionResult> AddApplicationForm([FromBody] ApplicationFormCreateDto applicationFormCreateDto)
     {
         if (!ModelState.IsValid)
