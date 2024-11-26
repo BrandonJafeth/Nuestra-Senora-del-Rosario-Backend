@@ -211,8 +211,8 @@ builder.Services.AddSwaggerGen(c =>
     c.OperationFilter<FileUploadOperationFilter>();
 });
 
-// Registrar el servicio de caché en memoria
-builder.Services.AddMemoryCache(); // Aquí se añade el servicio de caché
+
+builder.Services.AddMemoryCache(); 
 
 builder.Services.AddAuthorization();
 
