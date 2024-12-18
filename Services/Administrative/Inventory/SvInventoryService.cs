@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Entities.Administration;
 using Services.GenericService;
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
@@ -10,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
 using Services.Administrative.Inventory;
+using DataAccess.Entities.Administration;
 
 public class SvInventoryService : ISvInventoryService
 {

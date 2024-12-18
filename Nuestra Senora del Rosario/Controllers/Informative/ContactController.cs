@@ -1,4 +1,4 @@
-﻿using Entities.Informative;
+﻿using DataAccess.Entities.Informative;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Services.GenericService;

@@ -16,7 +16,7 @@ namespace Services.Administrative.Inventory
         Task<IEnumerable<InventoryReportDTO>> GetMonthlyReportAllProductsAsync(int month, int year); // Nuevo método
         Task<InventoryReportDTO> GetMonthlyReportAsync(int productId, int month, int year);
         Task RegisterMovementAsync(InventoryCreateDTO inventoryCreateDTO);
-        Task PatchInventoryAsync(int inventoryId, JsonPatchDocument<Entities.Administration.Inventory> patchDoc);
+        Task PatchInventoryAsync(int inventoryId, JsonPatchDocument<DataAccess.Entities.Administration.Inventory> patchDoc);
 
         Task DeleteInventoryAsync(int inventoryId); // Método de eliminación
 

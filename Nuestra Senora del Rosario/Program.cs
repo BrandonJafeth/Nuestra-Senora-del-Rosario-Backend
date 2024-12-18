@@ -1,5 +1,3 @@
-using Entities.Administration;
-using Entities.Informative;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -38,6 +36,8 @@ using Services.Validations.Admistrative;
 using Services.Administrative.Product;
 using Services.Administrative.Inventory;
 using System.Threading.RateLimiting;
+using DataAccess.Entities.Administration;
+using DataAccess.Entities.Informative;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -268,7 +268,6 @@ app.UseEndpoints(endpoints =>
 });
 
 // Configurar el puerto y ejecutar la aplicación
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-app.Urls.Add($"http://0.0.0.0:{port}");
+
 
 app.Run();

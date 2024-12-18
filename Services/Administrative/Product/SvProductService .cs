@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Entities.Administration;
 using Services.GenericService;
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
@@ -7,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Services.Administrative.Product;
+using DataAccess.Entities.Administration;
 
 public class SvProductService : ISvProductService
 {

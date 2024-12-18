@@ -1,4 +1,4 @@
-﻿using Entities.Informative;
+﻿using DataAccess.Entities.Informative;
 using Microsoft.EntityFrameworkCore;
 using Services.MyDbContext;
 using AutoMapper;

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Services.Administrative.Guardians;
 using System.Threading.Tasks;
-using Entities.Administration;
+using DataAccess.Entities.Administration;
 using Microsoft.EntityFrameworkCore;
 
 namespace Nuestra_Senora_del_Rosario.Controllers.Administrative

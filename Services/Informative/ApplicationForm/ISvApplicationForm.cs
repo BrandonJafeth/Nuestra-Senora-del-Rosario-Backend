@@ -1,4 +1,4 @@
-﻿using Entities.Informative;
+﻿using DataAccess.Entities.Informative;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Services.Informative.DTOS.CreatesDto; // Asegúrate de incluir el DTO

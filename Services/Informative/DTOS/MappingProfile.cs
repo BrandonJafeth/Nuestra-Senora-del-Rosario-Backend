@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Entities.Informative;
+using DataAccess.Entities.Informative;
 using Services.Informative.DTOS;
 using Services.Informative.DTOS.CreatesDto;
 

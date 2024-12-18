@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Entities.Informative;
+using DataAccess.Entities.Informative;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Services.Informative.ApplicationFormService;

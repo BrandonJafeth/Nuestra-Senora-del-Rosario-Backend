@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Entities.Administration;
+using DataAccess.Entities.Administration;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;

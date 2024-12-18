@@ -1,4 +1,4 @@
-﻿using Entities.Administration;
+﻿using DataAccess.Entities.Administration;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;

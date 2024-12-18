@@ -1,4 +1,4 @@
-﻿using Entities.Administration;
+﻿using DataAccess.Entities.Administration;
 using System;
 using System.Collections.Generic;
 using System.Linq;

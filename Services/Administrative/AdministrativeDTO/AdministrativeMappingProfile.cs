@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Entities.Administration;
+using DataAccess.Entities.Administration;
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
 using System.Data;

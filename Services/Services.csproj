@@ -36,7 +36,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Entities\Entities.csproj" />
+		<ProjectReference Include="..\Entities\DataAccess.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

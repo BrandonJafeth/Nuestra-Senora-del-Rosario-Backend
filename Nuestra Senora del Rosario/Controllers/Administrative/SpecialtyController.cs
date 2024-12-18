@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
-using Entities.Administration;
+using DataAccess.Entities.Administration;
 using Microsoft.AspNetCore.Mvc;
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
 using Services.GenericService;
-using System.Web.Http.ModelBinding;
 
 [ApiController]
 [Route("api/[controller]")]

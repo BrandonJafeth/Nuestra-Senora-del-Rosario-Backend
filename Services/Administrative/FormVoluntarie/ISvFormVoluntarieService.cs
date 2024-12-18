@@ -1,5 +1,5 @@
 ﻿
-using Entities.Informative;
+using DataAccess.Entities.Informative;
 using Services.GenericService;
 using System.Threading.Tasks;
 

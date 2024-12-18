@@ -1,5 +1,4 @@
-﻿using Entities.Administration;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
 using Services.Administrative.Notifications;
@@ -8,6 +7,7 @@ using Nuestra_Senora_del_Rosario.Hubs;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DataAccess.Entities.Administration;
 
 namespace Services.Administrative.NotificationServices
 {

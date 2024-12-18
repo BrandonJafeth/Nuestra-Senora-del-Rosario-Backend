@@ -1,4 +1,4 @@
-﻿using Entities.Informative;
+﻿using DataAccess.Entities.Informative;
 using Microsoft.AspNetCore.Mvc;
 using Services.GenericService;
 using System.Collections.Generic;

@@ -5,7 +5,7 @@ using Services.GenericService;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
-using Entities.Informative;
+using DataAccess.Entities.Informative;
 using Microsoft.EntityFrameworkCore;  // Asegúrate de usar el namespace correcto para Rol
 
 [ApiController]

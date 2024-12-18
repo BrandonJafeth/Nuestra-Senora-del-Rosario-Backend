@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using AutoMapper;
-using Entities.Administration;
 using Microsoft.EntityFrameworkCore;
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
@@ -13,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using PuppeteerSharp.Media;
 using PuppeteerSharp;
 using System.Text;
+using DataAccess.Entities.Administration;
 
 
 namespace Services.Administrative.PaymentReceiptService
