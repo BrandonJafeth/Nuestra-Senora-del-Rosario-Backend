@@ -1,10 +1,10 @@
-﻿using Entities.Informative;
+﻿
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Infrastructure.Services.Informative.DTOS;
 using Infrastructure.Services.Informative.DTOS.CreatesDto;
 
-namespace Infrastructure.Services.Informative.ApplicationForm
+namespace Infrastructure.Services.Informative.ApplicationFormService
 {
     public interface ISvApplicationForm
     {

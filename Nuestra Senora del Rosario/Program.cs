@@ -9,21 +9,19 @@ using Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// =============================
-// 1) Configuraciones globales
-// =============================
-
-// Rate Limiter
+#region RateLimiter
 builder.Services.AddRateLimiter(options =>
 {
     options.OnRejected = (context, token) =>
     {
         context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
         context.HttpContext.Response.ContentType = "application/json";
-        return new ValueTask(context.HttpContext.Response.WriteAsync(
-            "{\"error\": \"Has excedido el número máximo de solicitudes permitidas.\"}",
-            cancellationToken: token
-        ));
+        return new ValueTask(
+            context.HttpContext.Response.WriteAsync(
+                "{\"error\": \"Has excedido el número máximo de solicitudes permitidas.\"}",
+                cancellationToken: token
+            )
+        );
     };
 
     options.AddPolicy("LimiteDeSolicitudes", context =>
@@ -35,10 +33,12 @@ builder.Services.AddRateLimiter(options =>
                 Window = TimeSpan.FromMinutes(3),
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                 QueueLimit = 0
-            }));
+            })
+    );
 });
+#endregion
 
-// Autenticación con JWT
+#region JWT_Auth
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -54,8 +54,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
     });
+#endregion
 
-// CORS
+#region CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -63,15 +64,23 @@ builder.Services.AddCors(options =>
                        .AllowAnyMethod()
                        .AllowAnyHeader());
 });
+#endregion
 
-// ================================
-// 2) Llamada a tu AddInfrastructure
-// ================================
+#region MemoryCache_and_SignalR
+
+builder.Services.AddMemoryCache();
+
+
+builder.Services.AddSignalR();
+#endregion
+
+#region Infrastructure_DI
+
 builder.Services.AddInfrastructure(builder.Configuration);
+#endregion
 
-// ================================
-// 3) Configuración de Controllers + FluentValidation
-// ================================
+#region Controllers_and_FluentValidation
+
 var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 builder.Services.AddControllers()
     .AddFluentValidation(fv =>
@@ -79,31 +88,28 @@ builder.Services.AddControllers()
         fv.RegisterValidatorsFromAssemblies(assemblies);
         fv.DisableDataAnnotationsValidation = true;
     })
-    .AddNewtonsoftJson(); // si estás usando Newtonsoft
+    .AddNewtonsoftJson(); 
+#endregion
 
-// ================================
-// 4) Configuración de Swagger
-// ================================
+#region Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Mi API", Version = "v1" });
-    // c.OperationFilter<FileUploadOperationFilter>(); // si usas IFormFile
 });
+#endregion
 
-// ================================
-// 5) Construir y configurar la app
-// ================================
+#region Build_App
 var app = builder.Build();
+#endregion
 
-// Swagger en Development
+#region Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// Middlewares
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("AllowAll");
@@ -111,11 +117,8 @@ app.UseAuthentication();
 app.UseRateLimiter();
 app.UseAuthorization();
 
-// Mapeo de controladores (y Hubs si usas SignalR)
 app.MapControllers();
 app.MapHub<NotificationHub>("/notificationHub");
 
-//// Puerto y arranque
-//var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-//app.Urls.Add($"http://0.0.0.0:{port}");
 app.Run();
+#endregion

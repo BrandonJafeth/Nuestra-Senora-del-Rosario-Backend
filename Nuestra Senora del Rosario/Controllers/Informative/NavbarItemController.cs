@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Entities.Informative;
+using Domain.Entities.Informative;
 using Infrastructure.Services.Informative.DTOS;
 using Infrastructure.Services.Informative.NavbarItemServices;
 using Microsoft.AspNetCore.JsonPatch;

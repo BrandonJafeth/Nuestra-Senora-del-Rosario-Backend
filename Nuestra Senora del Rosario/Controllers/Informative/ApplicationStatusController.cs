@@ -1,4 +1,4 @@
-﻿using Entities.Informative;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using Services.GenericService;
 

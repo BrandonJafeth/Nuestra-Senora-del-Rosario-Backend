@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-
 // Referencias a tus namespaces de Infrastructure
 using Infrastructure.Persistence.MyDbAdministrativeContext;
 using Infrastructure.Persistence.MyDbContextInformative;
@@ -12,18 +11,18 @@ using Infrastructure.Persistence.MyDbContextInformative;
 using Infrastructure.Services.Administrative.Appointments;
 using Infrastructure.Services.Administrative.EmailServices;
 using Infrastructure.Services.Administrative.EmployeeRoleService;
-using Infrastructure.Services.Administrative.FormVoluntarie;
+using Infrastructure.Services.Administrative.FormVoluntarieService;
 using Infrastructure.Services.Administrative.Guardians;
 using Infrastructure.Services.Administrative.Inventory;
 using Infrastructure.Services.Administrative.Notifications;
 using Infrastructure.Services.Administrative.PasswordResetServices;
-using Infrastructure.Services.Administrative.PaymentReceipt;
+using Infrastructure.Services.Administrative.PaymentReceiptService;
 using Infrastructure.Services.Administrative.PdfReceiver;
 using Infrastructure.Services.Administrative.Product;
 using Infrastructure.Services.Administrative.Residents;
 using Infrastructure.Services.Administrative.Users;
 using Infrastructure.Services.Administrative.Notifications.Hubs;
-using Infrastructure.Services.Informative.ApplicationForm;
+using Infrastructure.Services.Informative.ApplicationFormService;
 using Infrastructure.Services.Informative.DonationType;
 using Infrastructure.Services.Informative.FormDonationService;
 using Infrastructure.Services.Informative.FormVoluntarieService;
@@ -33,9 +32,9 @@ using Infrastructure.Services.Informative.NavbarItemServices;
 using Services.GenericService;   // Para ISvGenericRepository, etc.
 
 // Entidades del Dominio, si necesitas
-using Entities.Administration;
-using Entities.Informative;
-using Infrastructure.Services.Administrative.AdministrativeDTO.Employee;
+using Infrastructure.Services.Administrative.AdministrativeDTO.EmployeeService;
+using Domain.Entities.Administration;
+using Domain.Entities.Informative;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -45,6 +44,7 @@ namespace Infrastructure.DependencyInjection
             this IServiceCollection services,
             IConfiguration configuration)
         {
+            #region DbContexts
             // 1. Registrar DbContexts
             services.AddDbContext<MyInformativeContext>(options =>
                 options.UseMySql(configuration.GetConnectionString("DefaultConnection"),
@@ -53,12 +53,14 @@ namespace Infrastructure.DependencyInjection
             services.AddDbContext<AdministrativeContext>(options =>
                 options.UseMySql(configuration.GetConnectionString("DefaultConnection"),
                     ServerVersion.AutoDetect(configuration.GetConnectionString("DefaultConnection"))));
+            #endregion
 
-            // ====== AutoMapper ======
+            #region AutoMapper
             services.AddAutoMapper(typeof(AdministrativeMappingProfile).Assembly);
-            // O si prefieres: services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-            // ====== Repositorios genéricos (MyInformativeContext) ======
+            #endregion
+
+            #region Repos_Generic_MyInformativeContext
             services.AddScoped<ISvGenericRepository<FormVoluntarie>, SvGenericRepository<FormVoluntarie, MyInformativeContext>>();
             services.AddScoped<ISvGenericRepository<NavbarItem>, SvGenericRepository<NavbarItem, MyInformativeContext>>();
             services.AddScoped<ISvGenericRepository<GalleryItem>, SvGenericRepository<GalleryItem, MyInformativeContext>>();
@@ -67,8 +69,9 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<ISvGenericRepository<FormDonation>, SvGenericRepository<FormDonation, MyInformativeContext>>();
             services.AddScoped<ISvGenericRepository<ApplicationForm>, SvGenericRepository<ApplicationForm, MyInformativeContext>>();
             services.AddScoped<ISvGenericRepository<Status>, SvGenericRepository<Status, MyInformativeContext>>();
+            #endregion
 
-            // ====== Repositorios genéricos (AdministrativeContext) ======
+            #region Repos_Generic_AdministrativeContext
             services.AddScoped<ISvGenericRepository<User>, SvGenericRepository<User, AdministrativeContext>>();
             services.AddScoped<ISvGenericRepository<Employee>, SvGenericRepository<Employee, AdministrativeContext>>();
             services.AddScoped<ISvGenericRepository<EmployeeRole>, SvGenericRepository<EmployeeRole, AdministrativeContext>>();
@@ -93,13 +96,14 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<ISvGenericRepository<HealthcareCenter>, SvGenericRepository<HealthcareCenter, AdministrativeContext>>();
             services.AddScoped<ISvGenericRepository<AppointmentStatus>, SvGenericRepository<AppointmentStatus, AdministrativeContext>>();
             services.AddScoped<ISvGenericRepository<Note>, SvGenericRepository<Note, AdministrativeContext>>();
+            #endregion
 
-            // ====== Servicios concretos (Administrative) ======
+            #region Services_Administrative
             services.AddScoped<ISvEmployee, SvEmployee>();
             services.AddScoped<ISvEmployeeRole, SvEmployeeRole>();
             services.AddScoped<ISvPasswordResetService, SvPasswordResetService>();
             services.AddScoped<ISvPdfReceiverService, SvPdfReceiverService>();
-            services.AddScoped<ISvNotification, SvNotification>();
+            services.AddScoped<ISvNotification, SvNotification>(); // Registro del servicio de notificaciones
             services.AddScoped<ISvProductService, SvProductService>();
             services.AddScoped<ISvInventoryService, SvInventoryService>();
             services.AddScoped<ISvAppointment, SvAppointment>();
@@ -107,8 +111,9 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<ISvPaymentReceipt, SvPaymentReceipt>();
             services.AddScoped<ISvResident, SvResident>();
             services.AddScoped<ISvUser, SvUser>();
+            #endregion
 
-            // ====== Servicios concretos (Informative) ======
+            #region Services_Informative
             services.AddScoped<ISvNavbarItemService, SvNavbarItem>();
             services.AddScoped<ISvGalleryItem, SvGalleryItem>();
             services.AddScoped<ISvMethodDonation, SvMethodDonation>();
@@ -118,9 +123,11 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<ISvFormVoluntarieService, SvFormVoluntarieService>();
             services.AddScoped<IAdministrativeFormVoluntarieService, AdministrativeFormVoluntarieService>();
             services.AddScoped<ISvEmailService, SvEmailService>();
+            #endregion
 
-            // ====== Retorna el IServiceCollection para permitir encadenamiento ======
+            #region Return
             return services;
+            #endregion
         }
     }
 }

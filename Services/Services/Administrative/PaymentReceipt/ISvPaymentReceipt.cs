@@ -1,9 +1,8 @@
 ﻿using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
-using Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Infrastructure.Services.Administrative.PaymentReceipt
+namespace Infrastructure.Services.Administrative.PaymentReceiptService
 {
     public interface ISvPaymentReceipt
     {

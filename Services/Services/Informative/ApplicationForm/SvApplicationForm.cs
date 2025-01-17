@@ -1,4 +1,4 @@
-﻿using Entities.Informative;
+﻿
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using Infrastructure.Services.Informative.DTOS;
 using Infrastructure.Services.Informative.DTOS.CreatesDto;
 using Infrastructure.Persistence.MyDbContextInformative;
 
-namespace Infrastructure.Services.Informative.ApplicationForm
+namespace Infrastructure.Services.Informative.ApplicationFormService
 {
     public class SvApplicationForm : ISvApplicationForm
     {

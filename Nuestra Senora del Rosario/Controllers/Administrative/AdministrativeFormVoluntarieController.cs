@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
-using Entities.Informative;
-using Infrastructure.Services.Administrative.FormVoluntarie;
+using Infrastructure.Services.Administrative.FormVoluntarieService;
 using Infrastructure.Services.Informative.DTOS;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;

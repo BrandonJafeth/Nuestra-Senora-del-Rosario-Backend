@@ -1,12 +1,12 @@
-﻿using Entities.Administration;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
 using Services.GenericService;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Infrastructure.Services.Administrative.Notifications.Hubs;
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
+using Domain.Entities.Administration;
 
 namespace Infrastructure.Services.Administrative.Notifications
 {

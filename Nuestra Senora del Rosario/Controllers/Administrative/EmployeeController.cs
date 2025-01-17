@@ -1,5 +1,5 @@
 ﻿using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
-using Infrastructure.Services.Administrative.AdministrativeDTO.Employee;
+using Infrastructure.Services.Administrative.AdministrativeDTO.EmployeeService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;

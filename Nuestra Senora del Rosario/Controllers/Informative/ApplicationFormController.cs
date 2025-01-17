@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
-using Entities.Informative;
-using Infrastructure.Services.Informative.ApplicationForm;
+using Infrastructure.Services.Informative.ApplicationFormService;
 using Infrastructure.Services.Informative.DTOS;
 using Infrastructure.Services.Informative.DTOS.CreatesDto;
 using Microsoft.AspNetCore.Mvc;

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Entities.Informative;
+using Domain.Entities.Informative;
 using Services.GenericService;
 
 namespace Infrastructure.Services.Informative.GalleryItemService

@@ -1,4 +1,4 @@
-﻿using Entities.Informative;
+﻿using Domain.Entities.Informative;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

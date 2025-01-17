@@ -1,5 +1,5 @@
-﻿using Entities.Administration;
-using Entities.Informative;
+﻿using Domain.Entities.Administration;
+using Domain.Entities.Informative;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.MyDbAdministrativeContext

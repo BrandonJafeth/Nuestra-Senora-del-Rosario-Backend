@@ -1,4 +1,4 @@
-﻿using Entities.Informative;
+﻿
 using Microsoft.EntityFrameworkCore;
 using Services.GenericService;
 using System.Collections.Generic;

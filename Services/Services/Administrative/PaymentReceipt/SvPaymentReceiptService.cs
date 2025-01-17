@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using AutoMapper;
-using Entities.Administration;
 using Microsoft.EntityFrameworkCore;
 
 using Microsoft.Extensions.Logging;
@@ -12,9 +11,10 @@ using System.Text;
 using Infrastructure.Services.Administrative.EmailServices;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
 using Infrastructure.Persistence.MyDbAdministrativeContext;
+using Domain.Entities.Administration;
 
 
-namespace Infrastructure.Services.Administrative.PaymentReceipt
+namespace Infrastructure.Services.Administrative.PaymentReceiptService
 {
     public class SvPaymentReceipt : ISvPaymentReceipt
     {

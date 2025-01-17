@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Entities.Administration;
+using Domain.Entities.Administration;
 using FluentValidation;
 using FluentValidation.Results;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;

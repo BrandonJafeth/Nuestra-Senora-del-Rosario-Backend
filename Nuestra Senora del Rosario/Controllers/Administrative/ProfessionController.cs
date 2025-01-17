@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Services.GenericService;
 using System.Threading.Tasks;
 

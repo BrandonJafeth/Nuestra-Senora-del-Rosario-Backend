@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Services.Informative.DonationType
 {
-    public class SvDonationType : SvGenericRepository<Entities.Informative.DonationType, MyInformativeContext>, ISvDonationType
+    public class SvDonationType : SvGenericRepository<Domain.Entities.Informative.DonationType, MyInformativeContext>, ISvDonationType
     {
         // Constructor que pasa el contexto a la clase base
         public SvDonationType(MyInformativeContext context) : base(context)
@@ -14,7 +14,7 @@ namespace Infrastructure.Services.Informative.DonationType
         }
 
         // Método especializado para obtener tipos de donación con sus métodos
-        public async Task<IEnumerable<Entities.Informative.DonationType>> GetDonationTypesWithMethodsAsync()
+        public async Task<IEnumerable<Domain.Entities.Informative.DonationType>> GetDonationTypesWithMethodsAsync()
         {
             return await _context.DonationTypes
                 .Include(dt => dt.MethodDonations)  // Incluir la relación con MethodDonations

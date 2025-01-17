@@ -1,4 +1,4 @@
-﻿using Entities.Informative;
+﻿using Domain.Entities.Informative;
 using Services.GenericService;
 using System;
 using System.Collections.Generic;

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
 using Infrastructure.Services.Administrative.Users;
 
 [ApiController]

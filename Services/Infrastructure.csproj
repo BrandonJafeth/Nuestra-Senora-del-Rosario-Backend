@@ -7,6 +7,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Services\Administrative\PaymentReceipt\Plantilla HTML\**" />
+	  <EmbeddedResource Remove="Services\Administrative\PaymentReceipt\Plantilla HTML\**" />
+	  <None Remove="Services\Administrative\PaymentReceipt\Plantilla HTML\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="13.0.1" />
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
 		<PackageReference Include="FluentValidation" Version="11.10.0" />
@@ -38,7 +44,6 @@
 
 	<ItemGroup>
 	  <Folder Include="Mappers\Mapping Informative\" />
-	  <Folder Include="Services\Administrative\PaymentReceipt\Plantilla HTML\" />
 	  <Folder Include="Archivitos\" />
 	  <Folder Include="Validations\Informative\" />
 	</ItemGroup>

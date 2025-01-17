@@ -1,10 +1,10 @@
-﻿using Entities.Informative;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Services.GenericService;
 using Infrastructure.Persistence.MyDbContextInformative;
+using Domain.Entities.Informative;
 
 namespace Infrastructure.Services.Informative.NavbarItemServices
 {

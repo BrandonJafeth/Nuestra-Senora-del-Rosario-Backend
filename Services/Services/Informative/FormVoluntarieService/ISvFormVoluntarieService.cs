@@ -1,4 +1,4 @@
-﻿using Entities.Informative;
+﻿
 using Infrastructure.Services.Informative.DTOS;
 using Infrastructure.Services.Informative.DTOS.CreatesDto;
 using Services.GenericService;

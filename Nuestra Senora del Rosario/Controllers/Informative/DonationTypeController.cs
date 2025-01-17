@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Entities.Informative;
+using Domain.Entities.Informative;
 using Infrastructure.Services.Informative.DonationType;
 using Infrastructure.Services.Informative.DTOS;
 using Microsoft.AspNetCore.JsonPatch;

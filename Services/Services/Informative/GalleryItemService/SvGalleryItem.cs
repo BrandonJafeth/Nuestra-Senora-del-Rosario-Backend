@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Entities.Informative;
+using Domain.Entities.Informative;
 using Infrastructure.Persistence.MyDbContextInformative;
 using Microsoft.EntityFrameworkCore;
 using Services.GenericService;

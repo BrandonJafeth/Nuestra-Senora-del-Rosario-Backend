@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Entities.Administration;
 using Services.GenericService;
 using System;
 using System.Collections.Generic;
@@ -10,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Infrastructure.Services.Administrative.Inventory;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
+using Domain.Entities.Administration;
 
 public class SvInventoryService : ISvInventoryService
 {
