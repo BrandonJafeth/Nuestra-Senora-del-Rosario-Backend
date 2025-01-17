@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Entities.Informative;
+using Infrastructure.Services.Informative.DTOS;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Services.GenericService;
-using Services.Informative.DTOS;
 
 [ApiController]
 [Route("api/[controller]")]

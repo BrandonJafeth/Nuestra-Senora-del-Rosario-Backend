@@ -1,9 +1,9 @@
 ﻿using Entities.Administration;
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
+using Infrastructure.Services.Administrative.Product;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
-using Services.Administrative.Product;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

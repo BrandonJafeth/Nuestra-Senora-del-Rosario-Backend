@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
-using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
 using Services.GenericService;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using Entities.Informative;
-using Microsoft.EntityFrameworkCore;  // Asegúrate de usar el namespace correcto para Rol
+using Microsoft.EntityFrameworkCore;
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;  // Asegúrate de usar el namespace correcto para Rol
 
 [ApiController]
 [Route("api/[controller]")]

@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
+using Infrastructure.Services.Administrative.Appointments;
 using Microsoft.AspNetCore.Mvc;
-using Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
-using Services.Administrative.AppointmentService;
 using Services.Validations.Admistrative;
 using System.Collections.Generic;
 using System.Threading.Tasks;

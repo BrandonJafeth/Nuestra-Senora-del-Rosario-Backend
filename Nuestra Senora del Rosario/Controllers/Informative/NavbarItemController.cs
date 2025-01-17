@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Entities.Informative;
+using Infrastructure.Services.Informative.DTOS;
+using Infrastructure.Services.Informative.NavbarItemServices;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Services.Informative.DTOS;
-using Services.Informative.NavbarItemServices;
 
 [ApiController]
 [Route("api/[controller]")]

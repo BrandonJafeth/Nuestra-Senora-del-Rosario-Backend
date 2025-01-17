@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Entities.Informative;
+using Infrastructure.Services.Informative.DTOS;
+using Infrastructure.Services.Informative.GalleryItemService;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Services.Informative.DTOS;
-using Services.Informative.GalleryItemServices;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
