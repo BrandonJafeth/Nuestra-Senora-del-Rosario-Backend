@@ -11,7 +11,6 @@ namespace Domain.Entities.Administration
         public int CategoryID { get; set; }
         public string CategoryName { get; set; }
 
-        // Navigation properties
         public ICollection<Product> Products { get; set; }
     }
 }

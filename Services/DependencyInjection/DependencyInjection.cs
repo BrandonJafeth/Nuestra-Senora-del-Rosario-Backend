@@ -4,9 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-// Referencias a tus namespaces de Infrastructure
-using Infrastructure.Persistence.MyDbAdministrativeContext;
-using Infrastructure.Persistence.MyDbContextInformative;
 
 using Infrastructure.Services.Administrative.Appointments;
 using Infrastructure.Services.Administrative.EmailServices;
@@ -35,6 +32,7 @@ using Services.GenericService;   // Para ISvGenericRepository, etc.
 using Infrastructure.Services.Administrative.AdministrativeDTO.EmployeeService;
 using Domain.Entities.Administration;
 using Domain.Entities.Informative;
+using Infrastructure.Persistence.AppDbContext;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -44,15 +42,14 @@ namespace Infrastructure.DependencyInjection
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            #region DbContexts
-            // 1. Registrar DbContexts
-            services.AddDbContext<MyInformativeContext>(options =>
-                options.UseMySql(configuration.GetConnectionString("DefaultConnection"),
-                    ServerVersion.AutoDetect(configuration.GetConnectionString("DefaultConnection"))));
-
-            services.AddDbContext<AdministrativeContext>(options =>
-                options.UseMySql(configuration.GetConnectionString("DefaultConnection"),
-                    ServerVersion.AutoDetect(configuration.GetConnectionString("DefaultConnection"))));
+            #region DbContext
+            // Usar SOLO AppDbContext unificado
+            services.AddDbContext<AppDbContext>(options =>
+            options.UseMySql(
+            configuration.GetConnectionString("DefaultConnection"),
+            ServerVersion.AutoDetect(configuration.GetConnectionString("DefaultConnection"))
+                )
+            );
             #endregion
 
             #region AutoMapper
@@ -61,41 +58,60 @@ namespace Infrastructure.DependencyInjection
             #endregion
 
             #region Repos_Generic_MyInformativeContext
-            services.AddScoped<ISvGenericRepository<FormVoluntarie>, SvGenericRepository<FormVoluntarie, MyInformativeContext>>();
-            services.AddScoped<ISvGenericRepository<NavbarItem>, SvGenericRepository<NavbarItem, MyInformativeContext>>();
-            services.AddScoped<ISvGenericRepository<GalleryItem>, SvGenericRepository<GalleryItem, MyInformativeContext>>();
-            services.AddScoped<ISvGenericRepository<MethodDonation>, SvGenericRepository<MethodDonation, MyInformativeContext>>();
-            services.AddScoped<ISvGenericRepository<DonationType>, SvGenericRepository<DonationType, MyInformativeContext>>();
-            services.AddScoped<ISvGenericRepository<FormDonation>, SvGenericRepository<FormDonation, MyInformativeContext>>();
-            services.AddScoped<ISvGenericRepository<ApplicationForm>, SvGenericRepository<ApplicationForm, MyInformativeContext>>();
-            services.AddScoped<ISvGenericRepository<Status>, SvGenericRepository<Status, MyInformativeContext>>();
+            services.AddScoped<ISvGenericRepository<FormVoluntarie>, SvGenericRepository<FormVoluntarie>>();
+            services.AddScoped<ISvGenericRepository<NavbarItem>, SvGenericRepository<NavbarItem>>();
+            services.AddScoped<ISvGenericRepository<GalleryItem>, SvGenericRepository<GalleryItem>>();
+            services.AddScoped<ISvGenericRepository<MethodDonation>, SvGenericRepository<MethodDonation>>();
+            services.AddScoped<ISvGenericRepository<DonationType>, SvGenericRepository<DonationType>>();
+            services.AddScoped<ISvGenericRepository<FormDonation>, SvGenericRepository<FormDonation>>();
+            services.AddScoped<ISvGenericRepository<ApplicationForm>, SvGenericRepository<ApplicationForm>>();
+            services.AddScoped<ISvGenericRepository<Status>, SvGenericRepository<Status>>();
+            services.AddScoped<ISvGenericRepository<AdministrativeRequirements>, SvGenericRepository<AdministrativeRequirements>>();
+            services.AddScoped<ISvGenericRepository<AssociatesSection>, SvGenericRepository<AssociatesSection>>();
+            services.AddScoped<ISvGenericRepository<ButtonInfo>, SvGenericRepository<ButtonInfo>>();
+            services.AddScoped<ISvGenericRepository<Contact>, SvGenericRepository<Contact>>();
+            services.AddScoped<ISvGenericRepository<DonationsSection>, SvGenericRepository<DonationsSection>>();
+            services.AddScoped<ISvGenericRepository<GalleryCategory>, SvGenericRepository<GalleryCategory>>();
+            services.AddScoped<ISvGenericRepository<HeroSection>, SvGenericRepository<HeroSection>>();
+            services.AddScoped<ISvGenericRepository<ImportantInformation>, SvGenericRepository<ImportantInformation>>();
+            services.AddScoped<ISvGenericRepository<NursingRequirements>, SvGenericRepository<NursingRequirements>>();
+            services.AddScoped<ISvGenericRepository<RegistrationSection>, SvGenericRepository<RegistrationSection>>();
+            services.AddScoped<ISvGenericRepository<ServiceSection>, SvGenericRepository<ServiceSection>>();
+            services.AddScoped<ISvGenericRepository<SiteSettings>, SvGenericRepository<SiteSettings>>();
+            services.AddScoped<ISvGenericRepository<TitleSection>, SvGenericRepository<TitleSection>>();
+            services.AddScoped<ISvGenericRepository<VoluntarieType>, SvGenericRepository<VoluntarieType>>();
+            services.AddScoped<ISvGenericRepository<VolunteeringSection>, SvGenericRepository<VolunteeringSection>>();
+            services.AddScoped<ISvGenericRepository<VolunteerProfile>, SvGenericRepository<VolunteerProfile>>();
+            services.AddScoped<ISvGenericRepository<AboutUsSection>, SvGenericRepository<AboutUsSection>>();
+            services.AddScoped<ISvGenericRepository<ApplicationStatus>, SvGenericRepository<ApplicationStatus>>();
+
             #endregion
 
             #region Repos_Generic_AdministrativeContext
-            services.AddScoped<ISvGenericRepository<User>, SvGenericRepository<User, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<Employee>, SvGenericRepository<Employee, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<EmployeeRole>, SvGenericRepository<EmployeeRole, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<TypeOfSalary>, SvGenericRepository<TypeOfSalary, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<Profession>, SvGenericRepository<Profession, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<PasswordResetToken>, SvGenericRepository<PasswordResetToken, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<Rol>, SvGenericRepository<Rol, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<Room>, SvGenericRepository<Room, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<DependencyLevel>, SvGenericRepository<DependencyLevel, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<DependencyHistory>, SvGenericRepository<DependencyHistory, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<ResidentApplication>, SvGenericRepository<ResidentApplication, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<Resident>, SvGenericRepository<Resident, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<Guardian>, SvGenericRepository<Guardian, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<Applicant>, SvGenericRepository<Applicant, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<Notification>, SvGenericRepository<Notification, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<UnitOfMeasure>, SvGenericRepository<UnitOfMeasure, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<Category>, SvGenericRepository<Category, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<Product>, SvGenericRepository<Product, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<Inventory>, SvGenericRepository<Inventory, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<Appointment>, SvGenericRepository<Appointment, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<Specialty>, SvGenericRepository<Specialty, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<HealthcareCenter>, SvGenericRepository<HealthcareCenter, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<AppointmentStatus>, SvGenericRepository<AppointmentStatus, AdministrativeContext>>();
-            services.AddScoped<ISvGenericRepository<Note>, SvGenericRepository<Note, AdministrativeContext>>();
+            services.AddScoped<ISvGenericRepository<User>, SvGenericRepository<User>>();
+            services.AddScoped<ISvGenericRepository<Employee>, SvGenericRepository<Employee>>();
+            services.AddScoped<ISvGenericRepository<EmployeeRole>, SvGenericRepository<EmployeeRole>>();
+            services.AddScoped<ISvGenericRepository<TypeOfSalary>, SvGenericRepository<TypeOfSalary>>();
+            services.AddScoped<ISvGenericRepository<Profession>, SvGenericRepository<Profession>>();
+            services.AddScoped<ISvGenericRepository<PasswordResetToken>, SvGenericRepository<PasswordResetToken>>();
+            services.AddScoped<ISvGenericRepository<Rol>, SvGenericRepository<Rol>>();
+            services.AddScoped<ISvGenericRepository<Room>, SvGenericRepository<Room>>();
+            services.AddScoped<ISvGenericRepository<DependencyLevel>, SvGenericRepository<DependencyLevel>>();
+            services.AddScoped<ISvGenericRepository<DependencyHistory>, SvGenericRepository<DependencyHistory>>();
+            services.AddScoped<ISvGenericRepository<ResidentApplication>, SvGenericRepository<ResidentApplication>>();
+            services.AddScoped<ISvGenericRepository<Resident>, SvGenericRepository<Resident>>();
+            services.AddScoped<ISvGenericRepository<Guardian>, SvGenericRepository<Guardian>>();
+            services.AddScoped<ISvGenericRepository<Applicant>, SvGenericRepository<Applicant>>();
+            services.AddScoped<ISvGenericRepository<Notification>, SvGenericRepository<Notification>>();
+            services.AddScoped<ISvGenericRepository<UnitOfMeasure>, SvGenericRepository<UnitOfMeasure>>();
+            services.AddScoped<ISvGenericRepository<Category>, SvGenericRepository<Category>>();
+            services.AddScoped<ISvGenericRepository<Product>, SvGenericRepository<Product>>();
+            services.AddScoped<ISvGenericRepository<Inventory>, SvGenericRepository<Inventory>>();
+            services.AddScoped<ISvGenericRepository<Appointment>, SvGenericRepository<Appointment>>();
+            services.AddScoped<ISvGenericRepository<Specialty>, SvGenericRepository<Specialty>>();
+            services.AddScoped<ISvGenericRepository<HealthcareCenter>, SvGenericRepository<HealthcareCenter>>();
+            services.AddScoped<ISvGenericRepository<AppointmentStatus>, SvGenericRepository<AppointmentStatus>>();
+            services.AddScoped<ISvGenericRepository<Note>, SvGenericRepository<Note>>();
             #endregion
 
             #region Services_Administrative

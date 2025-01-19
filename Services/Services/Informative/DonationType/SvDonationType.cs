@@ -1,15 +1,16 @@
-﻿using Infrastructure.Persistence.MyDbContextInformative;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Services.GenericService;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Infrastructure.Persistence.AppDbContext; // <-- Ajusta si tu AppDbContext está en otro namespace
 
 namespace Infrastructure.Services.Informative.DonationType
 {
-    public class SvDonationType : SvGenericRepository<Domain.Entities.Informative.DonationType, MyInformativeContext>, ISvDonationType
+    public class SvDonationType
+        : SvGenericRepository<Domain.Entities.Informative.DonationType>, ISvDonationType
     {
-        // Constructor que pasa el contexto a la clase base
-        public SvDonationType(MyInformativeContext context) : base(context)
+        // Constructor que pasa el nuevo AppDbContext a la clase base
+        public SvDonationType(AppDbContext context) : base(context)
         {
         }
 

@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Services.GenericService;
-using Infrastructure.Persistence.MyDbContextInformative;
+// Ajusta el using para tu AppDbContext:
+using Infrastructure.Persistence.AppDbContext;
 using Domain.Entities.Informative;
 
 namespace Infrastructure.Services.Informative.NavbarItemServices
 {
-    public class SvNavbarItem : SvGenericRepository<NavbarItem, MyInformativeContext>, ISvNavbarItemService
+    public class SvNavbarItem
+        : SvGenericRepository<NavbarItem>, ISvNavbarItemService
     {
-        public SvNavbarItem(MyInformativeContext context) : base(context)
+        public SvNavbarItem(AppDbContext context) : base(context)
         {
         }
 

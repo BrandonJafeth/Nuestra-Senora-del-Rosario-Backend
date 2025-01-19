@@ -2,15 +2,17 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Domain.Entities.Informative;
-using Infrastructure.Persistence.MyDbContextInformative;
 using Microsoft.EntityFrameworkCore;
 using Services.GenericService;
+// Ajusta el namespace si tu AppDbContext está en otra carpeta
+using Infrastructure.Persistence.AppDbContext;
 
 namespace Infrastructure.Services.Informative.GalleryItemService
 {
-    public class SvGalleryItem : SvGenericRepository<GalleryItem, MyInformativeContext>, ISvGalleryItem
+    public class SvGalleryItem
+        : SvGenericRepository<GalleryItem>, ISvGalleryItem
     {
-        public SvGalleryItem(MyInformativeContext context) : base(context)
+        public SvGalleryItem(AppDbContext context) : base(context)
         {
         }
 

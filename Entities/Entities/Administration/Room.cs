@@ -13,7 +13,7 @@ namespace Domain.Entities.Administration
         public int Id_Room { get; set; }
 
         [Required, MaxLength(10)]
-        public string RoomNumber { get; set; }  // Número de la habitación
+        public string RoomNumber { get; set; } 
 
         [Required]
         public int Capacity { get; set; }  // Capacidad de la habitación

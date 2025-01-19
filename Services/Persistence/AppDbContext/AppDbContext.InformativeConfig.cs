@@ -1,62 +1,17 @@
 ﻿using Domain.Entities.Informative;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Infrastructure.Persistence.MyDbContextInformative
+namespace Infrastructure.Persistence.AppDbContext
 {
-    public class MyInformativeContext : DbContext
+    public partial class AppDbContext
     {
-        public MyInformativeContext(DbContextOptions<MyInformativeContext> options) : base(options)
+        private void ConfigureInformativeEntities(ModelBuilder modelBuilder)
         {
-        }
-
-        public DbSet<NavbarItem> NavbarItems { get; set; }
-        public DbSet<HeroSection> HeroSections { get; set; }
-        public DbSet<AboutUsSection> AboutUsSections { get; set; }
-        public DbSet<SiteSettings> SiteSettings { get; set; }
-        public DbSet<TitleSection> TitleSections { get; set; }
-        public DbSet<ServiceSection> ServiceSections { get; set; }
-        public DbSet<RegistrationSection> RegistrationSections { get; set; }
-        public DbSet<VolunteeringSection> VolunteeringSections { get; set; }
-        public DbSet<DonationsSection> DonationsSections { get; set; }
-        public DbSet<GalleryCategory> GalleryCategories { get; set; }
-        public DbSet<GalleryItem> GalleryItems { get; set; }
-        public DbSet<Contact> Contacts { get; set; }
-        public DbSet<ButtonInfo> ButtonInfos { get; set; }
-        public DbSet<VolunteerProfile> VolunteerProfiles { get; set; }
-        public DbSet<AssociatesSection> AssociatesSections { get; set; }
-        public DbSet<AdministrativeRequirements> AdministrativeRequirements { get; set; }
-        public DbSet<NursingRequirements> NursingRequirements { get; set; }
-        public DbSet<ImportantInformation> ImportantInformation { get; set; }
-
-        public DbSet<DonationType> DonationTypes { get; set; }
-
-        public DbSet<MethodDonation> MethodDonations { get; set; }
-        public DbSet<Applicant> Applicants { get; set; }
-        public DbSet<Guardian> Guardians { get; set; }
-        public DbSet<ApplicationForm> ApplicationForms { get; set; }
-        public DbSet<FormDonation> FormDonations { get; set; }
-        public DbSet<VoluntarieType> VoluntarieTypes { get; set; }
-        public DbSet<FormVoluntarie> FormVoluntaries { get; set; }
-
-        public DbSet<ApplicationStatus> ApplicationStatuses { get; set; }
-
-        public DbSet<Status> Statuses { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-
             modelBuilder.Entity<NavbarItem>()
-                .HasMany(n => n.Children)
-                .WithOne(n => n.Parent)
-                .HasForeignKey(n => n.ParentId)
-                .OnDelete(DeleteBehavior.Cascade);
+                       .HasMany(n => n.Children)
+                       .WithOne(n => n.Parent)
+                       .HasForeignKey(n => n.ParentId)
+                       .OnDelete(DeleteBehavior.Cascade);
 
             // Configuración de claves primarias auto-incrementales
             modelBuilder.Entity<NavbarItem>()

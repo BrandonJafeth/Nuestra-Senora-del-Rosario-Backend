@@ -1,21 +1,25 @@
 ﻿using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+
+// Importa tu AppDbContext
+using Infrastructure.Persistence.AppDbContext;
 
 namespace Services.GenericService
 {
-    public class SvGenericRepository<T, TContext> : ISvGenericRepository<T>
+    public class SvGenericRepository<T> : ISvGenericRepository<T>
         where T : class
-        where TContext : DbContext
     {
-        protected readonly TContext _context;
+        protected readonly AppDbContext _context;
         protected readonly DbSet<T> _dbSet;
 
-        public SvGenericRepository(TContext context)
+        public SvGenericRepository(AppDbContext context)
         {
             _context = context;
-            _dbSet = context.Set<T>();
+            _dbSet = _context.Set<T>();
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()
@@ -68,14 +72,18 @@ namespace Services.GenericService
             return _dbSet.AsQueryable();
         }
 
+        // Este método asume que la entidad T tiene una columna "Dni_Employee" de tipo int
+        // Si no lo usas, puedes eliminarlo.
         public async Task<T> GetByDniAsync(int dniEmployee)
         {
+            // EF.Property<int> para acceder a la propiedad por nombre
             return await _dbSet.FirstOrDefaultAsync(u => EF.Property<int>(u, "Dni_Employee") == dniEmployee);
         }
 
-        //nuevo codigo
         public async Task<bool> ExistsAsync(Func<T, bool> predicate)
         {
+            // Como no tenemos un from-linq con EF, se simula con .Any() en memoria
+            // O, si tu predicado usa EF, necesitarías cambiar la firma.
             return await Task.FromResult(_dbSet.Any(predicate));
         }
 

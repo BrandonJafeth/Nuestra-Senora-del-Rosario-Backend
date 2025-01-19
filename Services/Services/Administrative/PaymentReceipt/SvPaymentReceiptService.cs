@@ -2,28 +2,30 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-
 using Microsoft.Extensions.Logging;
-
 using PuppeteerSharp.Media;
 using PuppeteerSharp;
 using System.Text;
 using Infrastructure.Services.Administrative.EmailServices;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
-using Infrastructure.Persistence.MyDbAdministrativeContext;
 using Domain.Entities.Administration;
-
+// Reemplaza este using por el que apunte a tu nuevo AppDbContext:
+using Infrastructure.Persistence.AppDbContext;
 
 namespace Infrastructure.Services.Administrative.PaymentReceiptService
 {
     public class SvPaymentReceipt : ISvPaymentReceipt
     {
         private readonly ILogger<SvPaymentReceipt> _logger;
-        private readonly AdministrativeContext _context;
+        private readonly AppDbContext _context;    // <-- Cambiado a AppDbContext
         private readonly IMapper _mapper;
         private readonly ISvEmailService _emailService;
 
-        public SvPaymentReceipt(AdministrativeContext context, IMapper mapper, ISvEmailService emailService, ILogger<SvPaymentReceipt> logger)
+        public SvPaymentReceipt(
+            AppDbContext context,             // <-- Ajustado aquí
+            IMapper mapper,
+            ISvEmailService emailService,
+            ILogger<SvPaymentReceipt> logger)
         {
             _context = context;
             _mapper = mapper;
@@ -38,30 +40,25 @@ namespace Infrastructure.Services.Administrative.PaymentReceiptService
 
             try
             {
-                // Crear el comprobante de pago
                 var paymentReceipt = _mapper.Map<PaymentReceipt>(paymentReceiptCreateDto);
                 paymentReceipt.CreatedAt = DateTime.UtcNow;
 
                 decimal totalExtraHoursAmount = paymentReceiptCreateDto.ExtraHourRate * paymentReceiptCreateDto.Overtime;
                 paymentReceipt.TotalExtraHoursAmount = totalExtraHoursAmount;
 
-                // Calcular el monto bruto (GrossAmount) sumando salario base y horas extras
+                // Calcular el monto bruto
                 paymentReceipt.GrossAmount = paymentReceiptCreateDto.Salary + totalExtraHoursAmount;
-
-                // Calcular el ingreso bruto (GrossIncome)
-                // Nota: Asegúrate de que este valor esté correctamente asignado o eliminado si no es necesario
+                // Asignar GrossIncome
                 paymentReceipt.GrossIncome = paymentReceipt.GrossAmount;
-
-                // Calcular el total de deducciones
+                // Calcular deducciones
                 paymentReceipt.TotalDeductions = paymentReceiptCreateDto.DeductionsList?.Sum(d => d.Amount) ?? 0;
-
-                // Calcular el monto neto
+                // Monto neto
                 paymentReceipt.NetAmount = paymentReceipt.GrossIncome - paymentReceipt.TotalDeductions;
 
-                // Guardar el comprobante de pago
+                // Guardar en DB
                 await _context.PaymentReceipts.AddAsync(paymentReceipt);
                 await _context.SaveChangesAsync();
-                // Registrar las deducciones
+
                 if (paymentReceiptCreateDto.DeductionsList != null && paymentReceiptCreateDto.DeductionsList.Any())
                 {
                     var deductions = _mapper.Map<List<Deduction>>(paymentReceiptCreateDto.DeductionsList);
@@ -74,24 +71,22 @@ namespace Infrastructure.Services.Administrative.PaymentReceiptService
 
                 await _context.SaveChangesAsync();
 
-                // Recargar el PaymentReceipt desde la base de datos para obtener las relaciones del empleado
+                // Recargar PaymentReceipt con las relaciones
                 var fullPaymentReceipt = await _context.PaymentReceipts
                     .Include(r => r.Employee)
-                        .ThenInclude(e => e.Profession)      // Incluir la profesión del empleado
-                    .Include(r => r.Employee.TypeOfSalary)   // Incluir el tipo de salario del empleado
-                    .Include(r => r.DeductionsList)          // Incluir la lista de deducciones
-                    .FirstOrDefaultAsync(r => r.Id == paymentReceipt.Id); // Recargar usando el ID recién generado
+                        .ThenInclude(e => e.Profession)
+                    .Include(r => r.Employee.TypeOfSalary)
+                    .Include(r => r.DeductionsList)
+                    .FirstOrDefaultAsync(r => r.Id == paymentReceipt.Id);
 
                 if (fullPaymentReceipt == null)
                 {
                     throw new Exception("Error al cargar el comprobante de pago después de la creación.");
                 }
 
-                // Mapear el PaymentReceipt con las relaciones cargadas a PaymentReceiptDto
                 var paymentReceiptDto = _mapper.Map<PaymentReceiptDto>(fullPaymentReceipt);
 
                 await transaction.CommitAsync();
-
                 return paymentReceiptDto;
             }
             catch (Exception ex)
@@ -101,14 +96,12 @@ namespace Infrastructure.Services.Administrative.PaymentReceiptService
             }
         }
 
-
-
         // Obtener recibos de pago por empleado
         public async Task<IEnumerable<PaymentReceiptDto>> GetPaymentReceiptsByEmployeeAsync(int employeeDni)
         {
             var receipts = await _context.PaymentReceipts
                 .Include(r => r.Employee)
-                .ThenInclude(e => e.Profession)
+                    .ThenInclude(e => e.Profession)
                 .Include(r => r.Employee.TypeOfSalary)
                 .Include(r => r.DeductionsList)
                 .Where(r => r.EmployeeDni == employeeDni)
@@ -146,7 +139,7 @@ namespace Infrastructure.Services.Administrative.PaymentReceiptService
         {
             var receipt = await _context.PaymentReceipts
                 .Include(r => r.Employee)
-                .ThenInclude(e => e.Profession)
+                    .ThenInclude(e => e.Profession)
                 .Include(r => r.Employee.TypeOfSalary)
                 .Include(r => r.DeductionsList)
                 .FirstOrDefaultAsync(r => r.Id == id);
@@ -170,13 +163,18 @@ namespace Infrastructure.Services.Administrative.PaymentReceiptService
 
             var pdfStream = await GeneratePaymentReceiptPdf(receipt);
 
-            await _emailService.SendEmailWithAttachmentAsync(employeeEmail, "Comprobante de Pago", "Adjunto está su comprobante de pago.", pdfStream, "ComprobantePago.pdf");
+            await _emailService.SendEmailWithAttachmentAsync(
+                employeeEmail,
+                "Comprobante de Pago",
+                "Adjunto está su comprobante de pago.",
+                pdfStream,
+                "ComprobantePago.pdf"
+            );
         }
 
         // Generar PDF del comprobante de pago
         public async Task<MemoryStream> GeneratePaymentReceiptPdf(PaymentReceiptDto receiptDto)
         {
-            // Ruta de la plantilla HTML
             string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates", "ComprobantePagoTemplate.html");
 
             if (!File.Exists(templatePath))
@@ -184,10 +182,7 @@ namespace Infrastructure.Services.Administrative.PaymentReceiptService
                 throw new FileNotFoundException($"No se encontró la plantilla HTML en la ruta: {templatePath}");
             }
 
-            // Leer la plantilla HTML
             string htmlTemplate = await File.ReadAllTextAsync(templatePath);
-
-            // Generar dinámicamente la tabla de deducciones
             var deduccionesHtml = new StringBuilder();
             deduccionesHtml.Append("<table><thead><tr><th>Tipo de Deducción</th><th>Monto</th></tr></thead><tbody>");
 
@@ -205,7 +200,7 @@ namespace Infrastructure.Services.Administrative.PaymentReceiptService
 
             deduccionesHtml.Append("</tbody></table>");
 
-            // Reemplazar los placeholders en el HTML
+            // Reemplazar placeholders en el HTML
             string htmlContent = htmlTemplate
                 .Replace("{{PaymentDate}}", receiptDto.PaymentDate.ToString("dd/MM/yyyy"))
                 .Replace("{{EmployeeFullName}}", receiptDto.EmployeeFullName)
@@ -220,12 +215,12 @@ namespace Infrastructure.Services.Administrative.PaymentReceiptService
                 .Replace("{{NightHours}}", receiptDto.NightHours.ToString("N2"))
                 .Replace("{{MixedHours}}", receiptDto.MixedHours.ToString("N2"))
                 .Replace("{{MandatoryHolidays}}", receiptDto.MandatoryHolidays.ToString("N2"))
-                .Replace("{{MandatoryHolidaysAmount}}", (receiptDto.MandatoryHolidays * receiptDto.Salary / 30).ToString("N2")) // Asumiendo que el pago es diario
+                .Replace("{{MandatoryHolidaysAmount}}", (receiptDto.MandatoryHolidays * receiptDto.Salary / 30).ToString("N2"))
                 .Replace("{{Adjustments}}", receiptDto.Adjustments.ToString("N2"))
                 .Replace("{{Incapacity}}", receiptDto.Incapacity.ToString("N2"))
                 .Replace("{{Absence}}", receiptDto.Absence.ToString("N2"))
                 .Replace("{{VacationDays}}", receiptDto.VacationDays.ToString("N2"))
-                .Replace("{{VacationAmount}}", (receiptDto.VacationDays * receiptDto.Salary / 30).ToString("N2")) // Asumiendo que el pago es diario
+                .Replace("{{VacationAmount}}", (receiptDto.VacationDays * receiptDto.Salary / 30).ToString("N2"))
                 .Replace("{{GrossIncome}}", receiptDto.GrossIncome.ToString("N2"))
                 .Replace("{{NetAmount}}", receiptDto.NetAmount.ToString("N2"))
                 .Replace("{{TotalExtraHoursAmount}}", receiptDto.TotalExtraHoursAmount.ToString())
@@ -235,19 +230,14 @@ namespace Infrastructure.Services.Administrative.PaymentReceiptService
 
             try
             {
-                // Configurar opciones de Puppeteer con el ejecutable del navegador
                 var launchOptions = new LaunchOptions
                 {
                     Headless = true,
-                    ExecutablePath = Environment.GetEnvironmentVariable("PUPPETEER_EXECUTABLE_PATH"), // Usar la variable de entorno configurada en Docker
-                    Args = new[]
-                    {
-                "--no-sandbox",
-                "--disable-setuid-sandbox"
-            }
+                    ExecutablePath = Environment.GetEnvironmentVariable("PUPPETEER_EXECUTABLE_PATH"),
+                    Args = new[] { "--no-sandbox", "--disable-setuid-sandbox" }
                 };
 
-                var browser = await Puppeteer.LaunchAsync(launchOptions); // Usar opciones de lanzamiento configuradas
+                var browser = await Puppeteer.LaunchAsync(launchOptions);
                 var page = await browser.NewPageAsync();
                 await page.SetContentAsync(htmlContent);
 
@@ -270,9 +260,5 @@ namespace Infrastructure.Services.Administrative.PaymentReceiptService
 
             return pdfStream;
         }
-
-
-
-
     }
 }

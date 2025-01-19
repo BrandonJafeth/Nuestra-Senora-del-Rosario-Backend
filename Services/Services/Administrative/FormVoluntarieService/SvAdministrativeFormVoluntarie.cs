@@ -1,5 +1,5 @@
 ﻿using Domain.Entities.Administration;
-using Infrastructure.Persistence.MyDbAdministrativeContext;
+using Infrastructure.Persistence.AppDbContext; // <-- Ajusta si tu carpeta difiere
 using Microsoft.EntityFrameworkCore;
 using Services.GenericService;
 using System.Collections.Generic;
@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Services.Administrative.FormVoluntarieService
 {
-    public class AdministrativeFormVoluntarieService : SvGenericRepository<FormVoluntarie, AdministrativeContext>, IAdministrativeFormVoluntarieService
+    public class AdministrativeFormVoluntarieService
+        : SvGenericRepository<FormVoluntarie>, IAdministrativeFormVoluntarieService
     {
-        // Constructor que pasa el contexto a la clase base
-        public AdministrativeFormVoluntarieService(AdministrativeContext context) : base(context)
+        // Constructor que pasa el nuevo AppDbContext a la clase base
+        public AdministrativeFormVoluntarieService(AppDbContext context) : base(context)
         {
         }
 

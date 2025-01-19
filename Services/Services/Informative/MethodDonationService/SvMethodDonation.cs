@@ -1,18 +1,17 @@
 ﻿using Domain.Entities.Informative;
-using Infrastructure.Persistence.MyDbContextInformative;
 using Microsoft.EntityFrameworkCore;
 using Services.GenericService;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+// Ajusta la ruta según dónde tengas tu AppDbContext
+using Infrastructure.Persistence.AppDbContext;
 
 namespace Infrastructure.Services.Informative.MethodDonationService
 {
-    public class SvMethodDonation : SvGenericRepository<MethodDonation, MyInformativeContext>, ISvMethodDonation
+    public class SvMethodDonation
+        : SvGenericRepository<MethodDonation>, ISvMethodDonation
     {
-        public SvMethodDonation(MyInformativeContext context) : base(context)
+        public SvMethodDonation(AppDbContext context) : base(context)
         {
         }
 
@@ -20,7 +19,7 @@ namespace Infrastructure.Services.Informative.MethodDonationService
         public async Task<IEnumerable<MethodDonation>> GetMethodDonationsWithTypesAsync()
         {
             return await _context.MethodDonations
-                .Include(md => md.DonationType)  // Incluir la relación con DonationType
+                .Include(md => md.DonationType)
                 .ToListAsync();
         }
     }

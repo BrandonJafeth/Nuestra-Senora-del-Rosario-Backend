@@ -2,16 +2,22 @@
 using Services.GenericService;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System;
+using System.Linq;
+
+// Ajusta el namespace del AppDbContext según tu carpeta real:
+using Infrastructure.Persistence.AppDbContext;
+
 using Infrastructure.Services.Informative.DTOS;
 using Infrastructure.Services.Informative.DTOS.CreatesDto;
-using Infrastructure.Persistence.MyDbContextInformative;
 using Domain.Entities.Informative;
 
 namespace Infrastructure.Services.Informative.FormDonationService
 {
-    public class SvFormDonationService : SvGenericRepository<FormDonation, MyInformativeContext>, ISvFormDonation
+    public class SvFormDonationService
+        : SvGenericRepository<FormDonation>, ISvFormDonation
     {
-        public SvFormDonationService(MyInformativeContext context) : base(context)
+        public SvFormDonationService(AppDbContext context) : base(context)
         {
         }
 
@@ -47,14 +53,14 @@ namespace Infrastructure.Services.Informative.FormDonationService
             return (donations, totalPages);
         }
 
-        // Obtener una donación por ID con detalles, incluyendo Status
+        // Obtener una donación por ID con detalles
         public async Task<FormDonationDto> GetFormDonationWithDetailsByIdAsync(int id)
         {
             return await _context.FormDonations
-                .AsNoTracking() // Evitamos tracking para consultas de solo lectura
-                .Include(fd => fd.DonationType) // Incluir DonationType
-                .Include(fd => fd.MethodDonation) // Incluir MethodDonation
-                .Include(fd => fd.Status) // Incluir Status para evitar el error
+                .AsNoTracking()
+                .Include(fd => fd.DonationType)
+                .Include(fd => fd.MethodDonation)
+                .Include(fd => fd.Status)
                 .Where(fd => fd.Id_FormDonation == id)
                 .Select(fd => new FormDonationDto
                 {
@@ -68,7 +74,7 @@ namespace Infrastructure.Services.Informative.FormDonationService
                     Delivery_date = fd.Delivery_date,
                     DonationType = fd.DonationType.Name_DonationType,
                     MethodDonation = fd.MethodDonation.Name_MethodDonation,
-                    Status_Name = fd.Status.Status_Name // Estado actual
+                    Status_Name = fd.Status.Status_Name
                 })
                 .FirstOrDefaultAsync();
         }

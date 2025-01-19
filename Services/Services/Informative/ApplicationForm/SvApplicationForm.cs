@@ -1,20 +1,22 @@
-﻿
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System;
+using System.Linq;
 using Infrastructure.Services.Informative.DTOS;
 using Infrastructure.Services.Informative.DTOS.CreatesDto;
-using Infrastructure.Persistence.MyDbContextInformative;
+// Reemplaza esta línea con tu nuevo AppDbContext
+using Infrastructure.Persistence.AppDbContext;
 
 namespace Infrastructure.Services.Informative.ApplicationFormService
 {
     public class SvApplicationForm : ISvApplicationForm
     {
-        private readonly MyInformativeContext _context;
+        private readonly AppDbContext _context;    // <-- Cambiado a AppDbContext
         private readonly IMapper _mapper; // Inyección de AutoMapper
 
-        public SvApplicationForm(MyInformativeContext context, IMapper mapper)
+        public SvApplicationForm(AppDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -38,21 +40,19 @@ namespace Infrastructure.Services.Informative.ApplicationFormService
             return (forms, totalPages);
         }
 
-
         public async Task<ApplicationFormDto> GetFormByIdAsync(int id)
         {
             var applicationForm = await _context.ApplicationForms
                 .AsNoTracking()
                 .Include(af => af.Applicant)
                 .Include(af => af.Guardian)
-                .Include(af => af.ApplicationStatus)  // Incluir ApplicationStatus
+                .Include(af => af.ApplicationStatus)
                 .FirstOrDefaultAsync(af => af.Id_ApplicationForm == id);
 
             if (applicationForm == null) return null;
 
             return _mapper.Map<ApplicationFormDto>(applicationForm);
         }
-
 
         public async Task AddFormAsync(ApplicationFormCreateDto formCreateDto)
         {
@@ -95,7 +95,7 @@ namespace Infrastructure.Services.Informative.ApplicationFormService
                         Lastname2_AP = formCreateDto.Lastname2_AP,
                         Age_AP = formCreateDto.Age_AP,
                         Cedula_AP = formCreateDto.Cedula_AP,
-                        Location = formCreateDto.Location, // Asigna la ubicación desde el DTO
+                        Location = formCreateDto.Location,
                         Id_Guardian = guardian.Id_Guardian
                     };
 
@@ -109,7 +109,7 @@ namespace Infrastructure.Services.Informative.ApplicationFormService
                     Applicant = applicant,
                     Guardian = guardian,
                     ApplicationDate = DateTime.UtcNow,
-                    Id_Status = 1 // Estado inicial, por ejemplo, "Pendiente"
+                    Id_Status = 1 // Estado inicial
                 };
 
                 await _context.ApplicationForms.AddAsync(applicationForm);
@@ -131,25 +131,20 @@ namespace Infrastructure.Services.Informative.ApplicationFormService
             await _context.SaveChangesAsync();
         }
 
-
-        // Método para actualizar solo el estado de un formulario
         public async Task UpdateFormStatusAsync(int id, int statusId)
         {
-            // Buscar el formulario de aplicación por ID
             var applicationForm = await _context.ApplicationForms.FindAsync(id);
             if (applicationForm == null)
             {
                 throw new KeyNotFoundException($"Formulario de aplicación con ID {id} no encontrado.");
             }
 
-            // Verificar si el estado proporcionado existe en la tabla ApplicationStatus
             var statusExists = await _context.ApplicationStatuses.AnyAsync(s => s.Id_Status == statusId);
             if (!statusExists)
             {
                 throw new ArgumentException("El estado proporcionado no existe.");
             }
 
-            // Actualizar el estado del formulario
             applicationForm.Id_Status = statusId;
             await _context.SaveChangesAsync();
         }

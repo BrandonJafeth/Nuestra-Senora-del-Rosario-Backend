@@ -1,22 +1,25 @@
-﻿
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Services.GenericService;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System;
 using Infrastructure.Services.Informative.DTOS;
 using Infrastructure.Services.Informative.DTOS.CreatesDto;
-using Infrastructure.Persistence.MyDbContextInformative;
+// Ajusta si la carpeta difiere:
+using Infrastructure.Persistence.AppDbContext;
+using Domain.Entities.Informative;
 
 namespace Infrastructure.Services.Informative.FormVoluntarieService
 {
-    public class SvFormVoluntarieService : SvGenericRepository<FormVoluntarie, MyInformativeContext>, ISvFormVoluntarieService
+    public class SvFormVoluntarieService
+        : SvGenericRepository<FormVoluntarie>, ISvFormVoluntarieService
     {
-        public SvFormVoluntarieService(MyInformativeContext context) : base(context)
+        public SvFormVoluntarieService(AppDbContext context) : base(context)
         {
         }
 
-        // Método para obtener todas las formas de voluntarios con su tipo y estado, optimizado con AsNoTracking
+        // Método para obtener todas las formas de voluntarios con su tipo y estado
         public async Task<(IEnumerable<FormVoluntarieDto> FormVoluntaries, int TotalPages)> GetAllFormVoluntariesWithTypeAsync(int pageNumber, int pageSize)
         {
             var totalFormVoluntaries = await _context.FormVoluntaries.CountAsync();
@@ -47,14 +50,13 @@ namespace Infrastructure.Services.Informative.FormVoluntarieService
             return (formVoluntaries, totalPages);
         }
 
-
         // Método para obtener un formulario de voluntario con su tipo y estado por ID
         public async Task<FormVoluntarieDto> GetFormVoluntarieWithTypeByIdAsync(int id)
         {
             return await _context.FormVoluntaries
                 .AsNoTracking()
-                .Include(f => f.VoluntarieType)  // Incluye la relación de tipo de voluntariado
-                .Include(f => f.Status)  // Incluye la relación de estado
+                .Include(f => f.VoluntarieType)
+                .Include(f => f.Status)
                 .Where(f => f.Id_FormVoluntarie == id)
                 .Select(f => new FormVoluntarieDto
                 {
@@ -122,7 +124,6 @@ namespace Infrastructure.Services.Informative.FormVoluntarieService
             formVoluntarie.Id_Status = statusId;
             await _context.SaveChangesAsync();
         }
-
 
         // Método para eliminar una forma de voluntariado
         public async Task DeleteFormVoluntarieAsync(int id)
