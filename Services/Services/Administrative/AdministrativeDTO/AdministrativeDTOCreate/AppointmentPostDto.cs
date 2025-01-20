@@ -10,10 +10,10 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.Administrativ
     public class AppointmentPostDto
     {
         [Required]
-        public int Id_Resident { get; set; }  // ID del residente al que se le asigna la cita
+        public int Id_Resident { get; set; } 
 
         [Required]
-        public DateTime Date { get; set; }  // Fecha de la cita
+        public DateTime Date { get; set; }  
 
         [Required]
         public TimeSpan Time { get; set; }  // Hora de la cita (en hora local)

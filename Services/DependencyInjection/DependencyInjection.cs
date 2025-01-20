@@ -43,7 +43,6 @@ namespace Infrastructure.DependencyInjection
             IConfiguration configuration)
         {
             #region DbContext
-            // Usar SOLO AppDbContext unificado
             services.AddDbContext<AppDbContext>(options =>
             options.UseMySql(
             configuration.GetConnectionString("DefaultConnection"),
