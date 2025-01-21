@@ -26,11 +26,11 @@ public class ProfessionController : ControllerBase
 
         try
         {
-            // Agregar la profesión directamente desde el objeto recibido
+     
             await _professionService.AddAsync(profession);
             await _professionService.SaveChangesAsync();
 
-            return Ok(profession); // Devuelve el objeto creado
+            return Ok(profession); 
         }
         catch (DbUpdateException ex)
         {

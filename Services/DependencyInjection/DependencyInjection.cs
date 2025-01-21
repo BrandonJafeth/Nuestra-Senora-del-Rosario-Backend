@@ -33,6 +33,7 @@ using Infrastructure.Services.Administrative.AdministrativeDTO.EmployeeService;
 using Domain.Entities.Administration;
 using Domain.Entities.Informative;
 using Infrastructure.Persistence.AppDbContext;
+using Infrastructure.Services.Informative.MappingProfiles;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -52,7 +53,7 @@ namespace Infrastructure.DependencyInjection
             #endregion
 
             #region AutoMapper
-            services.AddAutoMapper(typeof(AdministrativeMappingProfile).Assembly);
+            services.AddAutoMapper(typeof(AdministrativeMappingProfile), typeof(FormDonationMappingProfile));
 
             #endregion
 
