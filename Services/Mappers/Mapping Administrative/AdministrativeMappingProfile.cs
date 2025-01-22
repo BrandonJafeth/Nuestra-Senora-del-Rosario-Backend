@@ -277,9 +277,5 @@ public class AdministrativeMappingProfile : Profile
             .ForMember(dest => dest.TotalEgresos, opt => opt.Ignore());
 
 
-
-
-
-
     }
 }
