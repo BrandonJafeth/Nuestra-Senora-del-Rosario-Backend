@@ -1,5 +1,5 @@
 ﻿using Infrastructure.Persistence.AppDbContext;
-using Microsoft.EntityFrameworkCore; 
+using Microsoft.EntityFrameworkCore;
 using System;
 
 namespace MyProject.Tests.Helpers

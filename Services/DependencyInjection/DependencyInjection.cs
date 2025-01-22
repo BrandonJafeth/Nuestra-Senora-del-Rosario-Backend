@@ -53,7 +53,10 @@ namespace Infrastructure.DependencyInjection
             #endregion
 
             #region AutoMapper
-            services.AddAutoMapper(typeof(AdministrativeMappingProfile), typeof(FormDonationMappingProfile));
+            services.AddAutoMapper(typeof(AdministrativeMappingProfile),
+                          typeof(FormDonationMappingProfile),
+                          typeof(FormVoluntarieMappingProfile));
+
 
             #endregion
 

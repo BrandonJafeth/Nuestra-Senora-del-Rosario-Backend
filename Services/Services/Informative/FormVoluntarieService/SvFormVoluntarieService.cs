@@ -6,137 +6,137 @@ using System.Threading.Tasks;
 using System;
 using Infrastructure.Services.Informative.DTOS;
 using Infrastructure.Services.Informative.DTOS.CreatesDto;
-// Ajusta si la carpeta difiere:
 using Infrastructure.Persistence.AppDbContext;
 using Domain.Entities.Informative;
+using AutoMapper;
+using FluentValidation;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Services.Informative.FormVoluntarieService
 {
-    public class SvFormVoluntarieService
-        : SvGenericRepository<FormVoluntarie>, ISvFormVoluntarieService
+    public class SvFormVoluntarieService : SvGenericRepository<FormVoluntarie>, ISvFormVoluntarieService
     {
-        public SvFormVoluntarieService(AppDbContext context) : base(context)
+        private readonly IMapper _mapper;
+        private readonly IValidator<FormVoluntarieCreateDto> _validator;
+        private readonly ILogger<SvFormVoluntarieService> _logger;
+
+        public SvFormVoluntarieService(AppDbContext context,
+                                       IMapper mapper,
+                                       IValidator<FormVoluntarieCreateDto> validator,
+                                       ILogger<SvFormVoluntarieService> logger)
+            : base(context)
         {
+            _mapper = mapper;
+            _validator = validator;
+            _logger = logger;
         }
 
-        // Método para obtener todas las formas de voluntarios con su tipo y estado
+        // Obtener todas las solicitudes de voluntariado con su tipo y estado
         public async Task<(IEnumerable<FormVoluntarieDto> FormVoluntaries, int TotalPages)> GetAllFormVoluntariesWithTypeAsync(int pageNumber, int pageSize)
         {
-            var totalFormVoluntaries = await _context.FormVoluntaries.CountAsync();
+            var totalFormVoluntaries = await _context.FormVoluntaries.AsNoTracking().CountAsync();
 
             var formVoluntaries = await _context.FormVoluntaries
                 .AsNoTracking()
                 .Include(f => f.VoluntarieType)
                 .Include(f => f.Status)
+                .OrderBy(f => f.Id_FormVoluntarie)  // Para un orden consistente
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .Select(f => new FormVoluntarieDto
-                {
-                    Id_FormVoluntarie = f.Id_FormVoluntarie,
-                    Vn_Name = f.Vn_Name,
-                    Vn_Lastname1 = f.Vn_Lastname1,
-                    Vn_Lastname2 = f.Vn_Lastname2,
-                    Vn_Cedula = f.Vn_Cedula,
-                    Vn_Phone = f.Vn_Phone,
-                    Vn_Email = f.Vn_Email,
-                    Delivery_Date = f.Delivery_Date,
-                    End_Date = f.End_Date,
-                    Name_voluntarieType = f.VoluntarieType.Name_VoluntarieType,
-                    Status_Name = f.Status.Status_Name
-                })
+                .Select(f => _mapper.Map<FormVoluntarieDto>(f))
                 .ToListAsync();
 
             var totalPages = (int)Math.Ceiling(totalFormVoluntaries / (double)pageSize);
             return (formVoluntaries, totalPages);
         }
 
-        // Método para obtener un formulario de voluntario con su tipo y estado por ID
+        // Obtener una solicitud de voluntariado por ID con su tipo y estado
         public async Task<FormVoluntarieDto> GetFormVoluntarieWithTypeByIdAsync(int id)
         {
-            return await _context.FormVoluntaries
+            var formVoluntarie = await _context.FormVoluntaries
                 .AsNoTracking()
                 .Include(f => f.VoluntarieType)
                 .Include(f => f.Status)
-                .Where(f => f.Id_FormVoluntarie == id)
-                .Select(f => new FormVoluntarieDto
-                {
-                    Id_FormVoluntarie = f.Id_FormVoluntarie,
-                    Vn_Name = f.Vn_Name,
-                    Vn_Lastname1 = f.Vn_Lastname1,
-                    Vn_Lastname2 = f.Vn_Lastname2,
-                    Vn_Cedula = f.Vn_Cedula,
-                    Vn_Phone = f.Vn_Phone,
-                    Vn_Email = f.Vn_Email,
-                    Delivery_Date = f.Delivery_Date,
-                    End_Date = f.End_Date,
-                    Name_voluntarieType = f.VoluntarieType.Name_VoluntarieType,
-                    Status_Name = f.Status.Status_Name
-                })
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(f => f.Id_FormVoluntarie == id);
+
+            if (formVoluntarie == null)
+            {
+                _logger.LogWarning("Formulario de voluntario con ID {Id} no encontrado.", id);
+                throw new KeyNotFoundException($"Formulario de voluntario con ID {id} no encontrado.");
+            }
+
+            return _mapper.Map<FormVoluntarieDto>(formVoluntarie);
         }
 
+        // Crear una nueva solicitud de voluntariado con validación y mapeo
         public async Task CreateFormVoluntarieAsync(FormVoluntarieCreateDto formVoluntarieCreateDto)
         {
+            // Validar el DTO mediante FluentValidation
+            var validationResult = await _validator.ValidateAsync(formVoluntarieCreateDto);
+            if (!validationResult.IsValid)
+            {
+                var errors = string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage));
+                _logger.LogWarning("Fallo en la validación para crear formulario de voluntariado: {Errors}", errors);
+                throw new ArgumentException($"Errores de validación: {errors}");
+            }
+
             // Verificar si el tipo de voluntariado existe
             var voluntarieTypeExists = await _context.VoluntarieTypes
                 .AnyAsync(v => v.Id_VoluntarieType == formVoluntarieCreateDto.VoluntarieTypeId);
-
             if (!voluntarieTypeExists)
             {
+                _logger.LogWarning("El tipo de voluntariado con ID {TypeId} no existe.", formVoluntarieCreateDto.VoluntarieTypeId);
                 throw new ArgumentException("El tipo de voluntariado proporcionado no existe.");
             }
 
-            // Crear el formulario de voluntariado
-            var formVoluntarie = new FormVoluntarie
-            {
-                Vn_Name = formVoluntarieCreateDto.Vn_Name,
-                Vn_Lastname1 = formVoluntarieCreateDto.Vn_Lastname1,
-                Vn_Lastname2 = formVoluntarieCreateDto.Vn_Lastname2,
-                Vn_Cedula = formVoluntarieCreateDto.Vn_Cedula,
-                Vn_Phone = formVoluntarieCreateDto.Vn_Phone,
-                Vn_Email = formVoluntarieCreateDto.Vn_Email,
-                Delivery_Date = formVoluntarieCreateDto.Delivery_Date,
-                End_Date = formVoluntarieCreateDto.End_Date,
-                Id_VoluntarieType = formVoluntarieCreateDto.VoluntarieTypeId,
-                Id_Status = 1
-            };
+            // Mapear el DTO a la entidad utilizando AutoMapper
+            var formVoluntarie = _mapper.Map<FormVoluntarie>(formVoluntarieCreateDto);
+            formVoluntarie.Id_Status = 1; // Estado por defecto (por ejemplo, "Pendiente")
 
             await _context.FormVoluntaries.AddAsync(formVoluntarie);
             await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Creado formulario de voluntario con ID {Id}", formVoluntarie.Id_FormVoluntarie);
         }
 
-        // Método para actualizar solo el estado de un formulario
+        // Actualizar solo el estado de un formulario de voluntariado
         public async Task UpdateFormVoluntarieStatusAsync(int id, int statusId)
         {
             var formVoluntarie = await _context.FormVoluntaries.FindAsync(id);
             if (formVoluntarie == null)
             {
+                _logger.LogWarning("Formulario de voluntario con ID {Id} no encontrado para actualización de estado.", id);
                 throw new KeyNotFoundException($"Formulario de voluntario con ID {id} no encontrado.");
             }
 
             // Verificar si el estado proporcionado existe
-            var statusExists = await _context.Statuses.AnyAsync(s => s.Id_Status == statusId);
+            var statusExists = await _context.Statuses.AsNoTracking().AnyAsync(s => s.Id_Status == statusId);
             if (!statusExists)
             {
+                _logger.LogWarning("El estado {StatusId} proporcionado no existe.", statusId);
                 throw new ArgumentException("El estado proporcionado no existe.");
             }
 
             formVoluntarie.Id_Status = statusId;
             await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Actualizado el estado del formulario de voluntario con ID {Id} a {StatusId}", id, statusId);
         }
 
-        // Método para eliminar una forma de voluntariado
+        // Eliminar una solicitud de voluntariado
         public async Task DeleteFormVoluntarieAsync(int id)
         {
             var formVoluntarie = await _context.FormVoluntaries.FindAsync(id);
-
             if (formVoluntarie == null)
             {
+                _logger.LogWarning("Formulario de voluntario con ID {Id} no encontrado para eliminación.", id);
                 throw new KeyNotFoundException($"Formulario de voluntario con ID {id} no encontrado.");
             }
 
             _context.FormVoluntaries.Remove(formVoluntarie);
             await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Eliminado formulario de voluntario con ID {Id}", id);
         }
     }
 }
