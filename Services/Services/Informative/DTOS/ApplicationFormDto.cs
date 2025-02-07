@@ -5,34 +5,25 @@ namespace Infrastructure.Services.Informative.DTOS
     public class ApplicationFormDto
     {
         public int Id_ApplicationForm { get; set; }
-
-
-
-        // Datos del Aplicante
-
-        public int Id_Applicant { get; set; }
-        public string Name_AP { get; set; }
-        public string Lastname1_AP { get; set; }
-        public string Lastname2_AP { get; set; }
-        public int Age_AP { get; set; }
-        public string Cedula_AP { get; set; }
-
-        public string Location { get; set; }
-
-        // Datos del Guardian
-
-        public int Id_Guardian { get; set; }
-        public string Name_GD { get; set; }
-        public string Lastname1_GD { get; set; }
-        public string Lastname2_GD { get; set; }
-        public string Cedula_GD { get; set; }
-        public string Phone_GD { get; set; }
-        public string Email_GD { get; set; }
-
-        // Fecha de la solicitud
         public DateTime ApplicationDate { get; set; }
 
-        // Nombre del estado (mapeado desde ApplicationStatus)
+        // Guardian
+        public string GuardianName { get; set; }
+        public string GuardianLastName1 { get; set; }
+        public string GuardianLastName2 { get; set; }
+        public string GuardianCedula { get; set; }
+        public string GuardianEmail { get; set; }
+        public string GuardianPhone { get; set; }
+
+        // Solicitante
+        public string Name_AP { get; set; }
+        public string LastName1_AP { get; set; }
+        public string LastName2_AP { get; set; }
+        public string Cedula_AP { get; set; }
+        public int Age_AP { get; set; }
+        public string Location_AP { get; set; }
+
+        //  Solo si quieres devolver el nombre del estado
         public string Status_Name { get; set; }
     }
 }

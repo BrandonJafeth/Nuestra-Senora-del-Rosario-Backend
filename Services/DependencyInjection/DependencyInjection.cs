@@ -101,10 +101,8 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<ISvGenericRepository<Room>, SvGenericRepository<Room>>();
             services.AddScoped<ISvGenericRepository<DependencyLevel>, SvGenericRepository<DependencyLevel>>();
             services.AddScoped<ISvGenericRepository<DependencyHistory>, SvGenericRepository<DependencyHistory>>();
-            services.AddScoped<ISvGenericRepository<ResidentApplication>, SvGenericRepository<ResidentApplication>>();
             services.AddScoped<ISvGenericRepository<Resident>, SvGenericRepository<Resident>>();
             services.AddScoped<ISvGenericRepository<Guardian>, SvGenericRepository<Guardian>>();
-            services.AddScoped<ISvGenericRepository<Applicant>, SvGenericRepository<Applicant>>();
             services.AddScoped<ISvGenericRepository<Notification>, SvGenericRepository<Notification>>();
             services.AddScoped<ISvGenericRepository<UnitOfMeasure>, SvGenericRepository<UnitOfMeasure>>();
             services.AddScoped<ISvGenericRepository<Category>, SvGenericRepository<Category>>();

@@ -42,46 +42,18 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Id_VoluntarieType, opt => opt.MapFrom(src => src.VoluntarieTypeId)); // Mapear el ID directamente
 
 
-        // Mapeo de ApplicationForm a ApplicationFormDto (GET)
+        // De la Entidad a DTO para GET
         CreateMap<ApplicationForm, ApplicationFormDto>()
-            .ForMember(dest => dest.Name_AP, opt => opt.MapFrom(src => src.Applicant.Name_AP))
-            .ForMember(dest => dest.Lastname1_AP, opt => opt.MapFrom(src => src.Applicant.Lastname1_AP))
-            .ForMember(dest => dest.Lastname2_AP, opt => opt.MapFrom(src => src.Applicant.Lastname2_AP))
-            .ForMember(dest => dest.Age_AP, opt => opt.MapFrom(src => src.Applicant.Age_AP))
-            .ForMember(dest => dest.Cedula_AP, opt => opt.MapFrom(src => src.Applicant.Cedula_AP))
-            .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Applicant.Location))  // Mapeo de la localización
-            .ForMember(dest => dest.Name_GD, opt => opt.MapFrom(src => src.Guardian.Name_GD))
-            .ForMember(dest => dest.Lastname1_GD, opt => opt.MapFrom(src => src.Guardian.Lastname1_GD))
-            .ForMember(dest => dest.Lastname2_GD, opt => opt.MapFrom(src => src.Guardian.Lastname2_GD))
-            .ForMember(dest => dest.Cedula_GD, opt => opt.MapFrom(src => src.Guardian.Cedula_GD))
-            .ForMember(dest => dest.Phone_GD, opt => opt.MapFrom(src => src.Guardian.Phone_GD))
-            .ForMember(dest => dest.Email_GD, opt => opt.MapFrom(src => src.Guardian.Email_GD))
-            .ForMember(dest => dest.ApplicationDate, opt => opt.MapFrom(src => src.ApplicationDate))
-            .ForMember(dest => dest.Status_Name, opt => opt.MapFrom(src => src.ApplicationStatus.Status_Name)); // Mapear el nombre del estado
+            // Example: si quieres mapear un "status_name":
+            .ForMember(dest => dest.Status_Name, opt => opt.MapFrom(
+               src => src.ApplicationStatus.Status_Name
+            ));
 
-        // Mapeo de ApplicationFormCreateDto a ApplicationForm (POST)
+        // De DTO para POST a la Entidad
         CreateMap<ApplicationFormCreateDto, ApplicationForm>()
-            .ForMember(dest => dest.Applicant, opt => opt.Ignore())  // Se gestionan en el servicio
-            .ForMember(dest => dest.Guardian, opt => opt.Ignore())   // Se gestionan en el servicio
-            .ForMember(dest => dest.Id_Status, opt => opt.Ignore())  // Se asigna un valor por defecto
-            .ForMember(dest => dest.ApplicationDate, opt => opt.Ignore()); // Se asigna la fecha actual en el servicio
-
-        // Mapeo de ApplicationFormCreateDto a Applicant (POST)
-        CreateMap<ApplicationFormCreateDto, Applicant>()
-            .ForMember(dest => dest.Name_AP, opt => opt.MapFrom(src => src.Name_AP))
-            .ForMember(dest => dest.Lastname1_AP, opt => opt.MapFrom(src => src.Lastname1_AP))
-            .ForMember(dest => dest.Lastname2_AP, opt => opt.MapFrom(src => src.Lastname2_AP))
-            .ForMember(dest => dest.Age_AP, opt => opt.MapFrom(src => src.Age_AP))
-            .ForMember(dest => dest.Cedula_AP, opt => opt.MapFrom(src => src.Cedula_AP))
-            .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location));  // Mapeo de la localización
-
-        // Mapeo de ApplicationFormCreateDto a Guardian (POST)
-        CreateMap<ApplicationFormCreateDto, Guardian>()
-            .ForMember(dest => dest.Name_GD, opt => opt.MapFrom(src => src.Name_GD))
-            .ForMember(dest => dest.Lastname1_GD, opt => opt.MapFrom(src => src.Lastname1_GD))
-            .ForMember(dest => dest.Lastname2_GD, opt => opt.MapFrom(src => src.Lastname2_GD))
-            .ForMember(dest => dest.Cedula_GD, opt => opt.MapFrom(src => src.Cedula_GD))
-            .ForMember(dest => dest.Phone_GD, opt => opt.MapFrom(src => src.Phone_GD))
-            .ForMember(dest => dest.Email_GD, opt => opt.MapFrom(src => src.Email_GD));
+            // Ajustas lo que quieras ignorar
+            .ForMember(dest => dest.Id_ApplicationForm, opt => opt.Ignore())
+            .ForMember(dest => dest.ApplicationDate, opt => opt.Ignore())
+            .ForMember(dest => dest.Id_Status, opt => opt.Ignore());
     }
 }

@@ -35,17 +35,13 @@ public class ApplicationFormController : ControllerBase
 
 
     // GET: api/ApplicationForm/{id}
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> GetApplicationForm(int id)
     {
-        var applicationForm = await _applicationFormService.GetFormByIdAsync(id);
-        if (applicationForm == null)
-        {
-            return NotFound();
-        }
+        var formDto = await _applicationFormService.GetFormByIdAsync(id);
+        if (formDto == null) return NotFound();
 
-        var applicationFormDto = _mapper.Map<ApplicationFormDto>(applicationForm);
-        return Ok(applicationFormDto);
+        return Ok(formDto);
     }
 
     // POST: api/ApplicationForm
@@ -54,14 +50,18 @@ public class ApplicationFormController : ControllerBase
     public async Task<IActionResult> AddApplicationForm([FromBody] ApplicationFormCreateDto applicationFormCreateDto)
     {
         if (!ModelState.IsValid)
-        {
             return BadRequest(ModelState);
-        }
 
-        // Usa el servicio para manejar la lógica de creación, no el mapeo directo
-        await _applicationFormService.AddFormAsync(applicationFormCreateDto);
-        return CreatedAtAction(nameof(GetApplicationForm), new { id = applicationFormCreateDto.Id_ApplicationForm }, applicationFormCreateDto);
+        // El servicio ahora devuelve el nuevo Id
+        var newId = await _applicationFormService.AddFormAsync(applicationFormCreateDto);
+
+        // Devolvemos CreatedAtAction y la ruta de tu GetApplicationForm
+        // con { id = newId } como route values
+        return CreatedAtAction(nameof(GetApplicationForm),
+                               new { id = newId },
+                               applicationFormCreateDto);
     }
+
 
     // DELETE: api/ApplicationForm/{id}
     [HttpDelete("{id}")]

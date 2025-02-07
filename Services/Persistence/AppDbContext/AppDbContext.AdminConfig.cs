@@ -78,12 +78,7 @@ namespace Infrastructure.Persistence.AppDbContext
                 .Property(s => s.Id_Status)
                 .ValueGeneratedOnAdd();
 
-            // Configuración para Applicant
-            modelBuilder.Entity<Applicant>()
-                .HasKey(a => a.Id_Applicant);
-            modelBuilder.Entity<Applicant>()
-                .Property(a => a.Id_Applicant)
-                .ValueGeneratedOnAdd();
+
 
             // Configuración para Guardian
             modelBuilder.Entity<Guardian>()
@@ -233,7 +228,6 @@ namespace Infrastructure.Persistence.AppDbContext
             modelBuilder.Entity<Resident>().HasKey(r => r.Id_Resident);
             modelBuilder.Entity<DependencyLevel>().HasKey(dl => dl.Id_DependencyLevel);
             modelBuilder.Entity<DependencyHistory>().HasKey(dh => dh.Id_History);
-            modelBuilder.Entity<ResidentApplication>().HasKey(ra => ra.Id_Relation);
 
             // Relaciones
             modelBuilder.Entity<Resident>()
@@ -256,15 +250,6 @@ namespace Infrastructure.Persistence.AppDbContext
                 .WithMany()
                 .HasForeignKey(dh => dh.Id_DependencyLevel);
 
-            modelBuilder.Entity<ResidentApplication>()
-                .HasOne(ra => ra.Resident)
-                .WithMany()
-                .HasForeignKey(ra => ra.Id_Resident);
-
-            modelBuilder.Entity<ResidentApplication>()
-                .HasOne(ra => ra.Applicant)
-                .WithMany()
-                .HasForeignKey(ra => ra.Id_Applicant);
 
 
 

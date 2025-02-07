@@ -15,7 +15,7 @@ namespace Infrastructure.Services.Administrative.Residents
         Task<IEnumerable<ResidentGetDto>> GetAllResidentsAsync();
         Task<ResidentGetDto> GetResidentByIdAsync(int id);
         Task AddResidentAsync(ResidentCreateDto residentDto);
-        Task AddResidentFromApplicantAsync(ResidentFromApplicantDto dto);  // Nuevo método
+        //Task AddResidentFromApplicantAsync(ResidentFromApplicantDto dto);  // Nuevo método
         Task UpdateResidentAsync(int id, ResidentCreateDto residentDto);
         Task PatchResidentAsync(int id, ResidentPatchDto patchDto);
         Task DeleteResidentAsync(int id);

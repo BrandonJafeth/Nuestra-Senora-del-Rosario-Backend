@@ -238,58 +238,33 @@ namespace Infrastructure.Persistence.AppDbContext
 
 
 
-            // Configuración para Applicant
-            modelBuilder.Entity<Applicant>()
-                .HasKey(a => a.Id_Applicant);  // Llave primaria
-            modelBuilder.Entity<Applicant>()
-                .Property(a => a.Id_Applicant)
-                .ValueGeneratedOnAdd();  // Auto incremento
-
-            // Configuración para Guardian
-            modelBuilder.Entity<Guardian>()
-                .HasKey(g => g.Id_Guardian);  // Llave primaria
-            modelBuilder.Entity<Guardian>()
-                .Property(g => g.Id_Guardian)
-                .ValueGeneratedOnAdd();  // Auto incremento
-
-            // Configuración para ApplicationStatus
+            // Configuración para ApplicationStatus (opcional si deseas personalizar)
             modelBuilder.Entity<ApplicationStatus>()
-                .HasKey(s => s.Id_Status);  // Llave primaria
+                .HasKey(s => s.Id_Status);
             modelBuilder.Entity<ApplicationStatus>()
                 .Property(s => s.Id_Status)
-                .ValueGeneratedOnAdd();  // Auto incremento
+                .ValueGeneratedOnAdd();
+
             modelBuilder.Entity<ApplicationStatus>()
                 .Property(s => s.Status_Name)
-                .IsRequired()  // Campo requerido
-                .HasMaxLength(50);  // Longitud máxima del estado
+                .IsRequired()
+                .HasMaxLength(50);
 
             // Configuración para ApplicationForm
             modelBuilder.Entity<ApplicationForm>()
-                .HasKey(af => af.Id_ApplicationForm);  // Llave primaria
+                .HasKey(af => af.Id_ApplicationForm);
+
             modelBuilder.Entity<ApplicationForm>()
                 .Property(af => af.Id_ApplicationForm)
-                .ValueGeneratedOnAdd();  // Auto incremento
-
-            // Relación entre ApplicationForm y Applicant
-            modelBuilder.Entity<ApplicationForm>()
-                .HasOne(af => af.Applicant)  // Relación con Applicant
-                .WithMany()  // Un Applicant puede tener varias solicitudes
-                .HasForeignKey(af => af.Id_Applicant)
-                .OnDelete(DeleteBehavior.Cascade);  // Borrar en cascada si el Applicant es eliminado
-
-            // Relación entre ApplicationForm y Guardian
-            modelBuilder.Entity<ApplicationForm>()
-                .HasOne(af => af.Guardian)  // Relación con Guardian
-                .WithMany()  // Un Guardian puede tener varias solicitudes
-                .HasForeignKey(af => af.Id_Guardian)
-                .OnDelete(DeleteBehavior.Cascade);  // Borrar en cascada si el Guardian es eliminado
+                .ValueGeneratedOnAdd();
 
             // Relación entre ApplicationForm y ApplicationStatus
             modelBuilder.Entity<ApplicationForm>()
-                .HasOne(af => af.ApplicationStatus)  // Relación con ApplicationStatus
-                .WithMany()  // Un estado puede estar asignado a muchas solicitudes
+                .HasOne(af => af.ApplicationStatus)
+                .WithMany()      
                 .HasForeignKey(af => af.Id_Status)
-                .OnDelete(DeleteBehavior.Restrict);  // No eliminar el estado si está asignado a solicitudes
+                .OnDelete(DeleteBehavior.Restrict); 
+
         }
     }
 }

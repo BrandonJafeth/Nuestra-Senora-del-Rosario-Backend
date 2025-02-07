@@ -67,18 +67,18 @@ namespace Nuestra_Senora_del_Rosario.Controllers.Administrative
             return CreatedAtAction(nameof(GetResidentById), new { id = residentDto.Cedula_AP }, residentDto);
         }
 
-        // POST: api/Residents/fromApplicant
-        [HttpPost("fromApplicant")]
-        public async Task<IActionResult> AddResidentFromApplicant([FromBody] ResidentFromApplicantDto residentFromApplicantDto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //// POST: api/Residents/fromApplicant
+        //[HttpPost("fromApplicant")]
+        //public async Task<IActionResult> AddResidentFromApplicant([FromBody] ResidentFromApplicantDto residentFromApplicantDto)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
 
-            await _residentService.AddResidentFromApplicantAsync(residentFromApplicantDto);
-            return CreatedAtAction(nameof(GetResidentById), new { id = residentFromApplicantDto.Id_Applicant }, residentFromApplicantDto);
-        }
+        //    await _residentService.AddResidentFromApplicantAsync(residentFromApplicantDto);
+        //    return CreatedAtAction(nameof(GetResidentById), new { id = residentFromApplicantDto.Id_Applicant }, residentFromApplicantDto);
+        //}
 
         // PUT: api/Residents/5
         [HttpPut("{id}")]

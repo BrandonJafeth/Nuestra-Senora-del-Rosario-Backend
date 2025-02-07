@@ -6,15 +6,14 @@ using System;
 using System.Linq;
 using Infrastructure.Services.Informative.DTOS;
 using Infrastructure.Services.Informative.DTOS.CreatesDto;
-// Reemplaza esta línea con tu nuevo AppDbContext
-using Infrastructure.Persistence.AppDbContext;
+using Infrastructure.Persistence.AppDbContext; // Ajusta al namespace de tu contexto
 
 namespace Infrastructure.Services.Informative.ApplicationFormService
 {
     public class SvApplicationForm : ISvApplicationForm
     {
-        private readonly AppDbContext _context;    // <-- Cambiado a AppDbContext
-        private readonly IMapper _mapper; // Inyección de AutoMapper
+        private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
         public SvApplicationForm(AppDbContext context, IMapper mapper)
         {
@@ -24,108 +23,58 @@ namespace Infrastructure.Services.Informative.ApplicationFormService
 
         public async Task<(IEnumerable<ApplicationFormDto> Forms, int TotalPages)> GetAllFormsAsync(int pageNumber, int pageSize)
         {
-            var totalForms = await _context.ApplicationForms.CountAsync(); // Total de formularios
+            // Contar total de formularios
+            var totalForms = await _context.ApplicationForms.CountAsync();
 
+            // Obtener la lista paginada
             var forms = await _context.ApplicationForms
                 .AsNoTracking()
-                .Include(af => af.Applicant)
-                .Include(af => af.Guardian)
-                .Include(af => af.ApplicationStatus)
-                .Skip((pageNumber - 1) * pageSize) // Saltar elementos para la paginación
-                .Take(pageSize)                    // Limitar los resultados a pageSize
+                .Include(af => af.ApplicationStatus)  // Sólo si quieres traer el estado
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .Select(af => _mapper.Map<ApplicationFormDto>(af))
                 .ToListAsync();
 
+            // Calcular total de páginas
             var totalPages = (int)Math.Ceiling(totalForms / (double)pageSize);
             return (forms, totalPages);
         }
 
         public async Task<ApplicationFormDto> GetFormByIdAsync(int id)
         {
+            // Buscar el formulario con su estado
             var applicationForm = await _context.ApplicationForms
                 .AsNoTracking()
-                .Include(af => af.Applicant)
-                .Include(af => af.Guardian)
                 .Include(af => af.ApplicationStatus)
                 .FirstOrDefaultAsync(af => af.Id_ApplicationForm == id);
 
             if (applicationForm == null) return null;
 
+            // Mapear a DTO
             return _mapper.Map<ApplicationFormDto>(applicationForm);
         }
 
-        public async Task AddFormAsync(ApplicationFormCreateDto formCreateDto)
+        public async Task<int> AddFormAsync(ApplicationFormCreateDto formCreateDto)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            // Mapeamos a la entidad ApplicationForm
+            var applicationForm = _mapper.Map<ApplicationForm>(formCreateDto);
 
-            try
-            {
-                // Verificar si el Guardian ya existe
-                var guardian = await _context.Guardians
-                    .FirstOrDefaultAsync(g => g.Cedula_GD == formCreateDto.Cedula_GD);
+            // Ajustamos campos extra (fecha, estado, etc.)
+            applicationForm.ApplicationDate = DateTime.UtcNow;
+            applicationForm.Id_Status = 1; // Ejemplo: Pendiente
 
-                if (guardian == null)
-                {
-                    // Crear un nuevo Guardian
-                    guardian = new Guardian
-                    {
-                        Name_GD = formCreateDto.Name_GD,
-                        Lastname1_GD = formCreateDto.Lastname1_GD,
-                        Lastname2_GD = formCreateDto.Lastname2_GD,
-                        Cedula_GD = formCreateDto.Cedula_GD,
-                        Phone_GD = formCreateDto.Phone_GD,
-                        Email_GD = formCreateDto.Email_GD
-                    };
+            // Guardar en la BD
+            await _context.ApplicationForms.AddAsync(applicationForm);
+            await _context.SaveChangesAsync();
 
-                    await _context.Guardians.AddAsync(guardian);
-                    await _context.SaveChangesAsync();
-                }
-
-                // Verificar si el Applicant ya existe
-                var applicant = await _context.Applicants
-                    .FirstOrDefaultAsync(a => a.Cedula_AP == formCreateDto.Cedula_AP);
-
-                if (applicant == null)
-                {
-                    // Crear un nuevo Applicant
-                    applicant = new Applicant
-                    {
-                        Name_AP = formCreateDto.Name_AP,
-                        Lastname1_AP = formCreateDto.Lastname1_AP,
-                        Lastname2_AP = formCreateDto.Lastname2_AP,
-                        Age_AP = formCreateDto.Age_AP,
-                        Cedula_AP = formCreateDto.Cedula_AP,
-                        Location = formCreateDto.Location,
-                        Id_Guardian = guardian.Id_Guardian
-                    };
-
-                    await _context.Applicants.AddAsync(applicant);
-                    await _context.SaveChangesAsync();
-                }
-
-                // Crear el nuevo ApplicationForm
-                var applicationForm = new ApplicationForm
-                {
-                    Applicant = applicant,
-                    Guardian = guardian,
-                    ApplicationDate = DateTime.UtcNow,
-                    Id_Status = 1 // Estado inicial
-                };
-
-                await _context.ApplicationForms.AddAsync(applicationForm);
-                await _context.SaveChangesAsync();
-
-                await transaction.CommitAsync();
-            }
-            catch (Exception)
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+            // Retornar el nuevo ID
+            return applicationForm.Id_ApplicationForm;
         }
+
 
         public async Task DeleteAsync(int id)
         {
+            // Borrado simple por ID
             var form = new ApplicationForm { Id_ApplicationForm = id };
             _context.ApplicationForms.Remove(form);
             await _context.SaveChangesAsync();
@@ -135,15 +84,12 @@ namespace Infrastructure.Services.Informative.ApplicationFormService
         {
             var applicationForm = await _context.ApplicationForms.FindAsync(id);
             if (applicationForm == null)
-            {
                 throw new KeyNotFoundException($"Formulario de aplicación con ID {id} no encontrado.");
-            }
 
+            // Verificar que el estado existe
             var statusExists = await _context.ApplicationStatuses.AnyAsync(s => s.Id_Status == statusId);
             if (!statusExists)
-            {
                 throw new ArgumentException("El estado proporcionado no existe.");
-            }
 
             applicationForm.Id_Status = statusId;
             await _context.SaveChangesAsync();

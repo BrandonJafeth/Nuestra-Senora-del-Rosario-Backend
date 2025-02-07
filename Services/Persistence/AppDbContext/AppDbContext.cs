@@ -19,7 +19,6 @@ namespace Infrastructure.Persistence.AppDbContext
 
         public DbSet<ApplicationForm> ApplicationForms { get; set; }
         public DbSet<ApplicationStatus> ApplicationStatuses { get; set; }
-        public DbSet<Applicant> Applicants { get; set; }
         public DbSet<Guardian> Guardians { get; set; }
 
  
@@ -41,7 +40,6 @@ namespace Infrastructure.Persistence.AppDbContext
         public DbSet<Resident> Residents { get; set; }
         public DbSet<DependencyLevel> DependencyLevels { get; set; }
         public DbSet<DependencyHistory> DependencyHistories { get; set; }
-        public DbSet<ResidentApplication> Residents_Applications { get; set; }
 
         public DbSet<HealthcareCenter> HealthcareCenters { get; set; }
         public DbSet<Specialty> Specialties { get; set; }

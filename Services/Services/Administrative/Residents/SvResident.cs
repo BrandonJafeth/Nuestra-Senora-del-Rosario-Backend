@@ -16,7 +16,6 @@ namespace Infrastructure.Services.Administrative.Residents
         private readonly ISvGenericRepository<Resident> _residentRepository;
         private readonly ISvGenericRepository<Guardian> _guardianRepository;
         private readonly ISvGenericRepository<Room> _roomRepository;
-        private readonly ISvGenericRepository<Applicant> _applicantRepository;
         private readonly ISvGenericRepository<DependencyHistory> _dependencyHistoryRepository;
         private readonly ISvGenericRepository<DependencyLevel> _dependencyLevelRepository; // Repositorio de DependencyLevel
         private readonly IMapper _mapper;
@@ -25,7 +24,6 @@ namespace Infrastructure.Services.Administrative.Residents
             ISvGenericRepository<Resident> residentRepository,
             ISvGenericRepository<Guardian> guardianRepository,
             ISvGenericRepository<Room> roomRepository,
-            ISvGenericRepository<Applicant> applicantRepository,
             ISvGenericRepository<DependencyHistory> dependencyHistoryRepository,
             ISvGenericRepository<DependencyLevel> dependencyLevelRepository, // Inyección del repositorio de DependencyLevel
             IMapper mapper)
@@ -33,7 +31,6 @@ namespace Infrastructure.Services.Administrative.Residents
             _residentRepository = residentRepository;
             _guardianRepository = guardianRepository;
             _roomRepository = roomRepository;
-            _applicantRepository = applicantRepository;
             _dependencyHistoryRepository = dependencyHistoryRepository;
             _dependencyLevelRepository = dependencyLevelRepository; // Inyección del repositorio de DependencyLevel
             _mapper = mapper;
@@ -124,44 +121,44 @@ namespace Infrastructure.Services.Administrative.Residents
 
 
 
-        // Método para añadir un residente desde un Applicant aprobado
-        public async Task AddResidentFromApplicantAsync(ResidentFromApplicantDto dto)
-        {
-            var applicant = await _applicantRepository.GetByIdAsync(dto.Id_Applicant);
-            if (applicant == null)
-                throw new KeyNotFoundException($"Applicant with ID {dto.Id_Applicant} not found");
+        //// Método para añadir un residente desde un Applicant aprobado
+        //public async Task AddResidentFromApplicantAsync(ResidentFromApplicantDto dto)
+        //{
+        //    var applicant = await _applicantRepository.GetByIdAsync(dto.Id_Applicant);
+        //    if (applicant == null)
+        //        throw new KeyNotFoundException($"Applicant with ID {dto.Id_Applicant} not found");
 
-            var room = await _roomRepository.GetByIdAsync(dto.Id_Room);
-            if (room == null)
-                throw new KeyNotFoundException($"Room with ID {dto.Id_Room} not found");
+        //    var room = await _roomRepository.GetByIdAsync(dto.Id_Room);
+        //    if (room == null)
+        //        throw new KeyNotFoundException($"Room with ID {dto.Id_Room} not found");
 
-            var resident = new Resident
-            {
-                Name_AP = applicant.Name_AP,
-                Lastname1_AP = applicant.Lastname1_AP,
-                Lastname2_AP = applicant.Lastname2_AP,
-                Cedula_AP = applicant.Cedula_AP,
-                Sexo = dto.Sexo,
-                FechaNacimiento = DateTime.Now.AddYears(-applicant.Age_AP),
-                Id_Guardian = applicant.Id_Guardian,
-                Id_Room = dto.Id_Room,
-                EntryDate = dto.EntryDate,
-                Location = applicant.Location,
-                Status = "Activo"
-            };
+        //    var resident = new Resident
+        //    {
+        //        Name_AP = applicant.Name_AP,
+        //        Lastname1_AP = applicant.Lastname1_AP,
+        //        Lastname2_AP = applicant.Lastname2_AP,
+        //        Cedula_AP = applicant.Cedula_AP,
+        //        Sexo = dto.Sexo,
+        //        FechaNacimiento = DateTime.Now.AddYears(-applicant.Age_AP),
+        //        Id_Guardian = applicant.Id_Guardian,
+        //        Id_Room = dto.Id_Room,
+        //        EntryDate = dto.EntryDate,
+        //        Location = applicant.Location,
+        //        Status = "Activo"
+        //    };
 
-            await _residentRepository.AddAsync(resident);
-            await _residentRepository.SaveChangesAsync();
+        //    await _residentRepository.AddAsync(resident);
+        //    await _residentRepository.SaveChangesAsync();
 
-            var dependencyHistory = new DependencyHistory
-            {
-                Id_Resident = resident.Id_Resident,
-                Id_DependencyLevel = dto.Id_DependencyLevel
-            };
+        //    var dependencyHistory = new DependencyHistory
+        //    {
+        //        Id_Resident = resident.Id_Resident,
+        //        Id_DependencyLevel = dto.Id_DependencyLevel
+        //    };
 
-            await _dependencyHistoryRepository.AddAsync(dependencyHistory);
-            await _dependencyHistoryRepository.SaveChangesAsync();
-        }
+        //    await _dependencyHistoryRepository.AddAsync(dependencyHistory);
+        //    await _dependencyHistoryRepository.SaveChangesAsync();
+        //}
 
         // Método para actualizar un residente
         public async Task UpdateResidentAsync(int id, ResidentCreateDto residentDto)
