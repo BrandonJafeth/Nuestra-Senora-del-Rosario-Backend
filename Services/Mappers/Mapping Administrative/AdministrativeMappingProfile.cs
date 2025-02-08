@@ -116,7 +116,7 @@ public class AdministrativeMappingProfile : Profile
         // Mapeo de ResidentCreateDto a Resident
         CreateMap<ResidentCreateDto, Resident>()
             .ForMember(dest => dest.Sexo, opt => opt.MapFrom(src => src.Sexo))
-               .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location));
+               .ForMember(dest => dest.Location_RD, opt => opt.MapFrom(src => src.Location_RD));
 
         // Mapeo para obtener información completa de un residente
         CreateMap<Resident, ResidentGetDto>()
@@ -125,12 +125,14 @@ public class AdministrativeMappingProfile : Profile
           .ForMember(dest => dest.RoomNumber, opt => opt.MapFrom(src => src.Room.RoomNumber))
           .ForMember(dest => dest.DependencyLevel, opt => opt.MapFrom(src => src.DependencyHistories.OrderByDescending(dh => dh.Id_History).FirstOrDefault().DependencyLevel.LevelName))
           .ForMember(dest => dest.Edad, opt => opt.Ignore())  // Calculado dinámicamente
-          .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location));  // Mapeo de la nueva propiedad Location
+          .ForMember(dest => dest.Location_RD, opt => opt.MapFrom(src => src.Location_RD));  // Mapeo de la nueva propiedad Location
 
         // Mapeo adicional para añadir un residente desde Applicant
         CreateMap<ResidentFromApplicantDto, Resident>()
             .ForMember(dest => dest.Sexo, opt => opt.MapFrom(src => src.Sexo))
-            .ForMember(dest => dest.EntryDate, opt => opt.MapFrom(src => src.EntryDate));
+            .ForMember(dest => dest.EntryDate, opt => opt.MapFrom(src => src.EntryDate))
+            .ForMember(dest => dest.FechaNacimiento, opt => opt.MapFrom(src => src.FechaNacimiento));
+
 
 
 
@@ -154,8 +156,8 @@ public class AdministrativeMappingProfile : Profile
         CreateMap<Appointment, AppointmentGetDto>()
             .ForMember(dest => dest.Id_Appointment, opt => opt.MapFrom(src => src.Id_Appointment))
             .ForMember(dest => dest.ResidentFullName, opt => opt.MapFrom(src =>
-                $"{src.Resident.Name_AP} {src.Resident.Lastname1_AP} {src.Resident.Lastname2_AP}"))
-            .ForMember(dest => dest.ResidentCedula, opt => opt.MapFrom(src => src.Resident.Cedula_AP))
+                $"{src.Resident.Name_RD} {src.Resident.Lastname1_RD} {src.Resident.Lastname2_RD}"))
+            .ForMember(dest => dest.ResidentCedula, opt => opt.MapFrom(src => src.Resident.Cedula_RD))
             .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
             .ForMember(dest => dest.Time, opt => opt.MapFrom(src => src.Time))
             .ForMember(dest => dest.SpecialtyName, opt => opt.MapFrom(src => src.Specialty.Name_Specialty))

@@ -64,21 +64,39 @@ namespace Nuestra_Senora_del_Rosario.Controllers.Administrative
             }
 
             await _residentService.AddResidentAsync(residentDto);
-            return CreatedAtAction(nameof(GetResidentById), new { id = residentDto.Cedula_AP }, residentDto);
+            return CreatedAtAction(nameof(GetResidentById), new { id = residentDto.Cedula_RD }, residentDto);
         }
 
-        //// POST: api/Residents/fromApplicant
-        //[HttpPost("fromApplicant")]
-        //public async Task<IActionResult> AddResidentFromApplicant([FromBody] ResidentFromApplicantDto residentFromApplicantDto)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
+        // POST: api/Residents/fromApplicant
+        [HttpPost("fromApplicant")]
+        public async Task<IActionResult> AddResidentFromApplicant([FromBody] ResidentFromApplicantDto residentFromApplicantDto)
+        {
+            // Verificar si el modelo es válido
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-        //    await _residentService.AddResidentFromApplicantAsync(residentFromApplicantDto);
-        //    return CreatedAtAction(nameof(GetResidentById), new { id = residentFromApplicantDto.Id_Applicant }, residentFromApplicantDto);
-        //}
+            try
+            {
+                // Llamar al servicio para añadir el residente desde Applicant
+                await _residentService.AddResidentFromApplicantAsync(residentFromApplicantDto);
+
+                // Retornar respuesta creada exitosamente
+                return CreatedAtAction(nameof(GetResidentById), new { id = residentFromApplicantDto.Id_ApplicationForm }, residentFromApplicantDto);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                // Retornar error 404 si no se encuentra algún dato
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // Manejar errores inesperados
+                return StatusCode(500, new { error = "Ocurrió un error al procesar la solicitud.", details = ex.Message });
+            }
+        }
+
 
         // PUT: api/Residents/5
         [HttpPut("{id}")]

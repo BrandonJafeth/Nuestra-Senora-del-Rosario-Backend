@@ -3,10 +3,10 @@
     public class ResidentGetDto
     {
         public int Id_Resident { get; set; }
-        public string Name_AP { get; set; }
-        public string Lastname1_AP { get; set; }
-        public string Lastname2_AP { get; set; }
-        public string Cedula_AP { get; set; }
+        public string Name_RD { get; set; }
+        public string Lastname1_RD { get; set; }
+        public string Lastname2_RD { get; set; }
+        public string Cedula_RD { get; set; }
         public string Sexo { get; set; }
         public DateTime FechaNacimiento { get; set; }
         public string GuardianName { get; set; }  // Nombre completo del guardián
@@ -15,7 +15,7 @@
         public string Status { get; set; }  // Activo o Inactivo
         public DateTime EntryDate { get; set; }
         public string DependencyLevel { get; set; }  // Nivel de dependencia
-        public string Location { get; set; }  // Localización del residente
+        public string Location_RD { get; set; }  // Localización del residente
 
         public int Edad
         {
