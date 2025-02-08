@@ -30,12 +30,13 @@ namespace Test.ServicesTest.Administrative
                 FechaNacimiento = new DateTime(1950, 5, 20),
                 Id_Guardian = 1,
                 Id_Room = 2,
-                EntryDate = DateTime.UtcNow,
+                EntryDate = DateTime.Now.Date, // 👈 Asegurar que no sea en el futuro
                 Id_DependencyLevel = 3,
                 Location_RD = "San José, Costa Rica"
             };
 
             var result = _validator.TestValidate(dto);
+
             result.ShouldNotHaveAnyValidationErrors();
         }
 
@@ -133,8 +134,8 @@ namespace Test.ServicesTest.Administrative
         public void Should_Have_Error_When_EntryDate_Is_In_Future()
         {
             var dto = new ResidentCreateDto { EntryDate = DateTime.UtcNow.AddDays(1) };
-            var result = _validator.TestValidate(dto);
 
+            var result = _validator.TestValidate(dto);
             result.ShouldHaveValidationErrorFor(x => x.EntryDate)
                   .WithErrorMessage("La fecha de ingreso no puede ser en el futuro.");
         }
@@ -142,14 +143,29 @@ namespace Test.ServicesTest.Administrative
         // 🚨 Validación de localización vacía o demasiado larga
         [Theory]
         [InlineData("", "La localización del residente es requerida.")]
-        [InlineData("UbicaciónMuyLargaQueExcedeElLimiteDeCaracteresPermitidoPorElSistema..........................................................................................................", "La localización no puede exceder los 250 caracteres.")]
+        [InlineData("UbicaciónMuyLargaQueExcedeElLimiteDeCaracteresPermitidoPorElSistema..........................................................................................................................................................................................................fg.g.fdg.g.d.gd.g.d.g.d.g.dfg.d.fg.df.g.df.gfd..g.dg.d.g.d.g.fd.gf.dfg.d.g.",
+          "La localización no puede exceder los 250 caracteres.")]
         public void Should_Have_Error_When_Location_RD_Is_Invalid(string location, string expectedMessage)
         {
-            var dto = new ResidentCreateDto { Location_RD = location };
-            var result = _validator.TestValidate(dto);
+            var dto = new ResidentCreateDto
+            {
+                Name_RD = "Carlos",
+                Lastname1_RD = "Perez",
+                Lastname2_RD = "Gomez",
+                Cedula_RD = "123456789",
+                Sexo = "Masculino",
+                FechaNacimiento = new DateTime(1950, 5, 20),
+                Id_Guardian = 1,
+                Id_Room = 2,
+                EntryDate = DateTime.Now.AddDays(-1), // Cambiado a DateTime.Now
+                Id_DependencyLevel = 3,
+                Location_RD = location
+            };
 
+            var result = _validator.TestValidate(dto);
             result.ShouldHaveValidationErrorFor(x => x.Location_RD)
                   .WithErrorMessage(expectedMessage);
         }
+
     }
 }
