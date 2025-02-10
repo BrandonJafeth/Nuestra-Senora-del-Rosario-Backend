@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 namespace Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet
 {
 
-    public class UserGetDTO
+    public class UserGetDto
     {
-        public int Id_User { get; set; }  // Id del usuario
-        public string EmployeeName { get; set; }  // Nombre del empleado
-        public string RoleName { get; set; }  // Nombre del rol
-        public bool Is_Active { get; set; }  // Estado activo/inactivo
+        public int id_User { get; set; } // ID del usuario
+        public int Dni { get; set; } // DNI del usuario
+        public string Email { get; set; } // Nuevo campo
+        public bool Is_Active { get; set; } // Estado del usuario
+        public List<string> Roles { get; set; } // Roles asignados al usuario
     }
+
 }

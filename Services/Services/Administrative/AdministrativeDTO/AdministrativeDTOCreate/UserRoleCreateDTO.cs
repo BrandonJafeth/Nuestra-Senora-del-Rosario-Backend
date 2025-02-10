@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate
+{
+    public class UserRoleCreateDTO
+    {
+        public int Id_User { get; set; }
+        public int Id_Role { get; set; }
+    }
+
+}

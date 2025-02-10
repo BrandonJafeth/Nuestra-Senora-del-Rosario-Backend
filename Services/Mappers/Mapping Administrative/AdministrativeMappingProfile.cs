@@ -8,35 +8,37 @@ public class AdministrativeMappingProfile : Profile
 {
     public AdministrativeMappingProfile()
     {
-        // Mapping para el usuario (User) desde su DTO de creación
-        CreateMap<UserCreateDTO, User>();
+   
+        // Mapping para UserCreateFromEmployeeDto -> User
+        CreateMap<UserCreateFromEmployeeDto, User>()
+            .ForMember(dest => dest.DNI, opt => opt.MapFrom(src => src.DniEmployee))
+            .ForMember(dest => dest.Is_Active, opt => opt.MapFrom(src => src.IsActive));
+
+        CreateMap<UserCreateDto, User>();
 
         CreateMap<Employee, EmployeeGetDTO>()
-       .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.First_Name))
-       .ForMember(dest => dest.LastName1, opt => opt.MapFrom(src => src.Last_Name1))
-       .ForMember(dest => dest.LastName2, opt => opt.MapFrom(src => src.Last_Name2))
-       .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.Phone_Number))
-       .ForMember(dest => dest.EmergencyPhone, opt => opt.MapFrom(src => src.Emergency_Phone))
+       .ForMember(dest => dest.First_Name, opt => opt.MapFrom(src => src.First_Name))
+       .ForMember(dest => dest.Last_Name1, opt => opt.MapFrom(src => src.Last_Name1))
+       .ForMember(dest => dest.Last_Name2, opt => opt.MapFrom(src => src.Last_Name2))
+       .ForMember(dest => dest.Phone_Number, opt => opt.MapFrom(src => src.Phone_Number))
+       .ForMember(dest => dest.Emergency_Phone, opt => opt.MapFrom(src => src.Emergency_Phone))
        .ForMember(dest => dest.ProfessionName, opt => opt.MapFrom(src => src.Profession.Name_Profession))
        .ForMember(dest => dest.TypeOfSalaryName, opt => opt.MapFrom(src => src.TypeOfSalary.Name_TypeOfSalary));
         // Corrigiendo el mapeo con el nombre correcto
 
 
         CreateMap<EmployeeCreateDTO, Employee>()
-      .ForMember(dest => dest.First_Name, opt => opt.MapFrom(src => src.FirstName))
-      .ForMember(dest => dest.Last_Name1, opt => opt.MapFrom(src => src.LastName1))
-      .ForMember(dest => dest.Last_Name2, opt => opt.MapFrom(src => src.LastName2))
-      .ForMember(dest => dest.Phone_Number, opt => opt.MapFrom(src => src.PhoneNumber))
-      .ForMember(dest => dest.Emergency_Phone, opt => opt.MapFrom(src => src.EmergencyPhone))
-      .ForMember(dest => dest.Id_TypeOfSalary, opt => opt.MapFrom(src => src.TypeOfSalaryId))
-      .ForMember(dest => dest.Id_Profession, opt => opt.MapFrom(src => src.ProfessionId));
+      .ForMember(dest => dest.First_Name, opt => opt.MapFrom(src => src.First_Name))
+      .ForMember(dest => dest.Last_Name1, opt => opt.MapFrom(src => src.Last_Name1))
+      .ForMember(dest => dest.Last_Name2, opt => opt.MapFrom(src => src.Last_Name2))
+      .ForMember(dest => dest.Phone_Number, opt => opt.MapFrom(src => src.Phone_Number))
+      .ForMember(dest => dest.Emergency_Phone, opt => opt.MapFrom(src => src.Emergency_Phone))
+      .ForMember(dest => dest.Id_TypeOfSalary, opt => opt.MapFrom(src => src.Id_TypeOfSalary))
+      .ForMember(dest => dest.Id_Profession, opt => opt.MapFrom(src => src.Id_Profession));
 
-
-        CreateMap<User, UserGetDTO>()
-           .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.Employee.First_Name + " " + src.Employee.Last_Name1 + " " + src.Employee.Last_Name2))  // Nombre completo del empleado
-           .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src =>
-               src.Employee.EmployeeRoles.FirstOrDefault().Rol.Name_Role))  // Obtener el primer rol del usuario
-           .ForMember(dest => dest.Is_Active, opt => opt.MapFrom(src => src.Is_Active));
+        CreateMap<User, UserGetDto>()
+                   .ForMember(dest => dest.Roles, opt => opt.MapFrom(src =>
+                       src.UserRoles.Select(ur => ur.Role.Name_Role).ToList()));
 
         // Mapping para Rol
         CreateMap<RolCreateDTO, Rol>()
@@ -201,21 +203,12 @@ public class AdministrativeMappingProfile : Profile
         CreateMap<Notification, NotificationGetDto>();
 
 
-        // Mapping para Employee -> EmployeeWithRolesGetDto
-        CreateMap<Employee, EmployeeWithRolesGetDto>()
-            .ForMember(dest => dest.Dni, opt => opt.MapFrom(src => src.Dni))
-            .ForMember(dest => dest.FullName,
-                opt => opt.MapFrom(src => $"{src.First_Name} {src.Last_Name1} {src.Last_Name2}"))
-            .ForMember(dest => dest.Roles,
-                opt => opt.MapFrom(src => src.EmployeeRoles.Select(er => er.Rol.Name_Role).ToList()));
+        CreateMap<EmployeeCreateDTO, Employee>();
 
-        // Mapping para Employee -> EmployeeByRoleGetDto
-        CreateMap<Employee, EmployeeByRoleGetDto>()
-            .ForMember(dest => dest.Dni, opt => opt.MapFrom(src => src.Dni))
-            .ForMember(dest => dest.FullName,
-                opt => opt.MapFrom(src => $"{src.First_Name} {src.Last_Name1} {src.Last_Name2}"))
-            .ForMember(dest => dest.RoleName,
-                opt => opt.MapFrom(src => src.EmployeeRoles.FirstOrDefault().Rol.Name_Role));
+        // Mapping para Employee -> EmployeeGetDto
+        CreateMap<Employee, EmployeeGetDTO>()
+            .ForMember(dest => dest.TypeOfSalaryName, opt => opt.MapFrom(src => src.TypeOfSalary.Name_TypeOfSalary))
+            .ForMember(dest => dest.ProfessionName, opt => opt.MapFrom(src => src.Profession.Name_Profession));
 
 
         CreateMap<UnitOfMeasure, UnitOfMeasureGetDTO>()

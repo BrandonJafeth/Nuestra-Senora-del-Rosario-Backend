@@ -9,15 +9,15 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.Administrativ
     public class EmployeeCreateDTO
     {
         public int Dni { get; set; }
-        public string FirstName { get; set; }
-        public string LastName1 { get; set; }
-        public string LastName2 { get; set; }
-        public string PhoneNumber { get; set; }
+        public string First_Name { get; set; }
+        public string Last_Name1 { get; set; }
+        public string Last_Name2 { get; set; }
+        public string Phone_Number { get; set; }
         public string Address { get; set; }
         public string Email { get; set; }
-        public string EmergencyPhone { get; set; }
-        public int TypeOfSalaryId { get; set; }
-        public int ProfessionId { get; set; }
+        public string Emergency_Phone { get; set; }
+        public int Id_TypeOfSalary { get; set; }
+        public int Id_Profession { get; set; }
     }
 
 }

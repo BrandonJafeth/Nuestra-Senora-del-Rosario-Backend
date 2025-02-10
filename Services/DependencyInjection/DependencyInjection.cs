@@ -93,7 +93,7 @@ namespace Infrastructure.DependencyInjection
             #region Repos_Generic_AdministrativeContext
             services.AddScoped<ISvGenericRepository<User>, SvGenericRepository<User>>();
             services.AddScoped<ISvGenericRepository<Employee>, SvGenericRepository<Employee>>();
-            services.AddScoped<ISvGenericRepository<EmployeeRole>, SvGenericRepository<EmployeeRole>>();
+            services.AddScoped<ISvGenericRepository<UserRoles>, SvGenericRepository<UserRoles>>();
             services.AddScoped<ISvGenericRepository<TypeOfSalary>, SvGenericRepository<TypeOfSalary>>();
             services.AddScoped<ISvGenericRepository<Profession>, SvGenericRepository<Profession>>();
             services.AddScoped<ISvGenericRepository<PasswordResetToken>, SvGenericRepository<PasswordResetToken>>();
@@ -117,7 +117,7 @@ namespace Infrastructure.DependencyInjection
 
             #region Services_Administrative
             services.AddScoped<ISvEmployee, SvEmployee>();
-            services.AddScoped<ISvEmployeeRole, SvEmployeeRole>();
+            services.AddScoped<ISvUserRole, SvUserRole>();
             services.AddScoped<ISvPasswordResetService, SvPasswordResetService>();
             services.AddScoped<ISvPdfReceiverService, SvPdfReceiverService>();
             services.AddScoped<ISvNotification, SvNotification>(); // Registro del servicio de notificaciones

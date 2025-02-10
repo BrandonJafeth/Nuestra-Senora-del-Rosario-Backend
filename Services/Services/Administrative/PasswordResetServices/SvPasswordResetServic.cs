@@ -14,18 +14,15 @@ namespace Infrastructure.Services.Administrative.PasswordResetServices
 {
     public class SvPasswordResetService : ISvPasswordResetService
     {
-        private readonly ISvGenericRepository<Employee> _employeeRepository;
         private readonly ISvGenericRepository<User> _userRepository; // Repositorio de User
         private readonly ISvEmailService _emailService;
         private readonly IConfiguration _configuration;
 
         public SvPasswordResetService(
-            ISvGenericRepository<Employee> employeeRepository,
-            ISvGenericRepository<User> userRepository, // Repositorio inyectado
+            ISvGenericRepository<User> userRepository,
             ISvEmailService emailService,
             IConfiguration configuration)
         {
-            _employeeRepository = employeeRepository;
             _userRepository = userRepository;
             _emailService = emailService;
             _configuration = configuration;
@@ -34,99 +31,95 @@ namespace Infrastructure.Services.Administrative.PasswordResetServices
         // Solicitar el reseteo de contraseña enviando el correo con el token
         public async Task<bool> RequestPasswordResetAsync(string email)
         {
-            // Verificar si el empleado con el correo proporcionado existe
-            var employee = await _employeeRepository.Query().FirstOrDefaultAsync(e => e.Email == email);
-            if (employee == null)
+            // Verificar si el usuario con el correo proporcionado existe
+            var user = await _userRepository.Query().FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
             {
-                return false;  // No se encontró el empleado con el correo proporcionado
+                return false;  // No se encontró el usuario con el correo proporcionado
             }
 
             // Generar un token de recuperación de contraseña
-            var token = GenerateResetToken(employee.Dni);
+            var token = GenerateResetToken(user.Id_User);
 
             // Crear el enlace de recuperación de contraseña
-            var resetLink = $"{_configuration["App:FrontendUrl"]}/restablecer-contraseña?dni={employee.Dni}&token={token}";
+            var resetLink = $"{_configuration["App:FrontendUrl"]}/reset-password?userId={user.Id_User}&token={token}";
 
             // Crear el cuerpo del correo electrónico con HTML estilizado
             var body = $@"
-    <html>
-    <head>
-        <style>
-            body {{
-                font-family: Arial, sans-serif;
-                background-color: #f4f4f9;
-                margin: 0;
-                padding: 0;
-                font-size: 16px;
-                color: #333;
-            }}
-            .container {{
-                padding: 20px;
-                max-width: 600px;
-                margin: auto;
-                background-color: #fff;
-                border: 1px solid #ddd;
-                border-radius: 8px;
-            }}
-            h1 {{
-                color: #333;
-            }}
-            p {{
-                font-size: 16px;
-                line-height: 1.5;
-            }}
-            a {{
-                color: #3498db;
-                text-decoration: none;
-                font-weight: bold;
-            }}
-            .footer {{
-                margin-top: 20px;
-                font-size: 12px;
-                color: #999;
-            }}
-        </style>
-        <title>Solicitud de Restablecimiento de Contraseña</title>
-    </head>
-    <body>
-        <div class='container'>
-            <h1>Solicitud de Restablecimiento de Contraseña</h1>
-            <p>
-                Hemos recibido una solicitud para restablecer tu contraseña. Si realizaste esta solicitud, 
-                haz clic en el enlace de abajo para restablecer tu contraseña:
-            </p>
-            <p>
-                <a href='{resetLink}' target='_blank'>Restablecer tu contraseña</a>
-            </p>
-            <p>Si no solicitaste el restablecimiento de tu contraseña, puedes ignorar este correo.</p>
-            <div class='footer'>
-                <p>Este enlace expirará en 30 minutos. Por seguridad, no compartas este enlace con nadie.</p>
-            </div>
+<html>
+<head>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            font-size: 16px;
+            color: #333;
+        }}
+        .container {{
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }}
+        h1 {{
+            color: #333;
+        }}
+        p {{
+            font-size: 16px;
+            line-height: 1.5;
+        }}
+        a {{
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }}
+        .footer {{
+            margin-top: 20px;
+            font-size: 12px;
+            color: #999;
+        }}
+    </style>
+    <title>Restablecimiento de Contraseña</title>
+</head>
+<body>
+    <div class='container'>
+        <h1>Restablecimiento de Contraseña</h1>
+        <p>
+            Hemos recibido una solicitud para restablecer tu contraseña. Si realizaste esta solicitud,
+            haz clic en el enlace de abajo para continuar:
+        </p>
+        <p>
+            <a href='{resetLink}' target='_blank'>Restablecer Contraseña</a>
+        </p>
+        <p>Si no realizaste esta solicitud, puedes ignorar este correo.</p>
+        <div class='footer'>
+            <p>Este enlace expirará en 30 minutos. Por favor, no compartas este enlace con nadie.</p>
         </div>
-    </body>
-    </html>";
+    </div>
+</body>
+</html>";
 
             // Enviar el correo electrónico con el cuerpo HTML
-            await _emailService.SendEmailAsync(employee.Email, "Solicitud de Restablecimiento de Contraseña", body);
+            await _emailService.SendEmailAsync(user.Email, "Restablecimiento de Contraseña", body);
 
             return true;  // El correo se envió exitosamente
         }
 
-
-
-
-
         // Método para generar el token JWT de reseteo de contraseña
-        private string GenerateResetToken(int dniEmployee)
+        private string GenerateResetToken(int userId)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, dniEmployee.ToString()),
+                new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim("id", dniEmployee.ToString())
+                new Claim("id", userId.ToString())
             };
 
             var token = new JwtSecurityToken(
@@ -155,42 +148,38 @@ namespace Infrastructure.Services.Administrative.PasswordResetServices
                 {
                     ValidateIssuer = true,
                     ValidateAudience = true,
-                    ValidateLifetime = true, // Verifica si el token ha expirado
+                    ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = _configuration["Jwt:Issuer"],
                     ValidAudience = _configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ClockSkew = TimeSpan.Zero // Sin retraso de validación de expiración
+                    ClockSkew = TimeSpan.Zero
                 };
 
                 var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
 
-                // Verificar que el token es válido y no está comprometido
-                if (validatedToken == null)
-                {
-                    return false;
-                }
-
-                return true;
+                return validatedToken != null;
             }
             catch (SecurityTokenExpiredException)
             {
-                return false; // Token ha expirado
+                return false; // Token expirado
             }
-            catch (Exception)
+            catch
             {
-                return false; // Cualquier otro error de validación
+                return false; // Error en la validación
             }
         }
 
-
-
-        // Resetear la contraseña del usuario validando el token
-        public async Task<bool> ResetPasswordAsync(string token, string newPassword, string confirmPassword)
+        public async Task UpdatePasswordAsync(string token, string newPassword)
         {
-            if (newPassword != confirmPassword)
+            if (string.IsNullOrWhiteSpace(token))
             {
-                throw new ArgumentException("Las contraseñas no coinciden.");
+                throw new ArgumentException("El token no puede estar vacío.");
+            }
+
+            if (string.IsNullOrWhiteSpace(newPassword))
+            {
+                throw new ArgumentException("La nueva contraseña no puede estar vacía.");
             }
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -212,45 +201,28 @@ namespace Infrastructure.Services.Administrative.PasswordResetServices
 
                 var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
 
-                // Verificar que el token es válido y no está comprometido
-                if (validatedToken == null)
-                {
-                    throw new ArgumentException("Token inválido.");
-                }
-
-                // Extraer el DNI del empleado desde el token
+                // Extraer el DNI del usuario desde el token
                 var dniClaim = principal.Claims.FirstOrDefault(c => c.Type == "id");
                 if (dniClaim == null)
                 {
-                    throw new ArgumentException("Token inválido, no contiene DNI.");
+                    throw new ArgumentException("El token no contiene un identificador válido.");
                 }
 
                 var dniEmployee = int.Parse(dniClaim.Value);
 
-                // Verificar si el empleado existe
-                var employee = await _employeeRepository.GetByIdAsync(dniEmployee);
-                if (employee == null)
-                {
-                    throw new ArgumentException("Empleado no encontrado.");
-                }
-
-                // Verificar si existe un usuario asociado con el empleado
-                var user = await _userRepository.Query().FirstOrDefaultAsync(u => u.Dni_Employee == dniEmployee);
+                // Verificar si el usuario existe
+                var user = await _userRepository.Query().FirstOrDefaultAsync(u => u.DNI == dniEmployee);
                 if (user == null)
                 {
-                    throw new ArgumentException("Usuario no encontrado para este empleado.");
+                    throw new KeyNotFoundException("Usuario no encontrado.");
                 }
 
-                // Hashear la nueva contraseña
+                // Actualizar la contraseña del usuario
                 user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
-
-                // Reiniciar la expiración de la contraseña
                 user.PasswordExpiration = null;
 
-                // Guardar cambios
+                _userRepository.Update(user);
                 await _userRepository.SaveChangesAsync();
-
-                return true; // Contraseña actualizada correctamente
             }
             catch (SecurityTokenExpiredException)
             {
@@ -258,17 +230,80 @@ namespace Infrastructure.Services.Administrative.PasswordResetServices
             }
             catch (Exception ex)
             {
-                throw new ArgumentException("Token inválido: " + ex.Message);
+                throw new ArgumentException("Error al actualizar la contraseña: " + ex.Message);
             }
         }
 
 
-        public Task UpdatePasswordAsync(string token, string newPassword)
+        // Resetear la contraseña del usuario validando el token
+        public async Task<bool> ResetPasswordAsync(string token, string newPassword, string confirmPassword)
         {
-            throw new NotImplementedException();
+            if (newPassword != confirmPassword)
+            {
+                throw new ArgumentException("Las contraseñas no coinciden.");
+            }
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            try
+            {
+                // Validar el token
+                var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = _configuration["Jwt:Issuer"],
+                    ValidAudience = _configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ClockSkew = TimeSpan.Zero
+                };
+
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+
+                if (validatedToken == null)
+                {
+                    throw new ArgumentException("Token inválido.");
+                }
+
+                // Extraer el ID del usuario
+                var idClaim = principal.Claims.FirstOrDefault(c => c.Type == "id");
+                if (idClaim == null)
+                {
+                    throw new ArgumentException("Token inválido, no contiene información de usuario.");
+                }
+
+                var userId = int.Parse(idClaim.Value);
+
+                // Buscar al usuario
+                var user = await _userRepository.GetByIdAsync(userId);
+                if (user == null)
+                {
+                    throw new ArgumentException("Usuario no encontrado.");
+                }
+
+                // Actualizar la contraseña
+                user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                user.PasswordExpiration = null;
+
+
+                _userRepository.Update(user);
+                await _userRepository.SaveChangesAsync();
+
+                return true;
+            }
+            catch (SecurityTokenExpiredException)
+            {
+                throw new ArgumentException("El token ha expirado.");
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"Error en el restablecimiento de contraseña: {ex.Message}");
+            }
+
+
+
         }
-
-
-
     }
 }

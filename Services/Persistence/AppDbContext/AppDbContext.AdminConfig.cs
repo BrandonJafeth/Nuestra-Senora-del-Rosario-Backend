@@ -31,10 +31,16 @@ namespace Infrastructure.Persistence.AppDbContext
 
             // Configuración para Employee
             modelBuilder.Entity<Employee>()
-                .HasKey(e => e.Dni);
+                .HasKey(e => e.Id_Employee);
+
             modelBuilder.Entity<Employee>()
-                .Property(e => e.Dni)
-                .ValueGeneratedNever();  // No auto-incremento, ya que es una identificación externa
+            .Property(e => e.Id_Employee)
+            .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<Employee>()
+            .Property(e => e.Dni)
+            .IsRequired();
+
 
             modelBuilder.Entity<Employee>()
                 .HasOne(e => e.TypeOfSalary)
@@ -51,24 +57,25 @@ namespace Infrastructure.Persistence.AppDbContext
             // Configuración para User (1:1 con Employee)
             modelBuilder.Entity<User>()
                 .HasKey(u => u.Id_User);
+
             modelBuilder.Entity<User>()
-                .HasOne(u => u.Employee)
-                .WithOne()
-                .HasForeignKey<User>(u => u.Dni_Employee)
+            .Property(u => u.Id_User)
+            .ValueGeneratedOnAdd();
+
+            // Configuración para UserRoles (relación M:N entre User y Rol)
+            modelBuilder.Entity<UserRoles>()
+                .HasKey(ur => new { ur.Id_User, ur.Id_Role });
+
+            modelBuilder.Entity<UserRoles>()
+                .HasOne(ur => ur.User)
+                .WithMany(u => u.UserRoles)
+                .HasForeignKey(ur => ur.Id_User)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Configuración para EmployeeRole (relación M:N entre Employee y Rol)
-            modelBuilder.Entity<EmployeeRole>()
-                .HasKey(er => new { er.Dni_Employee, er.Id_Role });
-            modelBuilder.Entity<EmployeeRole>()
-                .HasOne(er => er.Employee)
-                .WithMany(e => e.EmployeeRoles)
-                .HasForeignKey(er => er.Dni_Employee)
-                .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<EmployeeRole>()
-                .HasOne(er => er.Rol)
-                .WithMany(r => r.EmployeeRoles)
-                .HasForeignKey(er => er.Id_Role)
+            modelBuilder.Entity<UserRoles>()
+                .HasOne(ur => ur.Role)
+                .WithMany(r => r.UserRoles)
+                .HasForeignKey(ur => ur.Id_Role)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // Configuración para ApplicationStatus
@@ -86,36 +93,6 @@ namespace Infrastructure.Persistence.AppDbContext
             modelBuilder.Entity<Guardian>()
                 .Property(g => g.Id_Guardian)
                 .ValueGeneratedOnAdd();
-
-            //// Configuración para ApplicationForm
-            //modelBuilder.Entity<ApplicationForm>()
-            //    .HasKey(af => af.Id_ApplicationForm);
-            //modelBuilder.Entity<ApplicationForm>()
-            //    .Property(af => af.Id_ApplicationForm)
-            //    .ValueGeneratedOnAdd();
-            //modelBuilder.Entity<ApplicationForm>()
-            //    .HasOne(af => af.Applicant)
-            //    .WithMany()
-            //    .HasForeignKey(af => af.Id_Applicant)
-            //    .OnDelete(DeleteBehavior.Cascade);  // Borrar en cascada si el Applicant es eliminado
-            //modelBuilder.Entity<ApplicationForm>()
-            //    .HasOne(af => af.Guardian)
-            //    .WithMany()
-            //    .HasForeignKey(af => af.Id_Guardian)
-            //    .OnDelete(DeleteBehavior.Cascade);  // Borrar en cascada si el Guardian es eliminado
-            //modelBuilder.Entity<ApplicationForm>()
-            //    .HasOne(af => af.ApplicationStatus)
-            //    .WithMany()
-            //    .HasForeignKey(af => af.Id_Status)
-            //    .OnDelete(DeleteBehavior.Restrict);  // No eliminar el estado si está asignado a solicitudes
-
-
-            //// Configuración para Status
-            //modelBuilder.Entity<Status>()
-            //    .HasKey(s => s.Id_Status);  // Clave primaria
-            //modelBuilder.Entity<Status>()
-            //    .Property(s => s.Id_Status)
-            //    .ValueGeneratedOnAdd();  // Auto incremento
 
             modelBuilder.Entity<PaymentReceipt>()
        .HasKey(pr => pr.Id);
@@ -189,34 +166,6 @@ namespace Infrastructure.Persistence.AppDbContext
             modelBuilder.Entity<Deduction>()
                 .HasIndex(d => d.PaymentReceiptId)
                 .HasDatabaseName("IX_Deduction_PaymentReceiptId");
-
-            //// Relación entre FormVoluntarie y VoluntarieType
-            //modelBuilder.Entity<FormVoluntarie>()
-            //    .HasOne(f => f.VoluntarieType)
-            //    .WithMany(v => v.FormVoluntaries)
-            //    .HasForeignKey(f => f.Id_VoluntarieType)
-            //    .OnDelete(DeleteBehavior.Cascade);
-
-            //// Relación entre FormVoluntarie y Status
-            //modelBuilder.Entity<FormVoluntarie>()
-            //    .HasOne(f => f.Status)
-            //    .WithMany()
-            //    .HasForeignKey(f => f.Id_Status)
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            //// Configuración adicional para VoluntarieType
-            //modelBuilder.Entity<VoluntarieType>()
-            //    .HasKey(v => v.Id_VoluntarieType);
-            //modelBuilder.Entity<VoluntarieType>()
-            //    .Property(v => v.Id_VoluntarieType)
-            //    .ValueGeneratedOnAdd();
-
-            //// Configuración para FormVoluntarie
-            //modelBuilder.Entity<FormVoluntarie>()
-            //    .HasKey(f => f.Id_FormVoluntarie);
-            //modelBuilder.Entity<FormVoluntarie>()
-            //    .Property(f => f.Id_FormVoluntarie)
-            //    .ValueGeneratedOnAdd();
 
             // Configuración adicional para PasswordResetToken
             modelBuilder.Entity<PasswordResetToken>()

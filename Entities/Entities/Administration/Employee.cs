@@ -1,8 +1,12 @@
 ﻿using Domain.Entities.Administration;
 
 public class Employee
+
+
 {
-    public int Dni { get; set; }  // Usamos el DNI como clave primaria
+
+    public int Id_Employee { get; set; }
+    public int Dni { get; set; }  
     public string First_Name { get; set; }
     public string Last_Name1 { get; set; }
     public string Last_Name2 { get; set; }
@@ -17,8 +21,6 @@ public class Employee
     public int Id_Profession { get; set; }
     public Profession Profession { get; set; }
 
-    // Relación M:N con Rol
-    public ICollection<EmployeeRole> EmployeeRoles { get; set; }
 
     public ICollection<PaymentReceipt> PaymentReceipts { get; set; }  // Relación 1:N con PaymentReceipt
 

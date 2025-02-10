@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate
 {
-    public class EmployeeRoleCreateDTO
+    public class UserRoleAssignDto
     {
-        public int DniEmployee { get; set; }
-        public int IdRole { get; set; }
+        public int IdUser { get; set; } // ID del usuario
+        public int IdRole { get; set; } // ID del rol
     }
 
 }
