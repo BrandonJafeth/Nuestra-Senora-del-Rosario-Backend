@@ -11,6 +11,7 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.Administrativ
         public int DniEmployee { get; set; } // DNI del empleado asociado
         public string Password { get; set; } // Contraseña (opcional si es generada)
         public bool IsActive { get; set; } = true; // Estado del usuario
+        public string FullName { get; set; }  
     }
 
 }

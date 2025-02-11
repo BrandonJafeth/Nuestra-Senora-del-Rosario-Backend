@@ -13,6 +13,7 @@ public class AdministrativeMappingProfile : Profile
         CreateMap<UserCreateFromEmployeeDto, User>()
             .ForMember(dest => dest.DNI, opt => opt.MapFrom(src => src.DniEmployee))
             .ForMember(dest => dest.Is_Active, opt => opt.MapFrom(src => src.IsActive));
+            
 
         CreateMap<UserCreateDto, User>();
 

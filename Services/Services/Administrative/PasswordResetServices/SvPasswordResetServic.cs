@@ -110,7 +110,7 @@ namespace Infrastructure.Services.Administrative.PasswordResetServices
         }
 
         // Método para generar el token JWT de reseteo de contraseña
-        private string GenerateResetToken(int userId)
+        public string GenerateResetToken(int userId)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

@@ -13,6 +13,7 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.Administrativ
         public int Dni { get; set; } // DNI del usuario
         public string Email { get; set; } // Nuevo campo
         public bool Is_Active { get; set; } // Estado del usuario
+        public string FullName { get; set; } 
         public List<string> Roles { get; set; } // Roles asignados al usuario
     }
 

@@ -33,5 +33,7 @@ namespace Infrastructure.Services.Administrative.PasswordResetServices
         /// <param name="confirmPassword">Confirmación de la nueva contraseña.</param>
         /// <returns>Verdadero si la contraseña fue restablecida exitosamente.</returns>
         Task<bool> ResetPasswordAsync(string token, string newPassword, string confirmPassword);
+
+        string GenerateResetToken(int userId);
     }
 }

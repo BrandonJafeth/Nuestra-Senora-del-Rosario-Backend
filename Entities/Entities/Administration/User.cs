@@ -12,6 +12,8 @@ public class User
 
     public DateTime? PasswordExpiration { get; set; } // Fecha de caducidad de la contraseña
 
+    public string FullName { get; set; }  // ✅ Nuevo campo agregado
+
     // Relación M:N con User
     public ICollection<UserRoles> UserRoles { get; set; } = new HashSet<UserRoles>();
 }

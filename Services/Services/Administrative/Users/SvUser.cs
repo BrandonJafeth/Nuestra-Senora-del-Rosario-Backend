@@ -16,6 +16,7 @@ using Infrastructure.Services.Administrative.EmailServices;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
 using Infrastructure.Persistence.AppDbContext;
+using Infrastructure.Services.Administrative.PasswordResetServices;
 
 namespace Infrastructure.Services.Administrative.Users
 {
@@ -28,6 +29,7 @@ namespace Infrastructure.Services.Administrative.Users
         private readonly IConfiguration _configuration;
         private readonly ISvGenericRepository<Employee> _employeeRepository;
         private readonly AppDbContext _context;
+        private readonly ISvPasswordResetService _passwordResetService;
 
         public SvUser(
             IMapper mapper,
@@ -36,7 +38,8 @@ namespace Infrastructure.Services.Administrative.Users
             ISvGenericRepository<UserRoles> userRoleRepository,
              ISvGenericRepository<Employee> employeeRepository,
             ISvEmailService emailService,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ISvPasswordResetService passwordResetService)
         {
             _mapper = mapper;
             _userRepository = userRepository;
@@ -45,6 +48,7 @@ namespace Infrastructure.Services.Administrative.Users
             _context = context;
             _emailService = emailService;
             _configuration = configuration;
+            _passwordResetService = passwordResetService;
         }
 
         // Crear un usuario desde cero
@@ -52,21 +56,20 @@ namespace Infrastructure.Services.Administrative.Users
         {
             var user = _mapper.Map<User>(userCreateDto);
 
-            // Generar la contraseña temporal
             string tempPassword = PasswordGenerator.GenerateRandomPassword();
 
-            // Hashear la contraseña antes de guardarla en la base de datos
             user.Password = HashPassword(tempPassword);
             user.Is_Active = true;
             user.PasswordExpiration = DateTime.Now.AddDays(10);
+            user.FullName = userCreateDto.FullName;  
 
-            // Guardar el usuario en la base de datos
             await _userRepository.AddAsync(user);
             await _userRepository.SaveChangesAsync();
 
-            // Enviar la contraseña original al correo
-            await SendUserCredentialsEmailAsync(user.DNI, user.Email, tempPassword);
+            await SendUserCredentialsEmailAsync(user.DNI, user.Email, tempPassword, user.FullName);
+
         }
+
 
 
         public async Task CreateUserFromEmployeeAsync(int dniEmployee, int idRole)
@@ -94,6 +97,9 @@ namespace Infrastructure.Services.Administrative.Users
                 // Generar una contraseña aleatoria
                 var randomPassword = PasswordGenerator.GenerateRandomPassword();
 
+                // Concatenar el nombre completo del empleado
+                string fullName = $"{employee.First_Name} {employee.Last_Name1} {employee.Last_Name2}".Trim();
+
                 // Crear el usuario con la información del empleado
                 var user = new User
                 {
@@ -101,7 +107,8 @@ namespace Infrastructure.Services.Administrative.Users
                     Email = employee.Email,  // ✅ Se usa el email del empleado
                     Password = HashPassword(randomPassword),
                     Is_Active = true,
-                    PasswordExpiration = DateTime.Now.AddDays(10) // La contraseña expira en 10 días
+                    PasswordExpiration = DateTime.Now.AddDays(10), // La contraseña expira en 10 días
+                    FullName = fullName 
                 };
 
                 await _userRepository.AddAsync(user);
@@ -121,7 +128,7 @@ namespace Infrastructure.Services.Administrative.Users
                 await transaction.CommitAsync();
 
                 // Enviar correo con credenciales
-                await SendUserCredentialsEmailAsync(user.DNI, user.Email, randomPassword);
+                await SendUserCredentialsEmailAsync(user.DNI, user.Email, randomPassword, user.FullName);
             }
             catch (Exception ex)
             {
@@ -129,6 +136,7 @@ namespace Infrastructure.Services.Administrative.Users
                 throw new ApplicationException("Ocurrió un error al crear el usuario desde el empleado.", ex);
             }
         }
+
 
 
         // Obtener un usuario por ID
@@ -262,14 +270,25 @@ namespace Infrastructure.Services.Administrative.Users
 
 
         // Enviar correo con credenciales
-        private async Task SendUserCredentialsEmailAsync(int dni, string email, string password)
+        private async Task SendUserCredentialsEmailAsync(int dni, string email, string password, string fullName)
         {
             if (string.IsNullOrEmpty(email))
             {
                 throw new ArgumentException("El email no puede estar vacío.");
             }
 
-            var changePasswordLink = $"{_configuration["App:FrontendUrl"]}/cambio-contraseña?dni={dni}";
+            // Obtener el usuario por DNI antes de generar el token
+            var user = await _userRepository.Query().FirstOrDefaultAsync(u => u.DNI == dni);
+            if (user == null)
+            {
+                throw new ArgumentException("Usuario no encontrado al generar el token de restablecimiento.");
+            }
+
+            // 🔹 Generar un token con el `Id_User` en lugar del `DNI`
+            var token = _passwordResetService.GenerateResetToken(user.Id_User);
+
+            // 🔹 Usar el token en el enlace de cambio de contraseña
+            var changePasswordLink = $"{_configuration["App:FrontendUrl"]}/reset-password?token={token}";
 
             var body = $@"
 <html>
@@ -313,7 +332,7 @@ namespace Infrastructure.Services.Administrative.Users
 </head>
 <body>
     <div class='container'>
-        <h1>¡Bienvenido!</h1>
+        <h1>¡Hola {fullName}!</h1>
         <p>
             Tu cuenta ha sido creada exitosamente. Tus credenciales son:
         </p>
@@ -342,6 +361,8 @@ namespace Infrastructure.Services.Administrative.Users
                 throw new ApplicationException($"Error al enviar el correo a {email}: {ex.Message}");
             }
         }
+
+
 
 
         // Método para hashear contraseñas
