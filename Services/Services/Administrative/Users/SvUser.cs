@@ -17,6 +17,7 @@ using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTO
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
 using Infrastructure.Persistence.AppDbContext;
 using Infrastructure.Services.Administrative.PasswordResetServices;
+using FluentValidation;
 
 namespace Infrastructure.Services.Administrative.Users
 {
@@ -30,6 +31,12 @@ namespace Infrastructure.Services.Administrative.Users
         private readonly ISvGenericRepository<Employee> _employeeRepository;
         private readonly AppDbContext _context;
         private readonly ISvPasswordResetService _passwordResetService;
+        private readonly IValidator<UserUpdateProfileDto> _updateProfileValidator;
+        private readonly IValidator<UserChangePasswordDto> _changePasswordValidator;
+        private readonly IValidator<UserStatusUpdateDto> _statusUpdateValidator;
+        private readonly IValidator<UserCreateDto> _userCreateValidator;
+        private readonly IValidator<(int dniEmployee, int idRole)> _userCreateFromEmployeeValidator;
+
 
         public SvUser(
             IMapper mapper,
@@ -39,7 +46,10 @@ namespace Infrastructure.Services.Administrative.Users
              ISvGenericRepository<Employee> employeeRepository,
             ISvEmailService emailService,
             IConfiguration configuration,
-            ISvPasswordResetService passwordResetService)
+            ISvPasswordResetService passwordResetService, IValidator<UserUpdateProfileDto> updateProfileValidator,
+        IValidator<UserChangePasswordDto> changePasswordValidator,
+        IValidator<UserStatusUpdateDto> statusUpdateValidator, IValidator<UserCreateDto> userCreateValidator,
+    IValidator<(int dniEmployee, int idRole)> userCreateFromEmployeeValidator)
         {
             _mapper = mapper;
             _userRepository = userRepository;
@@ -49,36 +59,49 @@ namespace Infrastructure.Services.Administrative.Users
             _emailService = emailService;
             _configuration = configuration;
             _passwordResetService = passwordResetService;
+            _updateProfileValidator = updateProfileValidator;
+            _changePasswordValidator = changePasswordValidator;
+            _statusUpdateValidator = statusUpdateValidator;
+            _userCreateValidator = userCreateValidator;
+            _userCreateFromEmployeeValidator = userCreateFromEmployeeValidator;
         }
 
-        // Crear un usuario desde cero
         public async Task CreateUserAsync(UserCreateDto userCreateDto)
         {
-            var user = _mapper.Map<User>(userCreateDto);
+            var validationResult = await _userCreateValidator.ValidateAsync(userCreateDto);
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
 
+            var user = _mapper.Map<User>(userCreateDto);
             string tempPassword = PasswordGenerator.GenerateRandomPassword();
 
             user.Password = HashPassword(tempPassword);
             user.Is_Active = true;
             user.PasswordExpiration = DateTime.Now.AddDays(10);
-            user.FullName = userCreateDto.FullName;  
+            user.FullName = userCreateDto.FullName;
 
             await _userRepository.AddAsync(user);
             await _userRepository.SaveChangesAsync();
 
             await SendUserCredentialsEmailAsync(user.DNI, user.Email, tempPassword, user.FullName);
-
         }
 
 
 
         public async Task CreateUserFromEmployeeAsync(int dniEmployee, int idRole)
         {
+            // 🔹 Validación sin FluentValidation
+            if (await ExistsUserByDniAsync(dniEmployee))
+            {
+                throw new InvalidOperationException($"El empleado con DNI {dniEmployee} ya tiene un usuario asociado.");
+            }
+
             using var transaction = await _context.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
 
             try
             {
-                // Buscar el empleado en la base de datos
                 var employee = await _employeeRepository.Query()
                     .FirstOrDefaultAsync(e => e.Dni == dniEmployee);
 
@@ -87,34 +110,22 @@ namespace Infrastructure.Services.Administrative.Users
                     throw new KeyNotFoundException($"No se encontró el empleado con DNI {dniEmployee}.");
                 }
 
-                // Verificar si el usuario ya existe
-                var existingUser = await _userRepository.Query().FirstOrDefaultAsync(u => u.DNI == dniEmployee);
-                if (existingUser != null)
-                {
-                    throw new InvalidOperationException($"El usuario con DNI {dniEmployee} ya existe.");
-                }
-
-                // Generar una contraseña aleatoria
                 var randomPassword = PasswordGenerator.GenerateRandomPassword();
-
-                // Concatenar el nombre completo del empleado
                 string fullName = $"{employee.First_Name} {employee.Last_Name1} {employee.Last_Name2}".Trim();
 
-                // Crear el usuario con la información del empleado
                 var user = new User
                 {
                     DNI = dniEmployee,
-                    Email = employee.Email,  // ✅ Se usa el email del empleado
+                    Email = employee.Email,
                     Password = HashPassword(randomPassword),
                     Is_Active = true,
-                    PasswordExpiration = DateTime.Now.AddDays(10), // La contraseña expira en 10 días
-                    FullName = fullName 
+                    PasswordExpiration = DateTime.Now.AddDays(10),
+                    FullName = fullName
                 };
 
                 await _userRepository.AddAsync(user);
                 await _userRepository.SaveChangesAsync();
 
-                // Asignar el rol al usuario
                 var userRole = new UserRoles
                 {
                     Id_User = user.Id_User,
@@ -124,10 +135,7 @@ namespace Infrastructure.Services.Administrative.Users
                 await _userRoleRepository.AddAsync(userRole);
                 await _userRoleRepository.SaveChangesAsync();
 
-                // Confirmar la transacción
                 await transaction.CommitAsync();
-
-                // Enviar correo con credenciales
                 await SendUserCredentialsEmailAsync(user.DNI, user.Email, randomPassword, user.FullName);
             }
             catch (Exception ex)
@@ -136,7 +144,6 @@ namespace Infrastructure.Services.Administrative.Users
                 throw new ApplicationException("Ocurrió un error al crear el usuario desde el empleado.", ex);
             }
         }
-
 
 
         // Obtener un usuario por ID
@@ -390,6 +397,12 @@ namespace Infrastructure.Services.Administrative.Users
 
         public async Task UpdateUserProfileAsync(int userId, UserUpdateProfileDto userUpdateProfileDto)
         {
+            var validationResult = await _updateProfileValidator.ValidateAsync(userUpdateProfileDto);
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
+
             var user = await _userRepository.Query().FirstOrDefaultAsync(u => u.Id_User == userId);
             if (user == null)
             {
@@ -405,9 +418,10 @@ namespace Infrastructure.Services.Administrative.Users
 
         public async Task ChangeAuthenticatedUserPasswordAsync(int userId, UserChangePasswordDto userChangePasswordDto)
         {
-            if (userChangePasswordDto.NewPassword != userChangePasswordDto.ConfirmPassword)
+            var validationResult = await _changePasswordValidator.ValidateAsync(userChangePasswordDto);
+            if (!validationResult.IsValid)
             {
-                throw new ArgumentException("Las contraseñas no coinciden.");
+                throw new ValidationException(validationResult.Errors);
             }
 
             var user = await _userRepository.Query().FirstOrDefaultAsync(u => u.Id_User == userId);
@@ -428,9 +442,14 @@ namespace Infrastructure.Services.Administrative.Users
             await _userRepository.SaveChangesAsync();
         }
 
-
         public async Task UpdateUserStatusAsync(int userId, bool isActive)
         {
+            var validationResult = await _statusUpdateValidator.ValidateAsync(new UserStatusUpdateDto { IsActive = isActive });
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
+
             var user = await _userRepository.Query().FirstOrDefaultAsync(u => u.Id_User == userId);
             if (user == null)
             {
@@ -444,8 +463,13 @@ namespace Infrastructure.Services.Administrative.Users
         }
 
 
-
         // Método para hashear contraseñas
         private string HashPassword(string password) => BCrypt.Net.BCrypt.HashPassword(password);
+
+        private async Task<bool> ExistsUserByDniAsync(int dni)
+        {
+            return await _userRepository.Query().AnyAsync(u => u.DNI == dni);
+        }
+
     }
 }

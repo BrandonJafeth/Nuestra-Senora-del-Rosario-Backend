@@ -31,6 +31,7 @@ namespace Infrastructure.Services.Administrative.Users
         Task ChangeAuthenticatedUserPasswordAsync(int userId, UserChangePasswordDto userChangePasswordDto);
         Task UpdateUserStatusAsync(int userId, bool isActive);
 
+ 
 
 
     }
