@@ -25,7 +25,12 @@ namespace Infrastructure.Services.Administrative.Users
         // Autenticación (login)
         Task<string> LoginAsync(UserLoginDTO loginDto);
 
-    
+
+        Task<UserGetMeDto> GetAuthenticatedUserAsync(int userId);
+        Task UpdateUserProfileAsync(int userId, UserUpdateProfileDto userUpdateProfileDto);
+        Task ChangeAuthenticatedUserPasswordAsync(int userId, UserChangePasswordDto userChangePasswordDto);
+        Task UpdateUserStatusAsync(int userId, bool isActive);
+
 
 
     }

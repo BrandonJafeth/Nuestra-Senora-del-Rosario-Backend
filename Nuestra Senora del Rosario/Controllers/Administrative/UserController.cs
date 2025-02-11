@@ -6,6 +6,8 @@ using Infrastructure.Services.Administrative.PasswordResetServices;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
 using System;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 [ApiController]
 [Route("api/users")]
@@ -173,6 +175,61 @@ public class UserController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
+
+    // 🔹 Obtener el usuario autenticado
+    [HttpGet("me")]
+    public async Task<IActionResult> GetAuthenticatedUser()
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+        {
+            return Unauthorized("No se pudo recuperar el ID del usuario autenticado.");
+        }
+
+        var user = await _userService.GetAuthenticatedUserAsync(userId);
+        return Ok(user);
+
+    }
+
+    [HttpPut("update-profile")]
+    public async Task<IActionResult> UpdateProfile([FromBody] UserUpdateProfileDto userUpdateProfileDto)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+        {
+            return Unauthorized("No se pudo recuperar el ID del usuario autenticado.");
+        }
+
+        await _userService.UpdateUserProfileAsync(userId, userUpdateProfileDto);
+        return NoContent();
+    }
+
+
+    [HttpPost("change-password-authenticated")]
+    public async Task<IActionResult> ChangePassword([FromBody] UserChangePasswordDto userChangePasswordDto)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+        {
+            return Unauthorized("No se pudo recuperar el ID del usuario autenticado.");
+        }
+
+        await _userService.ChangeAuthenticatedUserPasswordAsync(userId, userChangePasswordDto);
+        return NoContent();
+    }
+
+
+    // 🔹 Activar/Desactivar usuario (requiere permisos de administrador)
+    [HttpPut("{id}/status")]
+    public async Task<IActionResult> UpdateUserStatus(int id, [FromBody] UserStatusUpdateDto userStatusUpdateDto)
+    {
+        await _userService.UpdateUserStatusAsync(id, userStatusUpdateDto.IsActive);
+        return NoContent();
+    }
+
 
     /// <summary>
     /// 📌 Login de usuario

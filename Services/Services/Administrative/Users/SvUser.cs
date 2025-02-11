@@ -284,7 +284,7 @@ namespace Infrastructure.Services.Administrative.Users
                 throw new ArgumentException("Usuario no encontrado al generar el token de restablecimiento.");
             }
 
-            // 🔹 Generar un token con el `Id_User` en lugar del `DNI`
+            
             var token = _passwordResetService.GenerateResetToken(user.Id_User);
 
             // 🔹 Usar el token en el enlace de cambio de contraseña
@@ -362,6 +362,86 @@ namespace Infrastructure.Services.Administrative.Users
             }
         }
 
+
+        public async Task<UserGetMeDto> GetAuthenticatedUserAsync(int userId)
+        {
+            var user = await _userRepository.Query()
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .FirstOrDefaultAsync(u => u.Id_User == userId);
+
+            if (user == null)
+            {
+                throw new KeyNotFoundException("Usuario no encontrado.");
+            }
+
+            return new UserGetMeDto
+            {
+                Id_User = user.Id_User,
+                DNI = user.DNI.ToString(),
+                FullName = user.FullName,
+                Email = user.Email,
+                IsActive = user.Is_Active,
+                Roles = user.UserRoles.Select(ur => ur.Role.Name_Role).ToList() 
+            };
+        }
+
+
+
+        public async Task UpdateUserProfileAsync(int userId, UserUpdateProfileDto userUpdateProfileDto)
+        {
+            var user = await _userRepository.Query().FirstOrDefaultAsync(u => u.Id_User == userId);
+            if (user == null)
+            {
+                throw new KeyNotFoundException("Usuario no encontrado.");
+            }
+
+            user.FullName = userUpdateProfileDto.FullName;
+            user.Email = userUpdateProfileDto.Email;
+
+            _userRepository.Update(user);
+            await _userRepository.SaveChangesAsync();
+        }
+
+        public async Task ChangeAuthenticatedUserPasswordAsync(int userId, UserChangePasswordDto userChangePasswordDto)
+        {
+            if (userChangePasswordDto.NewPassword != userChangePasswordDto.ConfirmPassword)
+            {
+                throw new ArgumentException("Las contraseñas no coinciden.");
+            }
+
+            var user = await _userRepository.Query().FirstOrDefaultAsync(u => u.Id_User == userId);
+            if (user == null)
+            {
+                throw new KeyNotFoundException("Usuario no encontrado.");
+            }
+
+            if (!BCrypt.Net.BCrypt.Verify(userChangePasswordDto.CurrentPassword, user.Password))
+            {
+                throw new UnauthorizedAccessException("La contraseña actual es incorrecta.");
+            }
+
+            user.Password = BCrypt.Net.BCrypt.HashPassword(userChangePasswordDto.NewPassword);
+            user.PasswordExpiration = null;
+
+            _userRepository.Update(user);
+            await _userRepository.SaveChangesAsync();
+        }
+
+
+        public async Task UpdateUserStatusAsync(int userId, bool isActive)
+        {
+            var user = await _userRepository.Query().FirstOrDefaultAsync(u => u.Id_User == userId);
+            if (user == null)
+            {
+                throw new KeyNotFoundException("Usuario no encontrado.");
+            }
+
+            user.Is_Active = isActive;
+
+            _userRepository.Update(user);
+            await _userRepository.SaveChangesAsync();
+        }
 
 
 

@@ -88,7 +88,7 @@ builder.Services.AddControllers()
         fv.RegisterValidatorsFromAssemblies(assemblies);
         fv.DisableDataAnnotationsValidation = true;
     })
-    .AddNewtonsoftJson(); 
+    .AddNewtonsoftJson();
 #endregion
 
 #region Swagger
@@ -96,8 +96,36 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Mi API", Version = "v1" });
+
+    // 🔹 Definir el esquema de autenticación
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Ingrese el token JWT en este formato: Bearer {token}"
+    });
+
+    // 🔹 Aplicar el esquema de autenticación a todas las solicitudes
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
 });
 #endregion
+
 
 #region Build_App
 var app = builder.Build();
@@ -114,6 +142,7 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("AllowAll");
 app.UseAuthentication();
+app.UseAuthorization();
 app.UseRateLimiter();
 app.UseAuthorization();
 
