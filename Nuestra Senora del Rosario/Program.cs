@@ -137,19 +137,27 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Primero CORS
 app.UseCors("AllowAll");
-app.UseHttpsRedirection();
+
+// Quitar la redirección HTTPS si no tienes certificado configurado
+// app.UseHttpsRedirection();
+
+// Luego la autenticación y autorización
 app.UseAuthentication();
-app.UseRouting();
-
-
 app.UseAuthorization();
+
+// Rate limiting
 app.UseRateLimiter();
 
+// Routing al final
+app.UseRouting();
 
 app.MapControllers();
 app.MapHub<NotificationHub>("/notificationHub");
 
+// Configuración del puerto
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 app.Urls.Add($"http://0.0.0.0:{port}");
 
