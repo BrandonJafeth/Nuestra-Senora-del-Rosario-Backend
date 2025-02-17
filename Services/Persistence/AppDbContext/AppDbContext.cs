@@ -35,6 +35,14 @@ namespace Infrastructure.Persistence.AppDbContext
         public DbSet<PaymentReceipt> PaymentReceipts { get; set; }
         public DbSet<Deduction> Deductions { get; set; }
 
+        public DbSet<MedicationSpecific> MedicationSpecifics { get; set; }
+        public DbSet<AdministrationRoute> AdministrationRoutes { get; set; }
+
+        public DbSet<ResidentMedication> ResidentMedications { get; set; }
+
+        public DbSet<Pathology> Pathologies { get; set; }
+
+        public DbSet<ResidentPathology> ResidentPathologies { get; set; }
 
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Resident> Residents { get; set; }
