@@ -110,7 +110,7 @@ namespace Infrastructure.Services.Administrative.PaymentReceiptService
             return receipts.Select(r => new PaymentReceiptDto
             {
                 Id = r.Id,
-                EmployeeDni = r.EmployeeDni,
+                Id_Employee = r.Id_Employee,
                 EmployeeFullName = $"{r.Employee.First_Name} {r.Employee.Last_Name1} {r.Employee.Last_Name2}",
                 EmployeeEmail = r.Employee?.Email,
                 Profession = r.Employee?.Profession?.Name_Profession,

@@ -139,7 +139,7 @@ namespace Infrastructure.Persistence.AppDbContext
 
             // Índice en EmployeeDni y PaymentDate para consultas más rápidas
             modelBuilder.Entity<PaymentReceipt>()
-                .HasIndex(pr => new { pr.EmployeeDni, pr.PaymentDate })
+                .HasIndex(pr => new { pr.Id_Employee, pr.PaymentDate })
                 .HasDatabaseName("IX_PaymentReceipt_EmployeeDni_PaymentDate");
 
             // Configuración de propiedades para Deduction
