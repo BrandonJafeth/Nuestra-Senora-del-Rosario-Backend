@@ -2,7 +2,7 @@
 
 public class PaymentReceiptCreateDto
 {
-    public int EmployeeDni { get; set; }
+    public int Id_Employee { get; set; }
     public DateTime PaymentDate { get; set; }
     public decimal Salary { get; set; }
     public decimal Overtime { get; set; }

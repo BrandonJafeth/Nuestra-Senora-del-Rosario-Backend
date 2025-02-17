@@ -6,7 +6,7 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.Administrativ
     public class PaymentReceiptDto
     {
         public int Id { get; set; }
-        public int EmployeeDni { get; set; }  // Identificador del empleado (DNI)
+        public int Id_Employee { get; set; }  // Identificador del empleado (DNI)
         public string EmployeeFullName { get; set; }  // Nombre completo del empleado (generado combinando nombres y apellidos)
         public string EmployeeEmail { get; set; }  // Correo electrónico del empleado
         public string Profession { get; set; }  // Profesión del empleado
