@@ -2,7 +2,8 @@
 # Imagen base para ASP.NET en Linux
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-EXPOSE 10000  # Cambia esto a 10000 que es el puerto por defecto en Render
+# Puerto por defecto para Render
+EXPOSE 10000
 
 # Instalar dependencias necesarias para Puppeteer y Google Chrome
 RUN apt-get update && apt-get install -y \
