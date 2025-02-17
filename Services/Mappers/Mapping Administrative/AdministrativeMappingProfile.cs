@@ -86,7 +86,7 @@ public class AdministrativeMappingProfile : Profile
 
         // Mapear PaymentReceiptCreateDto a PaymentReceipt
         CreateMap<PaymentReceiptCreateDto, PaymentReceipt>()
-            .ForMember(dest => dest.Id_Employeee, opt => opt.MapFrom(src => src.Id_Employee))
+            .ForMember(dest => dest.Id_Employee, opt => opt.MapFrom(src => src.Id_Employee))
             .ForMember(dest => dest.PaymentDate, opt => opt.MapFrom(src => src.PaymentDate))
             .ForMember(dest => dest.Salary, opt => opt.MapFrom(src => src.Salary))
             .ForMember(dest => dest.Overtime, opt => opt.MapFrom(src => src.Overtime))

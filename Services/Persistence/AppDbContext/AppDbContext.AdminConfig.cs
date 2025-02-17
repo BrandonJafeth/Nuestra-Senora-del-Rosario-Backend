@@ -133,12 +133,13 @@ namespace Infrastructure.Persistence.AppDbContext
             modelBuilder.Entity<PaymentReceipt>()
                 .HasOne(pr => pr.Employee)
                 .WithMany(e => e.PaymentReceipts)
-                .HasForeignKey(pr => pr.Id_Employeee)
+                .HasForeignKey(pr => pr.Id_Employee)
+                .HasConstraintName("fk_paymentreceipts_employee")
                 .OnDelete(DeleteBehavior.Cascade);  // Eliminar los recibos si se elimina el empleado
 
             // Índice en EmployeeDni y PaymentDate para consultas más rápidas
             modelBuilder.Entity<PaymentReceipt>()
-                .HasIndex(pr => new { pr.Id_Employeee, pr.PaymentDate })
+                .HasIndex(pr => new { pr.EmployeeDni, pr.PaymentDate })
                 .HasDatabaseName("IX_PaymentReceipt_EmployeeDni_PaymentDate");
 
             // Configuración de propiedades para Deduction
