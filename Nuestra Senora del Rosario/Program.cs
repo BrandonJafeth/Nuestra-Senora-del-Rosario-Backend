@@ -137,14 +137,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
-app.UseRouting();
 app.UseCors("AllowAll");
+app.UseHttpsRedirection();
 app.UseAuthentication();
+app.UseRouting();
+
+
 app.UseAuthorization();
 app.UseRateLimiter();
-app.UseAuthorization();
+
 
 app.MapControllers();
 app.MapHub<NotificationHub>("/notificationHub");
