@@ -12,6 +12,9 @@ namespace Infrastructure.Services.Administrative.Appointments
         Task PatchAppointmentAsync(int id, AppointmentUpdateDto appointmentDto);
         Task<AppointmentGetDto> GetAppointmentByIdAsync(int id);
         Task<IEnumerable<AppointmentGetDto>> GetAllAppointmentsAsync();
+
+        Task<IEnumerable<AppointmentGetDto>> GetAppointmentsByResidentAsync(int residentId);
+
         Task DeleteAppointmentAsync(int id);
 
     }

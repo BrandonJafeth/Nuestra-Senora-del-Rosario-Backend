@@ -40,6 +40,20 @@ public class AppointmentController : ControllerBase
         return Ok(appointment);
     }
 
+    [HttpGet("resident/{residentId}")]
+    public async Task<IActionResult> GetAppointmentsByResident(int residentId)
+    {
+        try
+        {
+            var appointments = await _appointmentService.GetAppointmentsByResidentAsync(residentId);
+            return Ok(appointments);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error al obtener las citas del residente: {ex.Message}");
+        }
+    }
+
     // POST: api/appointment
     [HttpPost]
     public async Task<IActionResult> CreateAppointment([FromBody] AppointmentPostDto appointmentDto)

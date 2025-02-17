@@ -219,7 +219,20 @@ namespace Infrastructure.Services.Administrative.Appointments
             await _appointmentRepository.SaveChangesAsync();
         }
 
+        public async Task<IEnumerable<AppointmentGetDto>> GetAppointmentsByResidentAsync(int residentId)
+        {
+            var appointments = await _appointmentRepository
+                .Query()
+                .Where(a => a.Id_Resident == residentId)
+                .Include(a => a.Resident)
+                .Include(a => a.Companion)
+                .Include(a => a.Specialty)
+                .Include(a => a.HealthcareCenter)
+                .Include(a => a.AppointmentStatus)
+                .ToListAsync();
 
+            return _mapper.Map<IEnumerable<AppointmentGetDto>>(appointments);
+        }
 
     }
 }
