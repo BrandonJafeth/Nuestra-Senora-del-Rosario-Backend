@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Services.Administrative.NotificationServices;
-using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
 using AutoMapper;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Services.Administrative.Notifications;
+using Infrastructure.Services.Administrative.Notifications;
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
 
 namespace Nuestra_Senora_del_Rosario.Controllers.Administrative
 {

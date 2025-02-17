@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Services.GenericService;
 using System.Threading.Tasks;
-using Entities.Administration;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
-using Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
-using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
+using Domain.Entities.Administration;
 
 [ApiController]
 [Route("api/[controller]")]

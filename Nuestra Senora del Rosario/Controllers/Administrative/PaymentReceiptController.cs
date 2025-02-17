@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Services.Administrative.PaymentReceiptService;
-using Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
-using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
-using Services.Administrative.EmailServices;
+using Infrastructure.Services.Administrative.EmailServices;
+using Infrastructure.Services.Administrative.PaymentReceiptService;
 
 [ApiController]
 [Route("api/[controller]")]

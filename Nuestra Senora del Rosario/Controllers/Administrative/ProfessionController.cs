@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Services.GenericService;
 using System.Threading.Tasks;
 
@@ -27,11 +26,11 @@ public class ProfessionController : ControllerBase
 
         try
         {
-            // Agregar la profesión directamente desde el objeto recibido
+     
             await _professionService.AddAsync(profession);
             await _professionService.SaveChangesAsync();
 
-            return Ok(profession); // Devuelve el objeto creado
+            return Ok(profession); 
         }
         catch (DbUpdateException ex)
         {

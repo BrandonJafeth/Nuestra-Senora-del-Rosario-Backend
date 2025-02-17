@@ -1,9 +1,8 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
+using Infrastructure.Services.Administrative.Appointments;
 using Microsoft.AspNetCore.Mvc;
-using Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
-using Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
-using Services.Administrative.AppointmentService;
 using Services.Validations.Admistrative;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -39,6 +38,20 @@ public class AppointmentController : ControllerBase
         var appointment = await _appointmentService.GetAppointmentByIdAsync(id);
         if (appointment == null) return NotFound($"Cita con ID {id} no encontrada.");
         return Ok(appointment);
+    }
+
+    [HttpGet("resident/{residentId}")]
+    public async Task<IActionResult> GetAppointmentsByResident(int residentId)
+    {
+        try
+        {
+            var appointments = await _appointmentService.GetAppointmentsByResidentAsync(residentId);
+            return Ok(appointments);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error al obtener las citas del residente: {ex.Message}");
+        }
     }
 
     // POST: api/appointment

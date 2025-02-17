@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Services.Administrative.PaymentReceiptService;
-using Services.Administrative.PdfReceiver;
-using Services.Administrative.PdfReceiverService;
+﻿using Infrastructure.Services.Administrative.PaymentReceiptService;
+using Infrastructure.Services.Administrative.PdfReceiver;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 [ApiController]

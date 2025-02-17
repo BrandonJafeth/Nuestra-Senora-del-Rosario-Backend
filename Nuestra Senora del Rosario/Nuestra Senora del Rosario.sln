@@ -5,9 +5,11 @@ VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuestra Senora del Rosario", "Nuestra Senora del Rosario.csproj", "{FB0B3149-D30D-43F4-A274-F0165810DCD1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities", "..\Entities\Entities.csproj", "{C4085222-48F2-44C2-95AF-845EF980E4B0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "..\Entities\Domain.csproj", "{C4085222-48F2-44C2-95AF-845EF980E4B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "..\Services\Services.csproj", "{9608B9EF-95A7-4DD4-B119-0CD0B801A4CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "..\Services\Infrastructure.csproj", "{9608B9EF-95A7-4DD4-B119-0CD0B801A4CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "..\Test\Test.csproj", "{1B911C3B-194A-49BB-ABD1-8A47CEC5DAD5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{9608B9EF-95A7-4DD4-B119-0CD0B801A4CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9608B9EF-95A7-4DD4-B119-0CD0B801A4CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9608B9EF-95A7-4DD4-B119-0CD0B801A4CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B911C3B-194A-49BB-ABD1-8A47CEC5DAD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B911C3B-194A-49BB-ABD1-8A47CEC5DAD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B911C3B-194A-49BB-ABD1-8A47CEC5DAD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B911C3B-194A-49BB-ABD1-8A47CEC5DAD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
