@@ -133,12 +133,12 @@ namespace Infrastructure.Persistence.AppDbContext
             modelBuilder.Entity<PaymentReceipt>()
                 .HasOne(pr => pr.Employee)
                 .WithMany(e => e.PaymentReceipts)
-                .HasForeignKey(pr => pr.EmployeeDni)
+                .HasForeignKey(pr => pr.Id_Employeee)
                 .OnDelete(DeleteBehavior.Cascade);  // Eliminar los recibos si se elimina el empleado
 
             // Índice en EmployeeDni y PaymentDate para consultas más rápidas
             modelBuilder.Entity<PaymentReceipt>()
-                .HasIndex(pr => new { pr.EmployeeDni, pr.PaymentDate })
+                .HasIndex(pr => new { pr.Id_Employeee, pr.PaymentDate })
                 .HasDatabaseName("IX_PaymentReceipt_EmployeeDni_PaymentDate");
 
             // Configuración de propiedades para Deduction
@@ -390,7 +390,78 @@ namespace Infrastructure.Persistence.AppDbContext
                 .HasOne(i => i.Product)
                 .WithMany(p => p.Inventories)
                 .HasForeignKey(i => i.ProductID)
-                .OnDelete(DeleteBehavior.Cascade);  
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ResidentMedication>()
+          .HasKey(rm => rm.Id_ResidentMedication);
+
+
+            modelBuilder.Entity<MedicationSpecific>()
+                .HasKey(e => e.Id_MedicamentSpecific);
+
+            modelBuilder.Entity<MedicationSpecific>(entity =>
+            {
+                entity.ToTable("MedicationSpecifics");
+
+                entity.Property(e => e.Name_MedicamentSpecific)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.SpecialInstructions)
+                    .HasMaxLength(1000);
+
+                entity.Property(e => e.AdministrationSchedule)
+                    .HasMaxLength(500);
+
+                entity.HasOne(e => e.UnitOfMeasure)
+                    .WithMany(u => u.MedicationsSpecific)
+                    .HasForeignKey(e => e.UnitOfMeasureID);
+
+                entity.HasOne(e => e.AdministrationRoute)
+                    .WithMany(a => a.MedicationSpecifics)
+                    .HasForeignKey(e => e.Id_AdministrationRoute);
+            });
+
+            modelBuilder.Entity<AdministrationRoute>()
+                .HasKey(e => e.Id_AdministrationRoute);
+
+            modelBuilder.Entity<AdministrationRoute>(entity =>
+            {
+                entity.ToTable("AdministrationRoutes");
+
+                entity.Property(e => e.RouteName)
+                    .IsRequired()
+                    .HasMaxLength(100);
+            });
+
+
+
+            modelBuilder.Entity<ResidentMedication>(entity =>
+            {
+                entity.ToTable("ResidentMedications");
+                entity.Property(e => e.StartDate)
+                    .IsRequired();
+                entity.Property(e => e.EndDate)
+                    .IsRequired();
+                entity.Property(e => e.PrescribedDose)
+                    .IsRequired();
+                entity.HasOne(e => e.Resident)
+                    .WithMany(r => r.ResidentMedications)
+                    .HasForeignKey(e => e.Id_Resident);
+                entity.HasOne(e => e.MedicationSpecific)
+                    .WithMany(m => m.ResidentMedications)
+                    .HasForeignKey(e => e.Id_MedicamentSpecific);
+            });
+
+
+             modelBuilder.Entity<Pathology>()
+                .HasKey(p => p.Id_Pathology);
+
+            modelBuilder.Entity<ResidentPathology>()
+                .HasKey(rp => rp.Id_ResidentPathology);
+            modelBuilder.Entity<ResidentMedication>()
+                .HasKey(rm => rm.Id_ResidentMedication);
+
         }
     }
 }

@@ -104,13 +104,13 @@ namespace Infrastructure.Services.Administrative.PaymentReceiptService
                     .ThenInclude(e => e.Profession)
                 .Include(r => r.Employee.TypeOfSalary)
                 .Include(r => r.DeductionsList)
-                .Where(r => r.EmployeeDni == employeeDni)
+                .Where(r => r.Id_Employeee == employeeDni)
                 .ToListAsync();
 
             return receipts.Select(r => new PaymentReceiptDto
             {
                 Id = r.Id,
-                EmployeeDni = r.EmployeeDni,
+                EmployeeDni = r.Id_Employeee,
                 EmployeeFullName = $"{r.Employee.First_Name} {r.Employee.Last_Name1} {r.Employee.Last_Name2}",
                 EmployeeEmail = r.Employee?.Email,
                 Profession = r.Employee?.Profession?.Name_Profession,

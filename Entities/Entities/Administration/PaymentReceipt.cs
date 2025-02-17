@@ -12,7 +12,7 @@ namespace Domain.Entities.Administration
 
         [Required]  // Obligatorio
         [ForeignKey("Employee")]  // Clave foránea que referencia a la entidad "Employee"
-        public int EmployeeDni { get; set; }
+        public int Id_Employeee{ get; set; }
 
         // Relación con la entidad Employee, indica el empleado relacionado con este comprobante
         public Employee Employee { get; set; }
