@@ -141,10 +141,6 @@ if (app.Environment.IsDevelopment())
 // Primero CORS
 app.UseCors("AllowAll");
 
-// Quitar la redirección HTTPS si no tienes certificado configurado
-// app.UseHttpsRedirection();
-
-// Luego la autenticación y autorización
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -157,8 +153,9 @@ app.UseRouting();
 app.MapControllers();
 app.MapHub<NotificationHub>("/notificationHub");
 
-// Configuración del puerto
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+
+var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
+app.Urls.Clear();
 app.Urls.Add($"http://0.0.0.0:{port}");
 
 app.Run();
