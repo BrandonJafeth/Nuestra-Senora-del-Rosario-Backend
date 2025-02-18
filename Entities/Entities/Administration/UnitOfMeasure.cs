@@ -13,5 +13,6 @@ namespace Domain.Entities.Administration
 
         // Navigation properties
         public ICollection<Product> Products { get; set; }
+        public ICollection<MedicationSpecific> MedicationsSpecific { get; set; }
     }
 }

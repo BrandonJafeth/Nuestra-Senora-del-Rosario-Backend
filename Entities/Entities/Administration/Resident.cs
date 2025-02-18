@@ -51,6 +51,10 @@ namespace Domain.Entities.Administration
 
         public ICollection<Appointment> Appointments { get; set; }
 
+        public ICollection<ResidentMedication> ResidentMedications { get; set; }
+
+        public ICollection<ResidentPathology> ResidentPathologies { get; set; }
+
         // Esta propiedad es opcional si deseas cargar el último nivel de dependencia
         [NotMapped]
         public DependencyHistory LatestDependencyHistory => DependencyHistories?.OrderByDescending(d => d.Id_History).FirstOrDefault();
