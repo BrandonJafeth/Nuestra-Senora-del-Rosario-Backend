@@ -56,6 +56,7 @@ public class AdministrativeMappingProfile : Profile
 
         // Mapear PaymentReceipt a PaymentReceiptDto
         CreateMap<PaymentReceipt, PaymentReceiptDto>()
+            .ForMember(dest => dest.Dni, opt => opt.MapFrom(src => src.Employee.Dni))
             .ForMember(dest => dest.EmployeeFullName, opt => opt.MapFrom(src => $"{src.Employee.First_Name} {src.Employee.Last_Name1} {src.Employee.Last_Name2}"))
             .ForMember(dest => dest.EmployeeEmail, opt => opt.MapFrom(src => src.Employee.Email))
             .ForMember(dest => dest.Profession, opt => opt.MapFrom(src => src.Employee.Profession.Name_Profession))
