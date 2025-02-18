@@ -97,20 +97,21 @@ namespace Infrastructure.Services.Administrative.PaymentReceiptService
         }
 
         // Obtener recibos de pago por empleado
-        public async Task<IEnumerable<PaymentReceiptDto>> GetPaymentReceiptsByEmployeeAsync(int employeeDni)
+        public async Task<IEnumerable<PaymentReceiptDto>> GetPaymentReceiptsByEmployeeAsync(int employeeId)
         {
             var receipts = await _context.PaymentReceipts
                 .Include(r => r.Employee)
                     .ThenInclude(e => e.Profession)
                 .Include(r => r.Employee.TypeOfSalary)
                 .Include(r => r.DeductionsList)
-                .Where(r => r.Id_Employee == employeeDni)
+                .Where(r => r.Id_Employee == employeeId) // Si filtras por Id_Employee
                 .ToListAsync();
 
             return receipts.Select(r => new PaymentReceiptDto
             {
                 Id = r.Id,
                 Id_Employee = r.Id_Employee,
+                Dni = r.Employee.Dni,  // ← Asignación del DNI,
                 EmployeeFullName = $"{r.Employee.First_Name} {r.Employee.Last_Name1} {r.Employee.Last_Name2}",
                 EmployeeEmail = r.Employee?.Email,
                 Profession = r.Employee?.Profession?.Name_Profession,
