@@ -39,7 +39,7 @@ public class MappingProfile : Profile
         // Mapeo inverso de FormVoluntarieCreateDto a FormVoluntarie (POST)
         CreateMap<FormVoluntarieCreateDto, FormVoluntarie>()
             .ForMember(dest => dest.VoluntarieType, opt => opt.Ignore()) // Ignoramos el objeto VoluntarieType completo
-            .ForMember(dest => dest.Id_VoluntarieType, opt => opt.MapFrom(src => src.VoluntarieTypeId)); // Mapear el ID directamente
+            .ForMember(dest => dest.Id_VoluntarieType, opt => opt.MapFrom(src => src.Id_VoluntarieType)); // Mapear el ID directamente
 
 
         // De la Entidad a DTO para GET
