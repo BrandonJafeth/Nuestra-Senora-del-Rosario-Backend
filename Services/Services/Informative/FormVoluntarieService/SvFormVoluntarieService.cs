@@ -82,10 +82,10 @@ namespace Infrastructure.Services.Informative.FormVoluntarieService
 
             // Verificar si el tipo de voluntariado existe
             var voluntarieTypeExists = await _context.VoluntarieTypes
-                .AnyAsync(v => v.Id_VoluntarieType == formVoluntarieCreateDto.VoluntarieTypeId);
+                .AnyAsync(v => v.Id_VoluntarieType == formVoluntarieCreateDto.Id_VoluntarieType);
             if (!voluntarieTypeExists)
             {
-                _logger.LogWarning("El tipo de voluntariado con ID {TypeId} no existe.", formVoluntarieCreateDto.VoluntarieTypeId);
+                _logger.LogWarning("El tipo de voluntariado con ID {TypeId} no existe.", formVoluntarieCreateDto.Id_VoluntarieType);
                 throw new ArgumentException("El tipo de voluntariado proporcionado no existe.");
             }
 

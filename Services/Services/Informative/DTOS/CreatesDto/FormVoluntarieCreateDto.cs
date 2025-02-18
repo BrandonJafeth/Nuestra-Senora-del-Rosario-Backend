@@ -14,6 +14,6 @@ namespace Infrastructure.Services.Informative.DTOS.CreatesDto
         public DateTime End_Date { get; set; }
 
         // Aquí solo necesitamos el Id del tipo de voluntariado
-        public int VoluntarieTypeId { get; set; }
+        public int Id_VoluntarieType { get; set; }
     }
 }

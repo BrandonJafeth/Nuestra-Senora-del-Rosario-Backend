@@ -46,8 +46,8 @@ namespace Infrastructure.Validations.Informative
                 .WithMessage("La fecha final debe ser posterior a la fecha de inicio.");
 
             // Validación del tipo de voluntariado: debe ser mayor que cero
-            RuleFor(x => x.VoluntarieTypeId)
+            RuleFor(x => x.Id_VoluntarieType)
                 .GreaterThan(0).WithMessage("El tipo de voluntariado es requerido.");
         }
     }
-}
+}   
