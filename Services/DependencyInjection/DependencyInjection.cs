@@ -116,6 +116,7 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<ISvGenericRepository<Note>, SvGenericRepository<Note>>();
             services.AddScoped<ISvGenericRepository<MedicationSpecific>, SvGenericRepository<MedicationSpecific>>(); 
             services.AddScoped<ISvGenericRepository<AdministrationRoute>, SvGenericRepository<AdministrationRoute>>();
+            services.AddScoped<ISvGenericRepository<Pathology>, SvGenericRepository<Pathology>>();
             #endregion
 
             #region Services_Administrative

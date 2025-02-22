@@ -285,12 +285,21 @@ public class AdministrativeMappingProfile : Profile
         CreateMap<AdministrationRoute, AdministrationRouteGetDto>()
     .ForMember(dest => dest.Id_AdministrationRoute, opt => opt.MapFrom(src => src.Id_AdministrationRoute))
     .ForMember(dest => dest.RouteName, opt => opt.MapFrom(src => src.RouteName));
-        // Si en un futuro agregas propiedades de auditoría, mapea también CreatedAt/UpdatedAt
-
-        // Mapeo para CREATE: de DTO de creación a la entidad
+  
         CreateMap<AdministrationRouteCreateDto, AdministrationRoute>();
         CreateMap<AdministrationRouteUpdateDto, AdministrationRoute>();
-        // Mapeo para UPDATE (si usas un DTO distinto para actualización)
+
+
+        CreateMap<Pathology, PathologyGetDto>()
+     .ForMember(dest => dest.Id_Pathology, opt => opt.MapFrom(src => src.Id_Pathology))
+      .ForMember(dest => dest.Name_Pathology, opt => opt.MapFrom(src => src.Name_Pathology));
+
+
+
+
+        CreateMap<PathologyCreateDto, Pathology>();
+        CreateMap<PathologyUpdateDto, Pathology>();
+
 
 
     }
