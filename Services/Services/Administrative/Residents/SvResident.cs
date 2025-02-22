@@ -78,6 +78,26 @@ namespace Infrastructure.Services.Administrative.Residents
             return _mapper.Map<IEnumerable<ResidentGetDto>>(residents);
         }
 
+        public async Task<ResidentMinimalInfoDto> GetResidentMinimalInfoAsync(int id)
+        {
+            var resident = await _residentRepository.Query()
+                .Include(r => r.ResidentMedications)
+                    .ThenInclude(rm => rm.MedicationSpecific)
+                        .ThenInclude(ms => ms.UnitOfMeasure)
+                .Include(r => r.ResidentPathologies)
+                    .ThenInclude(rp => rp.Pathology)
+                .Include(r => r.Appointments)
+                    .ThenInclude(a => a.HealthcareCenter)
+                .Include(r => r.Appointments)
+                    .ThenInclude(a => a.Companion) 
+                .AsNoTracking()
+                .FirstOrDefaultAsync(r => r.Id_Resident == id);
+
+            if (resident == null)
+                throw new KeyNotFoundException($"Resident with ID {id} not found.");
+
+            return _mapper.Map<ResidentMinimalInfoDto>(resident);
+        }
 
 
         // Método para obtener un residente por ID

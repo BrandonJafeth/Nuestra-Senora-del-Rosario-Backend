@@ -54,8 +54,22 @@ namespace Nuestra_Senora_del_Rosario.Controllers.Administrative
             }
         }
 
-        // POST: api/Residents
-        [HttpPost]
+        // GET: api/Resident/minimalinfo/{id}
+        [HttpGet("minimalinfo/{id}")]
+        public async Task<IActionResult> GetResidentMinimalInfo(int id)
+        {
+            try
+            {
+                var residentDto = await _residentService.GetResidentMinimalInfoAsync(id);
+                return Ok(residentDto);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+            // POST: api/Residents
+            [HttpPost]
         public async Task<IActionResult> AddResident([FromBody] ResidentCreateDto residentDto)
         {
             if (!ModelState.IsValid)

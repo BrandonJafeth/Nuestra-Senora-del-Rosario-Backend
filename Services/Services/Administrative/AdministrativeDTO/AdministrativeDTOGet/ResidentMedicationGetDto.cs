@@ -11,6 +11,8 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.Administrativ
         public int Id_ResidentMedication { get; set; }
 
         public decimal PrescribedDose { get; set; }
+        public string UnitOfMeasureName { get; set; }
+
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public string Notes { get; set; }
@@ -18,11 +20,8 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.Administrativ
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
-        // Para mostrar info de la relación si lo deseas:
-        public int Id_Resident { get; set; }
         public string ResidentName { get; set; } // Ejemplo
 
-        public int Id_MedicamentSpecific { get; set; }
         public string Name_MedicamentSpecific { get; set; } // Ejemplo
     }
 

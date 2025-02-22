@@ -301,6 +301,51 @@ public class AdministrativeMappingProfile : Profile
         CreateMap<PathologyUpdateDto, Pathology>();
 
 
+        CreateMap<ResidentMedication, ResidentMedicationGetDto>()
+            .ForMember(dest => dest.ResidentName, opt => opt.MapFrom(src => src.Resident.Name_RD))
+            .ForMember(dest => dest.Name_MedicamentSpecific, opt => opt.MapFrom(src => src.MedicationSpecific.Name_MedicamentSpecific))
+            .ForMember(dest => dest.UnitOfMeasureName, opt => opt.MapFrom(src => src.MedicationSpecific.UnitOfMeasure.UnitName));
 
+
+        CreateMap<ResidentMedicationCreateDto, ResidentMedication>();
+
+        CreateMap<ResidentMedicationUpdateDto, ResidentMedication>();
+
+
+        CreateMap<ResidentPathology, ResidentPathologyGetDto>()
+            .ForMember(dest => dest.DiagnosisDate, opt => opt.MapFrom(src => src.DiagnosisDate.ToString("yyyy-MM-dd")))
+            .ForMember(dest => dest.RegisterDate, opt => opt.MapFrom(src => src.RegisterDate.ToString("yyyy-MM-dd")))
+            .ForMember(dest => dest.ResidentName, opt => opt.MapFrom(src => src.Resident.Name_RD))
+            .ForMember(dest => dest.Name_Pathology, opt => opt.MapFrom(src => src.Pathology.Name_Pathology));
+
+        CreateMap<ResidentPathologyCreateDto, ResidentPathology>()
+            .ForMember(dest => dest.DiagnosisDate, opt => opt.MapFrom(src => DateOnly.Parse(src.DiagnosisDate)))
+            .ForMember(dest => dest.RegisterDate, opt => opt.MapFrom(src => DateOnly.Parse(src.RegisterDate)));
+
+        CreateMap<ResidentPathologyUpdateDto, ResidentPathology>()
+            .ForMember(dest => dest.DiagnosisDate, opt => opt.MapFrom(src => DateOnly.Parse(src.DiagnosisDate)))
+            .ForMember(dest => dest.RegisterDate, opt => opt.MapFrom(src => DateOnly.Parse(src.RegisterDate)));
+
+
+        // Mapear de Resident a ResidentMinimalInfoDto
+        CreateMap<Resident, ResidentMinimalInfoDto>()
+        .ForMember(dest => dest.MedicationNames,
+                   opt => opt.MapFrom(src => src.ResidentMedications
+                        .Select(rm => rm.MedicationSpecific.Name_MedicamentSpecific)))
+        .ForMember(dest => dest.PathologyNames,
+                   opt => opt.MapFrom(src => src.ResidentPathologies
+                        .Select(rp => rp.Pathology.Name_Pathology)))
+        .ForMember(dest => dest.Appointments,
+                   opt => opt.MapFrom(src => src.Appointments));
+
+        // Mapear de Appointment a AppointmentMinimalDto
+        CreateMap<Appointment, AppointmentMinimalDto>()
+                .ForMember(dest => dest.Id_Appointment, opt => opt.MapFrom(src => src.Id_Appointment))
+                .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
+                .ForMember(dest => dest.Time, opt => opt.MapFrom(src => src.Time))
+            .ForMember(dest => dest.AppointmentManager,
+               opt => opt.MapFrom(src => src.Companion.First_Name + " " + src.Companion.Last_Name1))
+             .ForMember(dest => dest.HealthcareCenterName,
+               opt => opt.MapFrom(src => src.HealthcareCenter.Name_HC));
     }
 }
