@@ -35,6 +35,8 @@ using Domain.Entities.Informative;
 using Infrastructure.Persistence.AppDbContext;
 using Infrastructure.Services.Informative.MappingProfiles;
 using Infrastructure.Services.Administrative.MedicationSpecifics;
+using Infrastructure.Services.Administrative.ResidentMedications;
+using Infrastructure.Services.Administrative.ResidentPathologies;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -117,6 +119,8 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<ISvGenericRepository<MedicationSpecific>, SvGenericRepository<MedicationSpecific>>(); 
             services.AddScoped<ISvGenericRepository<AdministrationRoute>, SvGenericRepository<AdministrationRoute>>();
             services.AddScoped<ISvGenericRepository<Pathology>, SvGenericRepository<Pathology>>();
+            services.AddScoped<ISvGenericRepository<ResidentPathology>, SvGenericRepository<ResidentPathology>>();
+            services.AddScoped<ISvGenericRepository<ResidentMedication>, SvGenericRepository<ResidentMedication>>();
             #endregion
 
             #region Services_Administrative
@@ -124,7 +128,7 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<ISvUserRole, SvUserRole>();
             services.AddScoped<ISvPasswordResetService, SvPasswordResetService>();
             services.AddScoped<ISvPdfReceiverService, SvPdfReceiverService>();
-            services.AddScoped<ISvNotification, SvNotification>(); // Registro del servicio de notificaciones
+            services.AddScoped<ISvNotification, SvNotification>(); 
             services.AddScoped<ISvProductService, SvProductService>();
             services.AddScoped<ISvInventoryService, SvInventoryService>();
             services.AddScoped<ISvAppointment, SvAppointment>();
@@ -133,6 +137,8 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<ISvResident, SvResident>();
             services.AddScoped<ISvUser, SvUser>();
             services.AddScoped<ISvMedicationSpecific, SvMedicationSpecific>();
+            services.AddScoped<ISvResidentMedication, SvResidentMedication>();
+            services.AddScoped<ISvResidentPathology, SvResidentPathology>();
 
             #endregion
 

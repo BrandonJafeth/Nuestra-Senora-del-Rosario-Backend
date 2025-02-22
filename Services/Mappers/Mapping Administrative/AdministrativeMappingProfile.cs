@@ -301,6 +301,32 @@ public class AdministrativeMappingProfile : Profile
         CreateMap<PathologyUpdateDto, Pathology>();
 
 
+        CreateMap<ResidentMedication, ResidentMedicationGetDto>()
+            .ForMember(dest => dest.ResidentName, opt => opt.MapFrom(src => src.Resident.Name_RD))
+            .ForMember(dest => dest.Name_MedicamentSpecific, opt => opt.MapFrom(src => src.MedicationSpecific.Name_MedicamentSpecific))
+            .ForMember(dest => dest.UnitOfMeasureName, opt => opt.MapFrom(src => src.MedicationSpecific.UnitOfMeasure.UnitName));
+
+
+        CreateMap<ResidentMedicationCreateDto, ResidentMedication>();
+
+        CreateMap<ResidentMedicationUpdateDto, ResidentMedication>();
+
+
+        CreateMap<ResidentPathology, ResidentPathologyGetDto>()
+            .ForMember(dest => dest.DiagnosisDate, opt => opt.MapFrom(src => src.DiagnosisDate.ToString("yyyy-MM-dd")))
+            .ForMember(dest => dest.RegisterDate, opt => opt.MapFrom(src => src.RegisterDate.ToString("yyyy-MM-dd")))
+            .ForMember(dest => dest.ResidentName, opt => opt.MapFrom(src => src.Resident.Name_RD))
+            .ForMember(dest => dest.Name_Pathology, opt => opt.MapFrom(src => src.Pathology.Name_Pathology));
+
+        CreateMap<ResidentPathologyCreateDto, ResidentPathology>()
+            .ForMember(dest => dest.DiagnosisDate, opt => opt.MapFrom(src => DateOnly.Parse(src.DiagnosisDate)))
+            .ForMember(dest => dest.RegisterDate, opt => opt.MapFrom(src => DateOnly.Parse(src.RegisterDate)));
+
+        CreateMap<ResidentPathologyUpdateDto, ResidentPathology>()
+            .ForMember(dest => dest.DiagnosisDate, opt => opt.MapFrom(src => DateOnly.Parse(src.DiagnosisDate)))
+            .ForMember(dest => dest.RegisterDate, opt => opt.MapFrom(src => DateOnly.Parse(src.RegisterDate)));
+
+
 
     }
 }
