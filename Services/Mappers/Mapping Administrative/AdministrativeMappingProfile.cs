@@ -274,5 +274,13 @@ public class AdministrativeMappingProfile : Profile
             .ForMember(dest => dest.TotalEgresos, opt => opt.Ignore());
 
 
+        CreateMap<MedicationSpecific, MedicationSpecificGetDto>()
+    .ForMember(dest => dest.UnitOfMeasureName, opt => opt.MapFrom(src => src.UnitOfMeasure.UnitName))
+    .ForMember(dest => dest.RouteName, opt => opt.MapFrom(src => src.AdministrationRoute.RouteName));
+
+        CreateMap<MedicationSpecificCreateDto, MedicationSpecific>();
+        CreateMap<MedicationSpecificUpdateDto, MedicationSpecific>();
+
+
     }
 }

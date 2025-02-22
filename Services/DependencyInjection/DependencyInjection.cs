@@ -34,6 +34,7 @@ using Domain.Entities.Administration;
 using Domain.Entities.Informative;
 using Infrastructure.Persistence.AppDbContext;
 using Infrastructure.Services.Informative.MappingProfiles;
+using Infrastructure.Services.Administrative.MedicationSpecifics;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -113,6 +114,7 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<ISvGenericRepository<HealthcareCenter>, SvGenericRepository<HealthcareCenter>>();
             services.AddScoped<ISvGenericRepository<AppointmentStatus>, SvGenericRepository<AppointmentStatus>>();
             services.AddScoped<ISvGenericRepository<Note>, SvGenericRepository<Note>>();
+            services.AddScoped<ISvGenericRepository<MedicationSpecific>, SvGenericRepository<MedicationSpecific>>();
             #endregion
 
             #region Services_Administrative
@@ -128,6 +130,8 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<ISvPaymentReceipt, SvPaymentReceipt>();
             services.AddScoped<ISvResident, SvResident>();
             services.AddScoped<ISvUser, SvUser>();
+            services.AddScoped<ISvMedicationSpecific, SvMedicationSpecific>();
+
             #endregion
 
             #region Services_Informative

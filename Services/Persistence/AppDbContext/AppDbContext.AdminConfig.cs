@@ -393,75 +393,144 @@ namespace Infrastructure.Persistence.AppDbContext
                 .HasForeignKey(i => i.ProductID)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Pathology>(entity =>
+            {
+                // Nombre de tabla
+                entity.ToTable("Pathologies");
+
+                // Clave primaria
+                entity.HasKey(e => e.Id_Pathology);
+
+                // Columnas
+                entity.Property(e => e.Name_Pathology)
+                      .HasMaxLength(200)
+                      .IsRequired();
+
+                // Relación con ResidentPathology
+                entity.HasMany(p => p.ResidentPathologies)
+                      .WithOne(rp => rp.Pathology)
+                      .HasForeignKey(rp => rp.Id_Pathology)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ---------------------------------------------------------------------
+            // 2) ADMINISTRATION ROUTE
+            // ---------------------------------------------------------------------
+            modelBuilder.Entity<AdministrationRoute>(entity =>
+            {
+                entity.ToTable("AdministrationRoutes");
+                entity.HasKey(e => e.Id_AdministrationRoute);
+
+                entity.Property(e => e.RouteName)
+                      .HasMaxLength(100)
+                      .IsRequired();
+
+                // Relación con MedicationSpecific
+                entity.HasMany(ar => ar.MedicationSpecifics)
+                      .WithOne(ms => ms.AdministrationRoute)
+                      .HasForeignKey(ms => ms.Id_AdministrationRoute)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+
             modelBuilder.Entity<ResidentMedication>()
           .HasKey(rm => rm.Id_ResidentMedication);
 
 
-            modelBuilder.Entity<MedicationSpecific>()
-                .HasKey(e => e.Id_MedicamentSpecific);
-
+            // ---------------------------------------------------------------------
+            // 4) MEDICATION SPECIFIC
+            // ---------------------------------------------------------------------
             modelBuilder.Entity<MedicationSpecific>(entity =>
             {
-                entity.ToTable("MedicationSpecifics");
+                entity.ToTable("MedicationsSpecific");
+                entity.HasKey(ms => ms.Id_MedicamentSpecific);
 
                 entity.Property(e => e.Name_MedicamentSpecific)
-                    .IsRequired()
-                    .HasMaxLength(200);
+                      .HasMaxLength(200)
+                      .IsRequired();
 
                 entity.Property(e => e.SpecialInstructions)
-                    .HasMaxLength(1000);
+                      .HasMaxLength(1000);
 
                 entity.Property(e => e.AdministrationSchedule)
-                    .HasMaxLength(500);
+                      .HasMaxLength(500);
 
-                entity.HasOne(e => e.UnitOfMeasure)
-                    .WithMany(u => u.MedicationsSpecific)
-                    .HasForeignKey(e => e.UnitOfMeasureID);
+                // FK a UnitOfMeasure
+                entity.HasOne(ms => ms.UnitOfMeasure)
+                  .WithMany(u => u.MedicationsSpecific) 
+                  .HasForeignKey(ms => ms.UnitOfMeasureID)
+                  .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(e => e.AdministrationRoute)
-                    .WithMany(a => a.MedicationSpecifics)
-                    .HasForeignKey(e => e.Id_AdministrationRoute);
+                // FK a AdministrationRoute
+                entity.HasOne(ms => ms.AdministrationRoute)
+                      .WithMany(ar => ar.MedicationSpecifics)
+                      .HasForeignKey(ms => ms.Id_AdministrationRoute)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Relación con ResidentMedication
+                entity.HasMany(ms => ms.ResidentMedications)
+                      .WithOne(rm => rm.MedicationSpecific)
+                      .HasForeignKey(rm => rm.Id_MedicamentSpecific)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
 
-            modelBuilder.Entity<AdministrationRoute>()
-                .HasKey(e => e.Id_AdministrationRoute);
-
-            modelBuilder.Entity<AdministrationRoute>(entity =>
-            {
-                entity.ToTable("AdministrationRoutes");
-
-                entity.Property(e => e.RouteName)
-                    .IsRequired()
-                    .HasMaxLength(100);
-            });
 
 
 
+            // ---------------------------------------------------------------------
+            // 5) RESIDENT MEDICATION
+            // ---------------------------------------------------------------------
             modelBuilder.Entity<ResidentMedication>(entity =>
             {
                 entity.ToTable("ResidentMedications");
-                entity.Property(e => e.StartDate)
-                    .IsRequired();
-                entity.Property(e => e.EndDate)
-                    .IsRequired();
+                entity.HasKey(e => e.Id_ResidentMedication);
+
+                // Ejemplo en MySQL para decimal (18,2); ajusta si requieres otro scale
                 entity.Property(e => e.PrescribedDose)
-                    .IsRequired();
-                entity.HasOne(e => e.Resident)
-                    .WithMany(r => r.ResidentMedications)
-                    .HasForeignKey(e => e.Id_Resident);
-                entity.HasOne(e => e.MedicationSpecific)
-                    .WithMany(m => m.ResidentMedications)
-                    .HasForeignKey(e => e.Id_MedicamentSpecific);
+                      .HasColumnType("decimal(18,2)")
+                      .IsRequired();
+
+                // Tiempos: StartDate y EndDate => DATETIME/DATE en la DB
+                // ... si deseas formatearlos en la BD, se hace con HasColumnType("datetime")
+
+                // Relación con Resident
+                entity.HasOne(rm => rm.Resident)
+                      .WithMany(r => r.ResidentMedications)
+                      .HasForeignKey(rm => rm.Id_Resident)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Relación con MedicationSpecific
+                entity.HasOne(rm => rm.MedicationSpecific)
+                      .WithMany(ms => ms.ResidentMedications)
+                      .HasForeignKey(rm => rm.Id_MedicamentSpecific)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
 
+            // ---------------------------------------------------------------------
+            // 6) RESIDENT PATHOLOGY
+            // ---------------------------------------------------------------------
+            modelBuilder.Entity<ResidentPathology>(entity =>
+            {
+                entity.ToTable("ResidentPathologies");
+                entity.HasKey(e => e.Id_ResidentPathology);
 
-             modelBuilder.Entity<Pathology>()
-                .HasKey(p => p.Id_Pathology);
+                entity.Property(e => e.Resume_Pathology)
+                      .HasMaxLength(1000);
 
-            modelBuilder.Entity<ResidentPathology>()
-                .HasKey(rp => rp.Id_ResidentPathology);
-            modelBuilder.Entity<ResidentMedication>()
-                .HasKey(rm => rm.Id_ResidentMedication);
+                // Relación con Resident
+                entity.HasOne(rp => rp.Resident)
+                      .WithMany(r => r.ResidentPathologies)
+                      .HasForeignKey(rp => rp.Id_Resident)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Relación con Pathology
+                entity.HasOne(rp => rp.Pathology)
+                      .WithMany(p => p.ResidentPathologies)
+                      .HasForeignKey(rp => rp.Id_Pathology)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+       
 
         }
     }

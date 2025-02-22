@@ -18,6 +18,10 @@ namespace Domain.Entities.Administration
 
         [MaxLength(500)]
         public string AdministrationSchedule { get; set; } // Información sobre la frecuencia de toma
+
+
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? UpdatedAt { get; set; }
         #endregion
 
         #region Relations
