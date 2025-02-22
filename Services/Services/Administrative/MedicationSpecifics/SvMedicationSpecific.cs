@@ -28,6 +28,7 @@ namespace Infrastructure.Services.Administrative.MedicationSpecifics
         public async Task<IEnumerable<MedicationSpecificGetDto>> GetAllAsync()
         {
             var entities = await _medSpecRepository.Query()
+         .AsNoTracking()
          .Include(ms => ms.UnitOfMeasure)
          .Include(ms => ms.AdministrationRoute)
          .ToListAsync();
@@ -38,11 +39,16 @@ namespace Infrastructure.Services.Administrative.MedicationSpecifics
 
         public async Task<MedicationSpecificGetDto> GetByIdAsync(int id)
         {
-            var entity = await _medSpecRepository.GetByIdAsync(id);
-            if (entity == null)
+            var entities = await _medSpecRepository.Query()
+            .AsNoTracking()
+           .Include(ms => ms.UnitOfMeasure)
+           .Include(ms => ms.AdministrationRoute)
+           .FirstOrDefaultAsync(ms => ms.Id_MedicamentSpecific == id);
+
+            if (entities == null)
                 throw new KeyNotFoundException($"MedicationSpecific con ID {id} no encontrado.");
 
-            return _mapper.Map<MedicationSpecificGetDto>(entity);
+            return _mapper.Map<MedicationSpecificGetDto>(entities);
         }
 
         public async Task<MedicationSpecificGetDto> CreateAsync(MedicationSpecificCreateDto dto)
