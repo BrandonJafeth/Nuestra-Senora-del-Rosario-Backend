@@ -82,11 +82,14 @@ namespace Infrastructure.Services.Administrative.Residents
         {
             var resident = await _residentRepository.Query()
                 .Include(r => r.ResidentMedications)
-                .ThenInclude(rm => rm.MedicationSpecific)
-                 .ThenInclude(ms => ms.UnitOfMeasure)  
+                    .ThenInclude(rm => rm.MedicationSpecific)
+                        .ThenInclude(ms => ms.UnitOfMeasure)
                 .Include(r => r.ResidentPathologies)
-                .ThenInclude(rp => rp.Pathology)
+                    .ThenInclude(rp => rp.Pathology)
                 .Include(r => r.Appointments)
+                    .ThenInclude(a => a.HealthcareCenter)
+                .Include(r => r.Appointments)
+                    .ThenInclude(a => a.Companion) 
                 .AsNoTracking()
                 .FirstOrDefaultAsync(r => r.Id_Resident == id);
 

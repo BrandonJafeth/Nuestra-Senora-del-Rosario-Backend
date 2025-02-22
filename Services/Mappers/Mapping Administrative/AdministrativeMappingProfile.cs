@@ -342,6 +342,10 @@ public class AdministrativeMappingProfile : Profile
         CreateMap<Appointment, AppointmentMinimalDto>()
                 .ForMember(dest => dest.Id_Appointment, opt => opt.MapFrom(src => src.Id_Appointment))
                 .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
-                .ForMember(dest => dest.Time, opt => opt.MapFrom(src => src.Time));
+                .ForMember(dest => dest.Time, opt => opt.MapFrom(src => src.Time))
+            .ForMember(dest => dest.AppointmentManager,
+               opt => opt.MapFrom(src => src.Companion.First_Name + " " + src.Companion.Last_Name1))
+             .ForMember(dest => dest.HealthcareCenterName,
+               opt => opt.MapFrom(src => src.HealthcareCenter.Name_HC));
     }
 }

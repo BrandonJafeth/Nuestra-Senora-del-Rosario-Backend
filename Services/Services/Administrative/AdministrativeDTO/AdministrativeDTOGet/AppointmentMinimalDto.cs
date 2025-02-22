@@ -11,5 +11,7 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.Administrativ
         public int Id_Appointment { get; set; }
         public DateTime Date { get; set; }
         public TimeSpan Time { get; set; }
+        public string AppointmentManager { get; set; }
+        public string HealthcareCenterName { get; set; }
     }
 }
