@@ -77,12 +77,13 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.EmployeeServi
         }
 
         // Obtener empleados con profesiones específicas
-        public async Task<IEnumerable<EmployeeByProfessionDTO>> GetEmployeesByProfessionAsync(int professionId)
+        public async Task<IEnumerable<EmployeeByProfessionDTO>> GetEmployeesByProfessionsAsync(IEnumerable<int> professionIds)
         {
             var employees = await _employeeRepository.Query()
-                .Where(e => e.Id_Profession == professionId)
+                .Where(e => professionIds.Contains(e.Id_Profession))
                 .Select(e => new EmployeeByProfessionDTO
                 {
+                    Id_Employee = e.Id_Employee,
                     Dni = e.Dni,
                     FullName = $"{e.First_Name} {e.Last_Name1} {e.Last_Name2}",
                     Email = e.Email,
@@ -92,5 +93,6 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.EmployeeServi
 
             return employees;
         }
+
     }
 }

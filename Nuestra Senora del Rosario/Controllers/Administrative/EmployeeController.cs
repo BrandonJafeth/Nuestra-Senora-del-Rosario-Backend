@@ -94,13 +94,13 @@ public class EmployeeController : ControllerBase
         }
     }
 
-    // Obtener empleados por profesión
-    [HttpGet("by-profession/{professionId}")]
-    public async Task<IActionResult> GetEmployeesByProfession(int professionId)
+    // GET: api/Employee/by-professions?professionIds=1&professionIds=2&professionIds=3
+    [HttpGet("by-professions")]
+    public async Task<IActionResult> GetEmployeesByProfessions([FromQuery] IEnumerable<int> professionIds)
     {
         try
         {
-            var employees = await _employeeService.GetEmployeesByProfessionAsync(professionId);
+            var employees = await _employeeService.GetEmployeesByProfessionsAsync(professionIds);
             return Ok(employees);
         }
         catch (Exception ex)
@@ -108,4 +108,5 @@ public class EmployeeController : ControllerBase
             return StatusCode(500, $"Error interno: {ex.Message}");
         }
     }
+
 }

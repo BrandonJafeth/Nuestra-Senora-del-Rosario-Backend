@@ -10,5 +10,7 @@ public class UserCreateDto
     public bool IsActive { get; set; } = true; // Estado del usuario
     public string FullName { get; set; }
 
+    public int Id_Role { get; set; }
+
 }
 

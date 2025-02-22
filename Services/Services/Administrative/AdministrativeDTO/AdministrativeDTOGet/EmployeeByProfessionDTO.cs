@@ -8,6 +8,8 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.Administrativ
 {
     public class EmployeeByProfessionDTO
     {
+
+        public int Id_Employee { get; set; }
         public int Dni { get; set; }
         public string FullName { get; set; }
         public string Email { get; set; }

@@ -28,6 +28,8 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.Administrativ
 
         public int Id_Pathology { get; set; }
         public string Name_Pathology { get; set; }
+
+       
     }
 
 }

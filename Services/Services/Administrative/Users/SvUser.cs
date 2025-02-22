@@ -82,8 +82,17 @@ namespace Infrastructure.Services.Administrative.Users
             user.PasswordExpiration = DateTime.Now.AddDays(10);
             user.FullName = userCreateDto.FullName;
 
+            // Guardar el usuario
             await _userRepository.AddAsync(user);
             await _userRepository.SaveChangesAsync();
+
+            var userRole = new UserRoles
+            {
+                Id_User = user.Id_User,
+                Id_Role = userCreateDto.Id_Role
+            };
+            await _userRoleRepository.AddAsync(userRole);
+            await _userRoleRepository.SaveChangesAsync();
 
             await SendUserCredentialsEmailAsync(user.DNI, user.Email, tempPassword, user.FullName);
         }
@@ -235,28 +244,30 @@ namespace Infrastructure.Services.Administrative.Users
             return GenerateJwtToken(user);
         }
 
-        // Generar JWT con el rol del usuario
+        // Generar JWT con la lista de roles del usuario
         private string GenerateJwtToken(User user)
         {
-            // Obtener el rol del usuario desde la relación UserRoles
-            var userRole = _userRoleRepository.Query()
+            // Obtener la lista de roles asignados al usuario
+            var userRoles = _userRoleRepository.Query()
                 .Include(ur => ur.Role)
                 .Where(ur => ur.Id_User == user.Id_User)
                 .Select(ur => ur.Role.Name_Role)
-                .FirstOrDefault();
+                .ToList();
 
-            if (string.IsNullOrEmpty(userRole))
+            if (userRoles == null || !userRoles.Any())
             {
                 throw new ApplicationException("El usuario no tiene un rol asignado.");
             }
 
-            // Crear los claims del token
+            // Crear los claims básicos
             var claims = new List<Claim>
     {
         new Claim(JwtRegisteredClaimNames.Sub, user.Id_User.ToString()), // Identificador del usuario
-        new Claim("dni", user.DNI.ToString()), // DNI del usuario
-        new Claim(ClaimTypes.Role, userRole) // Rol del usuario
+        new Claim("dni", user.DNI.ToString()) // DNI del usuario
     };
+
+            // Añadir cada rol como un claim individual
+            claims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             // Generar la clave y las credenciales para el token
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -264,16 +275,17 @@ namespace Infrastructure.Services.Administrative.Users
 
             // Crear el token JWT
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"], // Emisor
-                audience: _configuration["Jwt:Audience"], // Audiencia
+                issuer: _configuration["Jwt:Issuer"],      // Emisor
+                audience: _configuration["Jwt:Audience"],  // Audiencia
                 claims: claims,
-                expires: DateTime.Now.AddHours(1), // Expiración en 1 hora
-                signingCredentials: creds // Credenciales de firma
+                expires: DateTime.Now.AddHours(1),         // Expiración en 1 hora
+                signingCredentials: creds                  // Credenciales de firma
             );
 
             // Retornar el token como string
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
 
 
         // Enviar correo con credenciales
