@@ -282,5 +282,25 @@ public class AdministrativeMappingProfile : Profile
         CreateMap<MedicationSpecificUpdateDto, MedicationSpecific>();
 
 
+        CreateMap<AdministrationRoute, AdministrationRouteGetDto>()
+    .ForMember(dest => dest.Id_AdministrationRoute, opt => opt.MapFrom(src => src.Id_AdministrationRoute))
+    .ForMember(dest => dest.RouteName, opt => opt.MapFrom(src => src.RouteName));
+  
+        CreateMap<AdministrationRouteCreateDto, AdministrationRoute>();
+        CreateMap<AdministrationRouteUpdateDto, AdministrationRoute>();
+
+
+        CreateMap<Pathology, PathologyGetDto>()
+     .ForMember(dest => dest.Id_Pathology, opt => opt.MapFrom(src => src.Id_Pathology))
+      .ForMember(dest => dest.Name_Pathology, opt => opt.MapFrom(src => src.Name_Pathology));
+
+
+
+
+        CreateMap<PathologyCreateDto, Pathology>();
+        CreateMap<PathologyUpdateDto, Pathology>();
+
+
+
     }
 }

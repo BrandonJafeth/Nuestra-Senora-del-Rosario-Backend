@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace Nuestra_Senora_del_Rosario.Controllers
+namespace Nuestra_Senora_del_Rosario.Controllers.Administrative
 {
     [ApiController]
     [Route("api/[controller]")]
