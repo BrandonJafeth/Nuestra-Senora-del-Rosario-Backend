@@ -20,8 +20,11 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.Administrativ
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
+        // Relaciones
+        public int Id_Resident { get; set; }
         public string ResidentName { get; set; } // Ejemplo
 
+        public int Id_MedicamentSpecific { get; set; }
         public string Name_MedicamentSpecific { get; set; } // Ejemplo
     }
 
