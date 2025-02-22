@@ -16,7 +16,7 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.EmployeeServi
 
         Task UpdateEmployeeAsync(int dni, EmployeeUpdateDto employeeUpdateDto);
 
-        Task<IEnumerable<EmployeeByProfessionDTO>> GetEmployeesByProfessionAsync(int professionId);
+        Task<IEnumerable<EmployeeByProfessionDTO>> GetEmployeesByProfessionsAsync(IEnumerable<int> professionIds);
 
 
     }

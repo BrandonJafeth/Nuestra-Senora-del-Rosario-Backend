@@ -15,15 +15,16 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.Administrativ
         public string Cedula_RD { get; set; }
         public string Sexo { get; set; }
         public DateTime FechaNacimiento { get; set; }
+        public int Age { get; set; }
         public string Status { get; set; }
         public DateTime EntryDate { get; set; }
         public string Location_RD { get; set; }
 
-        // Para medicamentos, queremos solo el nombre
-        public IEnumerable<string> MedicationNames { get; set; }
+        // Para medicamentos: colección de DTOs con información detallada
+        public IEnumerable<ResidentMedicationMinimalDto> Medications { get; set; }
 
-        // Para patologías, solo el nombre
-        public IEnumerable<string> PathologyNames { get; set; }
+        // Para patologías: colección de DTOs con información detallada
+        public IEnumerable<ResidentPathologyMinimalDto> Pathologies { get; set; }
 
         // Información mínima de las citas
         public IEnumerable<AppointmentMinimalDto> Appointments { get; set; }

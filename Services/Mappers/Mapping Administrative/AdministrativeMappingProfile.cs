@@ -329,14 +329,30 @@ public class AdministrativeMappingProfile : Profile
 
         // Mapear de Resident a ResidentMinimalInfoDto
         CreateMap<Resident, ResidentMinimalInfoDto>()
-        .ForMember(dest => dest.MedicationNames,
-                   opt => opt.MapFrom(src => src.ResidentMedications
-                        .Select(rm => rm.MedicationSpecific.Name_MedicamentSpecific)))
-        .ForMember(dest => dest.PathologyNames,
-                   opt => opt.MapFrom(src => src.ResidentPathologies
-                        .Select(rp => rp.Pathology.Name_Pathology)))
-        .ForMember(dest => dest.Appointments,
-                   opt => opt.MapFrom(src => src.Appointments));
+            .ForMember(dest => dest.Age, opt => opt.MapFrom(src =>
+                DateTime.Now.Month > src.FechaNacimiento.Month ||
+                (DateTime.Now.Month == src.FechaNacimiento.Month && DateTime.Now.Day >= src.FechaNacimiento.Day)
+                    ? DateTime.Now.Year - src.FechaNacimiento.Year
+                    : DateTime.Now.Year - src.FechaNacimiento.Year - 1))
+            // Mapear las colecciones utilizando los DTOs mínimos
+            .ForMember(dest => dest.Medications, opt => opt.MapFrom(src => src.ResidentMedications))
+            .ForMember(dest => dest.Pathologies, opt => opt.MapFrom(src => src.ResidentPathologies))
+            .ForMember(dest => dest.Appointments, opt => opt.MapFrom(src => src.Appointments));
+
+        CreateMap<ResidentMedication, ResidentMedicationMinimalDto>()
+    .ForMember(dest => dest.Id_ResidentMedication, opt => opt.MapFrom(src => src.Id_ResidentMedication))
+    .ForMember(dest => dest.Id_MedicamentSpecific, opt => opt.MapFrom(src => src.Id_MedicamentSpecific))
+    .ForMember(dest => dest.Name_MedicamentSpecific, opt => opt.MapFrom(src => src.MedicationSpecific.Name_MedicamentSpecific))
+    .ForMember(dest => dest.PrescribedDose, opt => opt.MapFrom(src => src.PrescribedDose))
+    .ForMember(dest => dest.UnitOfMeasureName, opt => opt.MapFrom(src => src.MedicationSpecific.UnitOfMeasure.UnitName))
+    .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes));
+
+        CreateMap<ResidentPathology, ResidentPathologyMinimalDto>()
+            .ForMember(dest => dest.Id_ResidentPathology, opt => opt.MapFrom(src => src.Id_ResidentPathology))
+            .ForMember(dest => dest.Id_Pathology, opt => opt.MapFrom(src => src.Id_Pathology))
+            .ForMember(dest => dest.Name_Pathology, opt => opt.MapFrom(src => src.Pathology.Name_Pathology))
+            .ForMember(dest => dest.Resume_Pathology, opt => opt.MapFrom(src => src.Resume_Pathology))
+            .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes));
 
         // Mapear de Appointment a AppointmentMinimalDto
         CreateMap<Appointment, AppointmentMinimalDto>()

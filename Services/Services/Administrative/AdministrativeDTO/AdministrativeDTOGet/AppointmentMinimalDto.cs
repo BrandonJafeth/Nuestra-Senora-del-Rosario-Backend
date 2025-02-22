@@ -13,5 +13,7 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.Administrativ
         public TimeSpan Time { get; set; }
         public string AppointmentManager { get; set; }
         public string HealthcareCenterName { get; set; }
+
+        public string Notes { get; set; }   
     }
 }

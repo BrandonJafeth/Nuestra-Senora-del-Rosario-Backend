@@ -17,7 +17,7 @@ namespace Domain.Entities.Administration
         public string Notes { get; set; }
         #endregion
         #region Audit
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
 
         #endregion
