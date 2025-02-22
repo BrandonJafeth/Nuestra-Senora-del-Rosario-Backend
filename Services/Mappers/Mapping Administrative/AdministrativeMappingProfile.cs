@@ -327,6 +327,21 @@ public class AdministrativeMappingProfile : Profile
             .ForMember(dest => dest.RegisterDate, opt => opt.MapFrom(src => DateOnly.Parse(src.RegisterDate)));
 
 
+        // Mapear de Resident a ResidentMinimalInfoDto
+        CreateMap<Resident, ResidentMinimalInfoDto>()
+        .ForMember(dest => dest.MedicationNames,
+                   opt => opt.MapFrom(src => src.ResidentMedications
+                        .Select(rm => rm.MedicationSpecific.Name_MedicamentSpecific)))
+        .ForMember(dest => dest.PathologyNames,
+                   opt => opt.MapFrom(src => src.ResidentPathologies
+                        .Select(rp => rp.Pathology.Name_Pathology)))
+        .ForMember(dest => dest.Appointments,
+                   opt => opt.MapFrom(src => src.Appointments));
 
+        // Mapear de Appointment a AppointmentMinimalDto
+        CreateMap<Appointment, AppointmentMinimalDto>()
+                .ForMember(dest => dest.Id_Appointment, opt => opt.MapFrom(src => src.Id_Appointment))
+                .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
+                .ForMember(dest => dest.Time, opt => opt.MapFrom(src => src.Time));
     }
 }
