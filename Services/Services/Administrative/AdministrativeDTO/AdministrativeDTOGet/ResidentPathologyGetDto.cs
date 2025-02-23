@@ -24,7 +24,7 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.Administrativ
 
         // Relaciones
         public int Id_Resident { get; set; }
-        public string ResidentName { get; set; }
+        public string ResidentFullName { get; set; }
 
         public int Id_Pathology { get; set; }
         public string Name_Pathology { get; set; }
