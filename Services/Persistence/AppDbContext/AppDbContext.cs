@@ -62,6 +62,10 @@ namespace Infrastructure.Persistence.AppDbContext
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Inventory> Inventories { get; set; }
+
+        public DbSet<MedicalHistory> MedicalHistories { get; set; }
+
+
         #endregion
 
         #region Informative_DbSets
