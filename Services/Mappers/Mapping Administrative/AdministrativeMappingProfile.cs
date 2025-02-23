@@ -302,7 +302,7 @@ public class AdministrativeMappingProfile : Profile
 
 
         CreateMap<ResidentMedication, ResidentMedicationGetDto>()
-            .ForMember(dest => dest.ResidentName, opt => opt.MapFrom(src => src.Resident.Name_RD))
+             .ForMember(dest => dest.ResidentFullName, opt => opt.MapFrom(src => $"{src.Resident.Name_RD} {src.Resident.Lastname1_RD} {src.Resident.Lastname2_RD}"))
             .ForMember(dest => dest.Name_MedicamentSpecific, opt => opt.MapFrom(src => src.MedicationSpecific.Name_MedicamentSpecific))
             .ForMember(dest => dest.UnitOfMeasureName, opt => opt.MapFrom(src => src.MedicationSpecific.UnitOfMeasure.UnitName));
 
@@ -315,7 +315,7 @@ public class AdministrativeMappingProfile : Profile
         CreateMap<ResidentPathology, ResidentPathologyGetDto>()
             .ForMember(dest => dest.DiagnosisDate, opt => opt.MapFrom(src => src.DiagnosisDate.ToString("yyyy-MM-dd")))
             .ForMember(dest => dest.RegisterDate, opt => opt.MapFrom(src => src.RegisterDate.ToString("yyyy-MM-dd")))
-            .ForMember(dest => dest.ResidentName, opt => opt.MapFrom(src => src.Resident.Name_RD))
+            .ForMember(dest => dest.ResidentFullName, opt => opt.MapFrom(src => $"{src.Resident.Name_RD} {src.Resident.Lastname1_RD} {src.Resident.Lastname2_RD}"))
             .ForMember(dest => dest.Name_Pathology, opt => opt.MapFrom(src => src.Pathology.Name_Pathology));
 
         CreateMap<ResidentPathologyCreateDto, ResidentPathology>()

@@ -76,7 +76,6 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.EmployeeServi
             return (_mapper.Map<IEnumerable<EmployeeGetDTO>>(employees), totalPages);
         }
 
-        // Obtener empleados con profesiones específicas
         public async Task<IEnumerable<EmployeeByProfessionDTO>> GetEmployeesByProfessionsAsync(IEnumerable<int> professionIds)
         {
             var employees = await _employeeRepository.Query()
