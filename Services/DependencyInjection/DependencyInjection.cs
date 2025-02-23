@@ -37,6 +37,7 @@ using Infrastructure.Services.Informative.MappingProfiles;
 using Infrastructure.Services.Administrative.MedicationSpecifics;
 using Infrastructure.Services.Administrative.ResidentMedications;
 using Infrastructure.Services.Administrative.ResidentPathologies;
+using Infrastructure.Services.Administrative.MedicalHistories;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -121,6 +122,7 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<ISvGenericRepository<Pathology>, SvGenericRepository<Pathology>>();
             services.AddScoped<ISvGenericRepository<ResidentPathology>, SvGenericRepository<ResidentPathology>>();
             services.AddScoped<ISvGenericRepository<ResidentMedication>, SvGenericRepository<ResidentMedication>>();
+            services.AddScoped<ISvGenericRepository<MedicalHistory>, SvGenericRepository<MedicalHistory>>();
             #endregion
 
             #region Services_Administrative
@@ -139,6 +141,7 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<ISvMedicationSpecific, SvMedicationSpecific>();
             services.AddScoped<ISvResidentMedication, SvResidentMedication>();
             services.AddScoped<ISvResidentPathology, SvResidentPathology>();
+            services.AddScoped<ISvMedicalHistory, SvMedicalHistory>();
 
             #endregion
 

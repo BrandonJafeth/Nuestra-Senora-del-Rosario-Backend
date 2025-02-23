@@ -530,7 +530,31 @@ namespace Infrastructure.Persistence.AppDbContext
                       .OnDelete(DeleteBehavior.Restrict);
             });
 
-       
+            // Configuración de la entidad MedicalHistory
+            modelBuilder.Entity<MedicalHistory>(entity =>
+            {
+                entity.HasKey(m => m.Id_MedicalHistory);
+
+                entity.Property(m => m.Diagnosis)
+                      .IsRequired()
+                      .HasMaxLength(1000);
+
+                entity.Property(m => m.Treatment)
+                      .HasMaxLength(1000);
+
+                entity.Property(m => m.Observations)
+                      .HasColumnType("TEXT");
+
+                // Configurar la relación 1:N con Resident
+                entity.HasOne(m => m.Resident)
+                      .WithMany(r => r.MedicalHistories)
+                      .HasForeignKey(m => m.Id_Resident)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+
+
+
 
         }
     }

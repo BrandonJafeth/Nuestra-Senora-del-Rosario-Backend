@@ -363,5 +363,23 @@ public class AdministrativeMappingProfile : Profile
                opt => opt.MapFrom(src => src.Companion.First_Name + " " + src.Companion.Last_Name1))
              .ForMember(dest => dest.HealthcareCenterName,
                opt => opt.MapFrom(src => src.HealthcareCenter.Name_HC));
+
+
+
+        CreateMap<MedicalHistory, MedicalHistoryGetDto>()
+            .ForMember(dest => dest.ResidentFullName, opt => opt.MapFrom(src => $"{src.Resident.Name_RD} {src.Resident.Lastname1_RD} {src.Resident.Lastname2_RD}"));
+
+
+        CreateMap<MedicalHistoryCreateDto, MedicalHistory>()
+                   .ForMember(dest => dest.CreationDate, opt => opt.Ignore())
+                   .ForMember(dest => dest.EditDate, opt => opt.Ignore());
+
+
+        CreateMap<MedicalHistoryUpdateDto, MedicalHistory>()
+                .ForMember(dest => dest.Id_MedicalHistory, opt => opt.Ignore())
+                .ForMember(dest => dest.Id_Resident, opt => opt.Ignore())
+                .ForMember(dest => dest.Resident, opt => opt.Ignore())
+                .ForMember(dest => dest.CreationDate, opt => opt.Ignore())
+                .ForMember(dest => dest.EditDate, opt => opt.MapFrom(src => DateTime.Now));
     }
 }

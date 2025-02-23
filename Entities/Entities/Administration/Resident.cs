@@ -55,7 +55,9 @@ namespace Domain.Entities.Administration
 
         public ICollection<ResidentPathology> ResidentPathologies { get; set; }
 
-        // Esta propiedad es opcional si deseas cargar el último nivel de dependencia
+        public ICollection<MedicalHistory> MedicalHistories { get; set; }
+
+
         [NotMapped]
         public DependencyHistory LatestDependencyHistory => DependencyHistories?.OrderByDescending(d => d.Id_History).FirstOrDefault();
     }
