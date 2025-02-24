@@ -37,6 +37,18 @@ namespace Infrastructure.Services.Administrative.MedicalHistories
             return _mapper.Map<MedicalHistoryGetDto>(entity);
         }
 
+
+        public async Task<IEnumerable<MedicalHistoryGetDto>> GetByResidentIdAsync(int residentId)
+        {
+            var histories = await _medicalHistoryRepository.Query()
+                .Where(mh => mh.Id_Resident == residentId)
+                .AsNoTracking()
+                .Include(mh => mh.Resident)
+                .ToListAsync();
+
+            return _mapper.Map<IEnumerable<MedicalHistoryGetDto>>(histories);
+        }
+
         // Crea un nuevo historial médico
         public async Task<MedicalHistoryGetDto> CreateAsync(MedicalHistoryCreateDto dto)
         {

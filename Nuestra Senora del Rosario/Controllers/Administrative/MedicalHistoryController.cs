@@ -37,6 +37,21 @@ namespace Nuestra_Senora_del_Rosario.Controllers.Administrative
             }
         }
 
+        // GET: api/MedicalHistory/resident/{residentId}
+        [HttpGet("resident/{residentId}")]
+        public async Task<IActionResult> GetByResidentId(int residentId)
+        {
+            try
+            {
+                var histories = await _medicalHistoryService.GetByResidentIdAsync(residentId);
+                return Ok(histories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal error: {ex.Message}");
+            }
+        }
+
         // POST: api/MedicalHistory
         [HttpPost]
         public async Task<IActionResult> CreateMedicalHistory([FromBody] MedicalHistoryCreateDto createDto)
