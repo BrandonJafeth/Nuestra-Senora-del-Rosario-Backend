@@ -2,6 +2,7 @@
 using Domain.Entities.Administration;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
+using Infrastructure.Services.Informative.DTOS.CreatesDto;
 using Microsoft.AspNetCore.Mvc;
 using Services.GenericService;
 
@@ -49,16 +50,26 @@ public class AppointmentStatusController : ControllerBase
             _mapper.Map<AppointmentStatusGetDto>(status));
     }
 
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] AppointmentStatusCreateUpdateDto dto)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateAppointmentStatus(int id, [FromBody] AppointmentStatusUpdateDTO updateDto)
     {
-        var existingStatus = await _statusRepository.GetByIdAsync(id);
-        if (existingStatus == null) return NotFound($"Status with ID {id} not found.");
+        // Verificar que el DTO sea válido
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
 
-        _mapper.Map(dto, existingStatus);
+        var existingSection = await _statusRepository.GetByIdAsync(id);
+        if (existingSection == null)
+        {
+            return NotFound($"AppointmentStatus con ID {id} no fue encontrada.");
+        }
+
+
+        _mapper.Map(updateDto, existingSection);
         await _statusRepository.SaveChangesAsync();
 
-        return Ok(_mapper.Map<AppointmentStatusGetDto>(existingStatus));
+        return Ok(existingSection);
     }
 
     [HttpDelete("{id}")]

@@ -1,4 +1,6 @@
-﻿using Domain.Entities.Informative;
+﻿using AutoMapper;
+using Domain.Entities.Informative;
+using Infrastructure.Services.Informative.DTOS.CreatesDto;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Services.GenericService;
@@ -9,9 +11,12 @@ public class AdministrativeRequirementsController : ControllerBase
 {
     private readonly ISvGenericRepository<AdministrativeRequirements> _administrativeRequirementsService;
 
-    public AdministrativeRequirementsController(ISvGenericRepository<AdministrativeRequirements> administrativeRequirementsService)
+
+    private readonly IMapper _mapper;
+    public AdministrativeRequirementsController(ISvGenericRepository<AdministrativeRequirements> administrativeRequirementsService,IMapper mapper)
     {
         _administrativeRequirementsService = administrativeRequirementsService;
+        _mapper = mapper;
     }
 
     [HttpGet]
@@ -40,19 +45,29 @@ public class AdministrativeRequirementsController : ControllerBase
         return CreatedAtAction(nameof(GetAdministrativeRequirement), new { id = requirement.Id_AdministrativeRequirement }, requirement);
     }
 
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchAdministrativeRequirement(int id, [FromBody] JsonPatchDocument<AdministrativeRequirements> patchDoc)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateAdministrariveRequeriments(int id, [FromBody] AdministrariveRequerimentsUpdateDTO updateDto)
     {
-        if (patchDoc == null)
+        // Verificar que el DTO sea válido
+        if (!ModelState.IsValid)
         {
-            return BadRequest();
+            return BadRequest(ModelState);
         }
 
-        await _administrativeRequirementsService.PatchAsync(id, patchDoc);
+        var existingSection = await _administrativeRequirementsService.GetByIdAsync(id);
+        if (existingSection == null)
+        {
+            return NotFound($"AdministrariveRequeriment con ID {id} no fue encontrada.");
+        }
+
+ 
+        _mapper.Map(updateDto, existingSection);
+
         await _administrativeRequirementsService.SaveChangesAsync();
 
-        return NoContent();
+        return Ok(existingSection);
     }
+
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAdministrativeRequirement(int id)

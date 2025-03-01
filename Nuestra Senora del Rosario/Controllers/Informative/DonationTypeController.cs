@@ -2,6 +2,7 @@
 using Domain.Entities.Informative;
 using Infrastructure.Services.Informative.DonationType;
 using Infrastructure.Services.Informative.DTOS;
+using Infrastructure.Services.Informative.DTOS.CreatesDto;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -53,18 +54,24 @@ public class DonationTypeController : ControllerBase
         return CreatedAtAction(nameof(GetDonationType), new { id = donationType.Id_DonationType }, donationTypeDto);
     }
 
-    // PATCH: api/DonationType/{id}
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchDonationType(int id, [FromBody] JsonPatchDocument<DonationType> patchDoc)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateDonationsSection(int id, [FromBody] DonationTypeUpdateDTO updateDto)
     {
-        if (patchDoc == null)
+        // Verificar que el DTO sea válido
+        if (!ModelState.IsValid)
         {
-            return BadRequest();
+            return BadRequest(ModelState);
         }
 
-        await _donationTypeService.PatchAsync(id, patchDoc);
+        var existingSection = await _donationTypeService.GetByIdAsync(id);
+        if (existingSection == null)
+        {
+            return NotFound($"DonationType con ID {id} no fue encontrada.");
+        }
+
+        _mapper.Map(updateDto, existingSection);
         await _donationTypeService.SaveChangesAsync();
-        return NoContent();
+        return Ok(existingSection);
     }
 
     // DELETE: api/DonationType/{id}

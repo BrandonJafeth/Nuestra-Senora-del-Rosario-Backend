@@ -381,5 +381,18 @@ public class AdministrativeMappingProfile : Profile
                 .ForMember(dest => dest.Resident, opt => opt.Ignore())
                 .ForMember(dest => dest.CreationDate, opt => opt.Ignore())
                 .ForMember(dest => dest.EditDate, opt => opt.MapFrom(src => DateTime.Now));
+
+
+        CreateMap<AppointmentStatusUpdateDTO,AppointmentStatus>()
+            .ForMember(dest => dest.Id_StatusAP, opt => opt.Ignore());
+
+
+         CreateMap<DependencyLevelUpdateDTO,DependencyLevel>()
+            .ForMember(dest => dest.Id_DependencyLevel, opt => opt.Ignore());
+
+        CreateMap<HealthcareCenterUpdateDTO, HealthcareCenter>()
+            .ForMember(dest => dest.Id_HC, opt => opt.Ignore());
+
+
     }
 }
