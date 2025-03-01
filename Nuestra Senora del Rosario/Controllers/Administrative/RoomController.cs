@@ -4,16 +4,21 @@ using Services.GenericService;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Domain.Entities.Administration;
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
+using Infrastructure.Services.Informative.DTOS.CreatesDto;
+using AutoMapper;
 
 [ApiController]
 [Route("api/[controller]")]
 public class RoomController : ControllerBase
 {
     private readonly ISvGenericRepository<Room> _roomService;
+    private readonly IMapper _mapper;
 
-    public RoomController(ISvGenericRepository<Room> roomService)
+    public RoomController(ISvGenericRepository<Room> roomService, IMapper mapper)
     {
         _roomService = roomService;
+        _mapper = mapper;
     }
 
     // GET: api/room
@@ -51,25 +56,26 @@ public class RoomController : ControllerBase
         return CreatedAtAction(nameof(GetRoomById), new { id = room.Id_Room }, room);
     }
 
-    // PATCH: api/room/{id}
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchRoom(int id, [FromBody] JsonPatchDocument<Room> patchDoc)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateRoom(int id, [FromBody] RoomUpdateDTO updateDto)
     {
-        if (patchDoc == null)
+        // Verificar que el DTO sea válido
+        if (!ModelState.IsValid)
         {
-            return BadRequest("Invalid patch document.");
+            return BadRequest(ModelState);
         }
 
-        try
+        var existingSection = await _roomService.GetByIdAsync(id);
+        if (existingSection == null)
         {
-            await _roomService.PatchAsync(id, patchDoc);
-            await _roomService.SaveChangesAsync();
-            return NoContent();
+            return NotFound($"Room con ID {id} no fue encontrada.");
         }
-        catch (DbUpdateException ex)
-        {
-            return StatusCode(500, ex.InnerException?.Message ?? ex.Message);
-        }
+
+
+        _mapper.Map(updateDto, existingSection);
+        await _roomService.SaveChangesAsync();
+
+        return Ok(existingSection);
     }
 
     // DELETE: api/room/{id}

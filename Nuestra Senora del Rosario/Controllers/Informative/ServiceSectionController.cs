@@ -1,4 +1,7 @@
-﻿using Domain.Entities.Informative;
+﻿using AutoMapper;
+using Domain.Entities.Informative;
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
+using Infrastructure.Services.Informative.DTOS.CreatesDto;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Services.GenericService;
@@ -8,10 +11,12 @@ using Services.GenericService;
 public class ServiceSectionController : ControllerBase
 {
     private readonly ISvGenericRepository<ServiceSection> _serviceSectionService;
+    private readonly IMapper _mapper;
 
-    public ServiceSectionController(ISvGenericRepository<ServiceSection> serviceSectionService)
+    public ServiceSectionController(ISvGenericRepository<ServiceSection> serviceSectionService, IMapper mapper)
     {
         _serviceSectionService = serviceSectionService;
+        _mapper = mapper;
     }
 
     [HttpGet]
@@ -40,19 +45,28 @@ public class ServiceSectionController : ControllerBase
         return CreatedAtAction(nameof(GetServiceSection), new { id = serviceSection.Id_ServiceSection }, serviceSection);
     }
 
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchServiceSection(int id, [FromBody] JsonPatchDocument<ServiceSection> patchDoc)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdatServiceSection(int id, [FromBody] ServiceSectionUpdateDTO updateDto)
     {
-        if (patchDoc == null)
+        // Verificar que el DTO sea válido
+        if (!ModelState.IsValid)
         {
-            return BadRequest();
+            return BadRequest(ModelState);
         }
 
-        await _serviceSectionService.PatchAsync(id, patchDoc);
+        var existingSection = await _serviceSectionService.GetByIdAsync(id);
+        if (existingSection == null)
+        {
+            return NotFound($"ServiceSection con ID {id} no fue encontrada.");
+        }
+
+
+        _mapper.Map(updateDto, existingSection);
         await _serviceSectionService.SaveChangesAsync();
 
-        return NoContent();
+        return Ok(existingSection);
     }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteServiceSection(int id)
     {

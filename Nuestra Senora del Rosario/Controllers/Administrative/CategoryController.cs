@@ -59,33 +59,28 @@ public class CategoryController : ControllerBase
         return CreatedAtAction(nameof(GetCategoryById), new { id = category.CategoryID }, categoryDto);
     }
 
-    // PATCH: api/category/{id}
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchCategory(int id, [FromBody] JsonPatchDocument<CategoryCreateDTO> patchDoc)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryUpdateDTO updateDto)
     {
-        if (patchDoc == null)
-        {
-            return BadRequest("Invalid patch document.");
-        }
-
-        var category = await _categoryService.GetByIdAsync(id);
-        if (category == null)
-        {
-            return NotFound($"Category with ID {id} not found.");
-        }
-
-        var categoryToPatch = _mapper.Map<CategoryCreateDTO>(category);
-        patchDoc.ApplyTo(categoryToPatch, ModelState);
-
+        // Verificar que el DTO sea válido
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        _mapper.Map(categoryToPatch, category);
+        var existingSection = await _categoryService.GetByIdAsync(id);
+        if (existingSection == null)
+        {
+            return NotFound($"Category con ID {id} no fue encontrada.");
+        }
+
+
+        _mapper.Map(updateDto, existingSection);
         await _categoryService.SaveChangesAsync();
-        return NoContent();
+
+        return Ok(existingSection);
     }
+
 
     // DELETE: api/category/{id}
     [HttpDelete("{id}")]

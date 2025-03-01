@@ -1,4 +1,7 @@
-﻿using Domain.Entities.Informative;
+﻿using AutoMapper;
+using Domain.Entities.Informative;
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
+using Infrastructure.Services.Informative.DTOS.CreatesDto;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Services.GenericService;
@@ -8,10 +11,12 @@ using Services.GenericService;
 public class RegistrationSectionController : ControllerBase
 {
     private readonly ISvGenericRepository<RegistrationSection> _registrationSectionService;
+    private readonly IMapper _mapper;
 
-    public RegistrationSectionController(ISvGenericRepository<RegistrationSection> registrationSectionService)
+    public RegistrationSectionController(ISvGenericRepository<RegistrationSection> registrationSectionService, IMapper mapper)
     {
         _registrationSectionService = registrationSectionService;
+        _mapper = mapper;
     }
 
     [HttpGet]
@@ -22,19 +27,28 @@ public class RegistrationSectionController : ControllerBase
     }
 
 
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchRegistrationSection(int id, [FromBody] JsonPatchDocument<RegistrationSection> patchDoc)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateRegistrationSection(int id, [FromBody] RegistrationSectionUpdateDTO updateDto)
     {
-        if (patchDoc == null)
+        // Verificar que el DTO sea válido
+        if (!ModelState.IsValid)
         {
-            return BadRequest();
+            return BadRequest(ModelState);
         }
 
-        await _registrationSectionService.PatchAsync(id, patchDoc);
+        var existingSection = await _registrationSectionService.GetByIdAsync(id);
+        if (existingSection == null)
+        {
+            return NotFound($"RegistrationSection  con ID {id} no fue encontrada.");
+        }
+
+
+        _mapper.Map(updateDto, existingSection);
         await _registrationSectionService.SaveChangesAsync();
 
-        return NoContent();
+        return Ok(existingSection);
     }
+
 
 
 }

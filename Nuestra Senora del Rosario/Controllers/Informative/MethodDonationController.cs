@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Entities.Informative;
 using Infrastructure.Services.Informative.DTOS;
+using Infrastructure.Services.Informative.DTOS.CreatesDto;
 using Infrastructure.Services.Informative.MethodDonationService;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -53,18 +54,23 @@ public class MethodDonationController : ControllerBase
         return CreatedAtAction(nameof(GetMethodDonation), new { id = methodDonation.Id_MethodDonation }, methodDonationDto);
     }
 
-    // PATCH: api/MethodDonation/{id}
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchMethodDonation(int id, [FromBody] JsonPatchDocument<MethodDonation> patchDoc)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateMethodDonation(int id, [FromBody] MethodDonationUpdateDTO updateDto)
     {
-        if (patchDoc == null)
+        if (!ModelState.IsValid)
         {
-            return BadRequest();
+            return BadRequest(ModelState);
         }
 
-        await _methodDonationService.PatchAsync(id, patchDoc);
+        var existingSection = await _methodDonationService.GetByIdAsync(id);
+        if (existingSection == null)
+        {
+            return NotFound($"MethodDonation con ID {id} no fue encontrada.");
+        }
+
+        _mapper.Map(updateDto, existingSection);
         await _methodDonationService.SaveChangesAsync();
-        return NoContent();
+        return Ok(existingSection);
     }
 
     // DELETE: api/MethodDonation/{id}

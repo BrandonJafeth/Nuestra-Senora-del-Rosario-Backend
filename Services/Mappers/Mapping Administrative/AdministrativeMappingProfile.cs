@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Domain.Entities.Administration;
+using Domain.Entities.Informative;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
+using Infrastructure.Services.Informative.DTOS.CreatesDto;
 using System.Data;
 
 public class AdministrativeMappingProfile : Profile
@@ -393,6 +395,21 @@ public class AdministrativeMappingProfile : Profile
         CreateMap<HealthcareCenterUpdateDTO, HealthcareCenter>()
             .ForMember(dest => dest.Id_HC, opt => opt.Ignore());
 
+       CreateMap<NoteUpdateDTO,Note>()
+        .ForMember(dest => dest.Id_Note, opt => opt.Ignore());
 
+        CreateMap<ProfessionUpdateDTO, Profession>()
+            .ForMember(dest => dest.Id_Profession, opt => opt.Ignore());
+ 
+        CreateMap<RoomUpdateDTO, Room>()
+            .ForMember(dest => dest.Id_Room, opt => opt.Ignore());
+
+        CreateMap<CategoryUpdateDTO, Category>()
+            .ForMember(dest => dest.CategoryID, opt => opt.Ignore());
+
+
+        CreateMap<ApplicationFormUpdateDto, ApplicationForm>()
+            .ForMember(dest => dest.Id_ApplicationForm, opt => opt.Ignore())
+            .ForMember(dest => dest.ApplicationDate, opt => opt.Ignore());
     }
 }

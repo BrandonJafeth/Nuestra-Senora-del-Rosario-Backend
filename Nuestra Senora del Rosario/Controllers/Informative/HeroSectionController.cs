@@ -26,9 +26,9 @@ public class HeroSectionController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateDonationsSection(int id, [FromBody] HeroSectionUpdateDTO updateDto)
+    public async Task<IActionResult> UpdateHeroSection(int id, [FromBody] HeroSectionUpdateDTO updateDto)
     {
-        // Verificar que el DTO sea válido
+    
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
@@ -44,6 +44,8 @@ public class HeroSectionController : ControllerBase
         await _heroSectionService.SaveChangesAsync();
         return Ok(existingSection);
     }
+
+
 
 
 }
