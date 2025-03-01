@@ -138,16 +138,25 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-app.UseRouting();
+// Primero CORS
 app.UseCors("AllowAll");
+
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Rate limiting
 app.UseRateLimiter();
-app.UseAuthorization();
+
+// Routing al final
+app.UseRouting();
 
 app.MapControllers();
 app.MapHub<NotificationHub>("/notificationHub");
+
+
+var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
+app.Urls.Clear();
+app.Urls.Add($"http://0.0.0.0:{port}");
 
 app.Run();
 #endregion

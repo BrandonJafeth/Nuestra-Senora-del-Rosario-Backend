@@ -4,16 +4,21 @@ using Services.GenericService;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Domain.Entities.Administration;
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
+using AutoMapper;
+using Infrastructure.Services.Informative.DTOS.CreatesDto;
 
 [ApiController]
 [Route("api/[controller]")]
 public class NoteController : ControllerBase
 {
     private readonly ISvGenericRepository<Note> _noteService;
+    private readonly IMapper _mapper;
 
-    public NoteController(ISvGenericRepository<Note> noteService)
+    public NoteController(ISvGenericRepository<Note> noteService, IMapper mapper)
     {
         _noteService = noteService;
+        _mapper = mapper;
     }
 
     // GET: api/note
@@ -57,26 +62,28 @@ public class NoteController : ControllerBase
         return CreatedAtAction(nameof(GetNoteById), new { id = note.Id_Note }, note);
     }
 
-    // PATCH: api/note/{id}
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchNote(int id, [FromBody] JsonPatchDocument<Note> patchDoc)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateNotes(int id, [FromBody] NoteUpdateDTO updateDto)
     {
-        if (patchDoc == null)
+        // Verificar que el DTO sea válido
+        if (!ModelState.IsValid)
         {
-            return BadRequest("Invalid patch document.");
+            return BadRequest(ModelState);
         }
 
-        try
+        var existingSection = await _noteService.GetByIdAsync(id);
+        if (existingSection == null)
         {
-            await _noteService.PatchAsync(id, patchDoc);
-            await _noteService.SaveChangesAsync();
-            return NoContent();
+            return NotFound($"Note con ID {id} no fue encontrada.");
         }
-        catch (DbUpdateException ex)
-        {
-            return StatusCode(500, ex.InnerException?.Message ?? ex.Message);
-        }
+
+
+        _mapper.Map(updateDto, existingSection);
+        await _noteService.SaveChangesAsync();
+
+        return Ok(existingSection);
     }
+
 
     // DELETE: api/note/{id}
     [HttpDelete("{id}")]

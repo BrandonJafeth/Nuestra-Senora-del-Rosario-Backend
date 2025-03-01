@@ -85,6 +85,22 @@ public class MappingProfile : Profile
         CreateMap<HeroSectionUpdateDTO, HeroSection>()
      .ForMember(dest => dest.Id_Hero, opt => opt.Ignore());
 
+        CreateMap<ImportantInformationUpdateDTO, ImportantInformation>()
+            .ForMember(dest => dest.Id_ImportantInformation, opt => opt.Ignore());
+
+        CreateMap<MethodDonationUpdateDTO, MethodDonation>()
+            .ForMember(dest => dest.Id_MethodDonation, opt => opt.Ignore());
+
+        CreateMap<NursingRequirementsUpdateDTO, NursingRequirements>()
+            .ForMember(dest => dest.Id_NursingRequirement, opt => opt.Ignore());
+
+        CreateMap<RegistrationSectionUpdateDTO, RegistrationSection>()
+            .ForMember(dest => dest.Id_RegistrationSection, opt => opt.Ignore());
+
+        CreateMap<ServiceSectionUpdateDTO, ServiceSection>()
+      .ForMember(dest => dest.Id_ServiceSection, opt => opt.Ignore());
+
+
 
     }
 }

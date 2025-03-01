@@ -1,4 +1,6 @@
-﻿using Domain.Entities.Informative;
+﻿using AutoMapper;
+using Domain.Entities.Informative;
+using Infrastructure.Services.Informative.DTOS.CreatesDto;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Services.GenericService;
@@ -8,10 +10,12 @@ using Services.GenericService;
 public class ImportantInformationController : ControllerBase
 {
     private readonly ISvGenericRepository<ImportantInformation> _importantInformationService;
+    private readonly IMapper _mapper;
 
-    public ImportantInformationController(ISvGenericRepository<ImportantInformation> importantInformationService)
+    public ImportantInformationController(ISvGenericRepository<ImportantInformation> importantInformationService, IMapper mapper)
     {
         _importantInformationService = importantInformationService;
+        _mapper = mapper;
     }
 
     [HttpGet]
@@ -40,18 +44,23 @@ public class ImportantInformationController : ControllerBase
         return CreatedAtAction(nameof(GetImportantInfo), new { id = importantInformation.Id_ImportantInformation }, importantInformation);
     }
 
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchImportantInfo(int id, [FromBody] JsonPatchDocument<ImportantInformation> patchDoc)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateImportanInformation(int id, [FromBody] ImportantInformationUpdateDTO updateDto)
     {
-        if (patchDoc == null)
+        if (!ModelState.IsValid)
         {
-            return BadRequest();
+            return BadRequest(ModelState);
         }
 
-        await _importantInformationService.PatchAsync(id, patchDoc);
-        await _importantInformationService.SaveChangesAsync();
+        var existingSection = await _importantInformationService.GetByIdAsync(id);
+        if (existingSection == null)
+        {
+            return NotFound($"DonationsSection con ID {id} no fue encontrada.");
+        }
 
-        return NoContent();
+        _mapper.Map(updateDto, existingSection);
+        await _importantInformationService.SaveChangesAsync();
+        return Ok(existingSection);
     }
 
     [HttpDelete("{id}")]

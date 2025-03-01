@@ -1,4 +1,7 @@
-﻿using Domain.Entities.Informative;
+﻿using AutoMapper;
+using Domain.Entities.Informative;
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
+using Infrastructure.Services.Informative.DTOS.CreatesDto;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Services.GenericService;
@@ -8,10 +11,12 @@ using Services.GenericService;
 public class NursingRequirementsController : ControllerBase
 {
     private readonly ISvGenericRepository<NursingRequirements> _nursingRequirementsService;
+    private readonly IMapper _mapper;
 
-    public NursingRequirementsController(ISvGenericRepository<NursingRequirements> nursingRequirementsService)
+    public NursingRequirementsController(ISvGenericRepository<NursingRequirements> nursingRequirementsService, IMapper mapper)
     {
         _nursingRequirementsService = nursingRequirementsService;
+        _mapper = mapper;
     }
 
     [HttpGet]
@@ -39,19 +44,25 @@ public class NursingRequirementsController : ControllerBase
         await _nursingRequirementsService.SaveChangesAsync();
         return CreatedAtAction(nameof(GetNursingRequirement), new { id = nursingRequirement.Id_NursingRequirement }, nursingRequirement);
     }
-
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchNursingRequirement(int id, [FromBody] JsonPatchDocument<NursingRequirements> patchDoc)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateNursingRequirements(int id, [FromBody] NursingRequirementsUpdateDTO updateDto)
     {
-        if (patchDoc == null)
+        if (!ModelState.IsValid)
         {
-            return BadRequest();
+            return BadRequest(ModelState);
         }
 
-        await _nursingRequirementsService.PatchAsync(id, patchDoc);
+        var existingSection = await _nursingRequirementsService.GetByIdAsync(id);
+        if (existingSection == null)
+        {
+            return NotFound($"NursingRequirements con ID {id} no fue encontrada.");
+        }
+
+
+        _mapper.Map(updateDto, existingSection);
         await _nursingRequirementsService.SaveChangesAsync();
 
-        return NoContent();
+        return Ok(existingSection);
     }
 
     [HttpDelete("{id}")]
