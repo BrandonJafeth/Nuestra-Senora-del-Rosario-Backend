@@ -52,15 +52,22 @@ public class InventoryController : ControllerBase
 
     // POST: api/inventory
     [HttpPost]
-    public async Task<IActionResult> RegisterMovement([FromBody] InventoryCreateDTO inventoryCreateDTO)
+    public async Task<IActionResult> RegisterMovements([FromBody] List<InventoryCreateDTO> dtos)
     {
-        if (!ModelState.IsValid)
+        if (dtos == null || dtos.Count == 0)
         {
-            return BadRequest(ModelState);
+            return BadRequest("La lista de movimientos está vacía.");
         }
 
-        await _inventoryService.RegisterMovementAsync(inventoryCreateDTO);
-        return StatusCode(201); // 201 Created
+        try
+        {
+            await _inventoryService.RegisterMovementsAsync(dtos);
+            return Ok("Movimientos registrados exitosamente.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error al registrar los movimientos: {ex.Message}");
+        }
     }
 
     // PATCH: api/inventory/{id}

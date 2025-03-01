@@ -10,16 +10,20 @@ using Infrastructure.Services.Administrative.Inventory;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
 using Domain.Entities.Administration;
+using iText.Commons.Actions.Contexts;
+using Infrastructure.Persistence.AppDbContext;
 
 public class SvInventoryService : ISvInventoryService
 {
     private readonly ISvGenericRepository<Inventory> _inventoryRepository;
     private readonly IMapper _mapper;
+    private readonly AppDbContext _context;
 
-    public SvInventoryService(ISvGenericRepository<Inventory> inventoryRepository, IMapper mapper)
+    public SvInventoryService(ISvGenericRepository<Inventory> inventoryRepository, IMapper mapper, AppDbContext context)
     {
         _inventoryRepository = inventoryRepository;
         _mapper = mapper;
+        _context = context;
     }
 
     public async Task<IEnumerable<InventoryGetDTO>> GetAllMovementsAsync()
@@ -58,12 +62,36 @@ public class SvInventoryService : ISvInventoryService
         };
     }
 
-    public async Task RegisterMovementAsync(InventoryCreateDTO inventoryCreateDTO)
+    public async Task RegisterMovementsAsync(IEnumerable<InventoryCreateDTO> inventoryCreateDTOs)
     {
-        var inventory = _mapper.Map<Inventory>(inventoryCreateDTO);
-        await _inventoryRepository.AddAsync(inventory);
-        await _inventoryRepository.SaveChangesAsync();
+        if (inventoryCreateDTOs == null || !inventoryCreateDTOs.Any())
+        {
+            throw new ArgumentException("Debe proporcionar al menos un movimiento de inventario.");
+        }
+
+        // (Opcional) iniciar transacción si deseas atomicidad:
+        using var transaction = await _context.Database.BeginTransactionAsync();
+
+        try
+        {
+            foreach (var dto in inventoryCreateDTOs)
+            {
+                var inventoryMovement = _mapper.Map<Inventory>(dto);
+                // Si necesitas lógica adicional por movimiento, colócala aquí
+                await _inventoryRepository.AddAsync(inventoryMovement);
+            }
+
+            await _inventoryRepository.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            // Si algo falla, revertimos
+            await transaction.RollbackAsync();
+            throw; // Propaga la excepción
+        }
     }
+
 
     public async Task PatchInventoryAsync(int inventoryId, JsonPatchDocument<Inventory> patchDoc)
     {

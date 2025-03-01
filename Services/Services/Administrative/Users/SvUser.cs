@@ -489,7 +489,7 @@ namespace Infrastructure.Services.Administrative.Users
         }
 
 
-        // Método para hashear contraseñas
+
         private string HashPassword(string password) => BCrypt.Net.BCrypt.HashPassword(password);
 
         private async Task<bool> ExistsUserByDniAsync(int dni)
