@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Entities.Informative;
 using Infrastructure.Services.Informative.DTOS;
+using Infrastructure.Services.Informative.DTOS.CreatesDto;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Services.GenericService;
@@ -55,35 +56,24 @@ public class GalleryCategoryController : ControllerBase
         return CreatedAtAction(nameof(GetGalleryCategory), new { id = createdGalleryCategoryDto.Id_GalleryCategory }, createdGalleryCategoryDto);
     }
 
-    // PATCH: api/GalleryCategory/{id}
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchGalleryCategory(int id, [FromBody] JsonPatchDocument<GalleryCategoryDto> patchDoc)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateGalleryCategory(int id, [FromBody] GalleryCategoryUpdateDTO updateDto)
     {
-        if (patchDoc == null)
-        {
-            return BadRequest();
-        }
-
-        var galleryCategory = await _galleryCategoryService.GetByIdAsync(id);
-        if (galleryCategory == null)
-        {
-            return NotFound();
-        }
-
-        // Aplica el parche al DTO y luego mapea de nuevo a la entidad
-        var galleryCategoryDto = _mapper.Map<GalleryCategoryDto>(galleryCategory);
-        patchDoc.ApplyTo(galleryCategoryDto, ModelState);
-
+        // Verificar que el DTO sea válido
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        _mapper.Map(galleryCategoryDto, galleryCategory);
+        var existingSection = await _galleryCategoryService.GetByIdAsync(id);
+        if (existingSection == null)
+        {
+            return NotFound($"GalleryCategory con ID {id} no fue encontrada.");
+        }
 
+        _mapper.Map(updateDto, existingSection);
         await _galleryCategoryService.SaveChangesAsync();
-
-        return NoContent();
+        return Ok(existingSection);
     }
 
     // DELETE: api/GalleryCategory/{id}

@@ -2,6 +2,7 @@
 using Domain.Entities.Administration;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
+using Infrastructure.Services.Informative.DTOS.CreatesDto;
 using Microsoft.AspNetCore.Mvc;
 using Services.GenericService;
 
@@ -49,16 +50,24 @@ public class HealthcareCenterController : ControllerBase
             _mapper.Map<HealthcareCenterGetDto>(center));
     }
 
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] HealthcareCenterCreateUpdateDto dto)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateHealthCareCenter(int id, [FromBody] HealthcareCenterUpdateDTO updateDto)
     {
-        var existingCenter = await _hcRepository.GetByIdAsync(id);
-        if (existingCenter == null) return NotFound($"Center with ID {id} not found.");
+        // Verificar que el DTO sea válido
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
 
-        _mapper.Map(dto, existingCenter);
+        var existingSection = await _hcRepository.GetByIdAsync(id);
+        if (existingSection == null)
+        {
+            return NotFound($"HealthcareCenter con ID {id} no fue encontrada.");
+        }
+
+        _mapper.Map(updateDto, existingSection);
         await _hcRepository.SaveChangesAsync();
-
-        return Ok(_mapper.Map<HealthcareCenterGetDto>(existingCenter));
+        return Ok(existingSection);
     }
 
     [HttpDelete("{id}")]

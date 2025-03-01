@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using System.Linq;
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 
 namespace Infrastructure.Services.Informative.ApplicationFormService
 {
@@ -93,6 +94,23 @@ namespace Infrastructure.Services.Informative.ApplicationFormService
 
             applicationForm.Id_Status = statusId;
             await _context.SaveChangesAsync();
+        }
+
+
+        public async Task<ApplicationFormDto> UpdateFormAsync(int id, ApplicationFormUpdateDto updateDto)
+        {
+
+            var applicationForm = await _context.ApplicationForms
+                .FirstOrDefaultAsync(af => af.Id_ApplicationForm == id);
+
+            if (applicationForm == null)
+                throw new KeyNotFoundException($"ApplicationForm con ID {id} no encontrado.");
+
+            _mapper.Map(updateDto, applicationForm);
+
+
+            await _context.SaveChangesAsync();
+            return _mapper.Map<ApplicationFormDto>(applicationForm);
         }
     }
 }

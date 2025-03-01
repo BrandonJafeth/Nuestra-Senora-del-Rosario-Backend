@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Domain.Entities.Administration;
 using Domain.Entities.Informative;
 using Infrastructure.Services.Informative.DTOS;
 using Infrastructure.Services.Informative.DTOS.CreatesDto;
@@ -55,5 +56,60 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Id_ApplicationForm, opt => opt.Ignore())
             .ForMember(dest => dest.ApplicationDate, opt => opt.Ignore())
             .ForMember(dest => dest.Id_Status, opt => opt.Ignore());
+
+
+        CreateMap<AssociatesSectionUpdateDto, AboutUsSection>()
+       .ForMember(dest => dest.Id_About_Us, opt => opt.Ignore());
+
+        CreateMap<AdministrariveRequerimentsUpdateDTO, AdministrativeRequirements>()
+        .ForMember(dest => dest.Id_AdministrativeRequirement, opt => opt.Ignore());
+
+        CreateMap<AssociatesSectionUpdateDTO, AssociatesSection>()
+        .ForMember(dest => dest.Id_AssociatesSection, opt => opt.Ignore());
+
+        CreateMap<ContactUpdateDTO, Contact>()
+        .ForMember(dest => dest.Id_Contact, opt => opt.Ignore());
+
+        CreateMap<DonationSectionUpdateDTO, DonationsSection>()
+        .ForMember(dest => dest.Id_DonationsSection, opt => opt.Ignore());
+
+        CreateMap<DonationTypeUpdateDTO, DonationType>()
+            .ForMember(dest => dest.Id_DonationType, opt => opt.Ignore());
+
+        CreateMap<GalleryCategoryUpdateDTO, GalleryCategory>()
+        .ForMember(dest => dest.Id_GalleryCategory, opt => opt.Ignore());
+
+        CreateMap<GalleryItemUpdateDTO, GalleryItem>()
+        .ForMember(dest => dest.Id_GalleryItem, opt => opt.Ignore());
+
+        CreateMap<HeroSectionUpdateDTO, HeroSection>()
+     .ForMember(dest => dest.Id_Hero, opt => opt.Ignore());
+
+        CreateMap<ImportantInformationUpdateDTO, ImportantInformation>()
+            .ForMember(dest => dest.Id_ImportantInformation, opt => opt.Ignore());
+
+        CreateMap<MethodDonationUpdateDTO, MethodDonation>()
+            .ForMember(dest => dest.Id_MethodDonation, opt => opt.Ignore());
+
+        CreateMap<NursingRequirementsUpdateDTO, NursingRequirements>()
+            .ForMember(dest => dest.Id_NursingRequirement, opt => opt.Ignore());
+
+        CreateMap<RegistrationSectionUpdateDTO, RegistrationSection>()
+            .ForMember(dest => dest.Id_RegistrationSection, opt => opt.Ignore());
+
+        CreateMap<ServiceSectionUpdateDTO, ServiceSection>()
+      .ForMember(dest => dest.Id_ServiceSection, opt => opt.Ignore());
+
+        CreateMap<SiteSettingsUpdateDto, SiteSettings>()
+        .ForMember(dest => dest.Id_Site_Settings, opt => opt.Ignore());
+
+        CreateMap<VoluntarieTypeUpdateDto, VoluntarieType>()
+         .ForMember(dest => dest.Id_VoluntarieType, opt => opt.Ignore());
+
+        CreateMap<VolunteeringSectionUpdateDto, VolunteeringSection>()
+        .ForMember(dest => dest.Id_VolunteeringSection, opt => opt.Ignore());
+
+
     }
 }
+

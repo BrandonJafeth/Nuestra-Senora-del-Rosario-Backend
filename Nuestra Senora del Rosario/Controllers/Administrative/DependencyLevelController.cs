@@ -4,16 +4,20 @@ using Services.GenericService;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Domain.Entities.Administration;
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
+using AutoMapper;
 
 [ApiController]
 [Route("api/[controller]")]
 public class DependencyLevelController : ControllerBase
 {
     private readonly ISvGenericRepository<DependencyLevel> _dependencyLevelService;
+    private readonly IMapper _mapper;
 
-    public DependencyLevelController(ISvGenericRepository<DependencyLevel> dependencyLevelService)
+    public DependencyLevelController(ISvGenericRepository<DependencyLevel> dependencyLevelService, IMapper mapper)
     {
         _dependencyLevelService = dependencyLevelService;
+        _mapper = mapper;
     }
 
     // GET: api/dependencylevel
@@ -51,25 +55,24 @@ public class DependencyLevelController : ControllerBase
         return CreatedAtAction(nameof(GetDependencyLevelById), new { id = dependencyLevel.Id_DependencyLevel }, dependencyLevel);
     }
 
-    // PATCH: api/dependencylevel/{id}
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchDependencyLevel(int id, [FromBody] JsonPatchDocument<DependencyLevel> patchDoc)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateDependencyLevel(int id, [FromBody] DependencyLevelUpdateDTO updateDto)
     {
-        if (patchDoc == null)
+        // Verificar que el DTO sea válido
+        if (!ModelState.IsValid)
         {
-            return BadRequest("Invalid patch document.");
+            return BadRequest(ModelState);
         }
 
-        try
+        var existingSection = await _dependencyLevelService.GetByIdAsync(id);
+        if (existingSection == null)
         {
-            await _dependencyLevelService.PatchAsync(id, patchDoc);
-            await _dependencyLevelService.SaveChangesAsync();
-            return NoContent();
+            return NotFound($"DependencyLevel con ID {id} no fue encontrada.");
         }
-        catch (DbUpdateException ex)
-        {
-            return StatusCode(500, ex.InnerException?.Message ?? ex.Message);
-        }
+
+        _mapper.Map(updateDto, existingSection);
+        await _dependencyLevelService.SaveChangesAsync();
+        return Ok(existingSection);
     }
 
     // DELETE: api/dependencylevel/{id}

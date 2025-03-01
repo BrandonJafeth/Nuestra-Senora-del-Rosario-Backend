@@ -7,6 +7,7 @@ using AutoMapper;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
 using Domain.Entities.Administration;
+using Infrastructure.Services.Informative.DTOS.CreatesDto;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -60,35 +61,24 @@ public class UnitOfMeasureController : ControllerBase
         return CreatedAtAction(nameof(GetUnitOfMeasureById), new { id = unitDto.UnitOfMeasureID }, unitDto);
     }
 
-    // PATCH: api/unitofmeasure/{id}
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchUnitOfMeasure(int id, [FromBody] JsonPatchDocument<UnitOfMeasureCreateDTO> patchDoc)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateUnitOfMeasure(int id, [FromBody] UnitOfMeasureUpdateDto updateDto)
     {
-        if (patchDoc == null)
-        {
-            return BadRequest("Invalid patch document.");
-        }
-
-        var unit = await _unitOfMeasureService.GetByIdAsync(id);
-        if (unit == null)
-        {
-            return NotFound($"Unit of Measure with ID {id} not found.");
-        }
-
-        // Mapea la entidad a DTO para aplicar el parche
-        var unitDto = _mapper.Map<UnitOfMeasureCreateDTO>(unit);
-        patchDoc.ApplyTo(unitDto, ModelState);
-
+        // Verificar que el DTO sea válido
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        // Mapea el DTO modificado de vuelta a la entidad y guarda cambios
-        _mapper.Map(unitDto, unit);
-        await _unitOfMeasureService.SaveChangesAsync();
+        var existingSection = await _unitOfMeasureService.GetByIdAsync(id);
+        if (existingSection == null)
+        {
+            return NotFound($"UnitOfMeasure con ID {id} no fue encontrada.");
+        }
 
-        return NoContent();
+        _mapper.Map(updateDto, existingSection);
+        await _unitOfMeasureService.SaveChangesAsync();
+        return Ok(existingSection);
     }
 
     // DELETE: api/unitofmeasure/{id}

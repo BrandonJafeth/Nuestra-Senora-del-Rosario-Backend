@@ -1,4 +1,6 @@
-﻿using Domain.Entities.Informative;
+﻿using AutoMapper;
+using Domain.Entities.Informative;
+using Infrastructure.Services.Informative.DTOS.CreatesDto;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Services.GenericService;
@@ -9,10 +11,12 @@ using System.Threading.Tasks;
 public class AssociatesSectionController : ControllerBase
 {
     private readonly ISvGenericRepository<AssociatesSection> _associatesSectionService;
+    private readonly IMapper _mapper;   
 
-    public AssociatesSectionController(ISvGenericRepository<AssociatesSection> associatesSectionService)
+    public AssociatesSectionController(ISvGenericRepository<AssociatesSection> associatesSectionService, IMapper mapper)
     {
         _associatesSectionService = associatesSectionService;
+        _mapper = mapper;
     }
 
     // GET: api/AssociatesSection
@@ -24,19 +28,25 @@ public class AssociatesSectionController : ControllerBase
     }
 
 
-    // PATCH: api/AssociatesSection/{id}
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchAssociatesSection(int id, [FromBody] JsonPatchDocument<AssociatesSection> patchDoc)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateAssociatesSection(int id, [FromBody] AssociatesSectionUpdateDto updateDto)
     {
-        if (patchDoc == null)
+        // Verificar que el DTO sea válido
+        if (!ModelState.IsValid)
         {
-            return BadRequest();
+            return BadRequest(ModelState);
         }
 
-        await _associatesSectionService.PatchAsync(id, patchDoc);
-        await _associatesSectionService.SaveChangesAsync();
+        // Obtener la entidad existente de la base de datos (la cual ya está en tracking)
+        var existingSection = await _associatesSectionService.GetByIdAsync(id);
+        if (existingSection == null)
+        {
+            return NotFound($"AssociatesSection con ID {id} no fue encontrada.");
+        }
 
-        return NoContent();
+        _mapper.Map(updateDto, existingSection);
+        await _associatesSectionService.SaveChangesAsync();
+        return Ok(existingSection);
     }
 
 

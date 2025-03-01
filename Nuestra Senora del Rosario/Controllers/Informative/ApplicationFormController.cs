@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Infrastructure.Services.Informative.ApplicationFormService;
 using Infrastructure.Services.Informative.DTOS;
 using Infrastructure.Services.Informative.DTOS.CreatesDto;
@@ -100,4 +101,29 @@ public class ApplicationFormController : ControllerBase
             return BadRequest(ex.Message); // Retorna 400 Bad Request si el estado no es válido
         }
     }
+
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, [FromBody] ApplicationFormUpdateDto updateDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            var updated = await _applicationFormService.UpdateFormAsync(id, updateDto);
+            return Ok(updated);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error interno: {ex.Message}");
+        }
+    }
+
 }

@@ -2,6 +2,7 @@
 using Domain.Entities.Administration;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
+using Infrastructure.Services.Informative.DTOS.CreatesDto;
 using Microsoft.AspNetCore.Mvc;
 using Services.GenericService;
 
@@ -49,16 +50,24 @@ public class SpecialtyController : ControllerBase
             _mapper.Map<SpecialtyGetDto>(specialty));
     }
 
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] SpecialtyCreateUpdateDto dto)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateSpecialty(int id, [FromBody] SpecialtyUpdateDto updateDto)
     {
-        var existingSpecialty = await _specialtyRepository.GetByIdAsync(id);
-        if (existingSpecialty == null) return NotFound($"Specialty with ID {id} not found.");
+        // Verificar que el DTO sea válido
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
 
-        _mapper.Map(dto, existingSpecialty);
+        var existingSection = await _specialtyRepository.GetByIdAsync(id);
+        if (existingSection == null)
+        {
+            return NotFound($"Specialty con ID {id} no fue encontrada.");
+        }
+
+        _mapper.Map(updateDto, existingSection);
         await _specialtyRepository.SaveChangesAsync();
-
-        return Ok(_mapper.Map<SpecialtyGetDto>(existingSpecialty));
+        return Ok(existingSection);
     }
 
     [HttpDelete("{id}")]

@@ -1,4 +1,6 @@
-﻿using Domain.Entities.Informative;
+﻿using AutoMapper;
+using Domain.Entities.Informative;
+using Infrastructure.Services.Informative.DTOS.CreatesDto;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Services.GenericService;
@@ -8,10 +10,12 @@ using Services.GenericService;
 public class VolunteeringSectionController : ControllerBase
 {
     private readonly ISvGenericRepository<VolunteeringSection> _volunteeringSectionService;
+    private readonly IMapper _mapper;
 
-    public VolunteeringSectionController(ISvGenericRepository<VolunteeringSection> volunteeringSectionService)
+    public VolunteeringSectionController(ISvGenericRepository<VolunteeringSection> volunteeringSectionService, IMapper mapper)
     {
         _volunteeringSectionService = volunteeringSectionService;
+        _mapper = mapper;
     }
 
     [HttpGet]
@@ -39,19 +43,24 @@ public class VolunteeringSectionController : ControllerBase
         await _volunteeringSectionService.SaveChangesAsync();
         return CreatedAtAction(nameof(GetVolunteeringSection), new { id = volunteeringSection.Id_VolunteeringSection }, volunteeringSection);
     }
-
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchVolunteeringSection(int id, [FromBody] JsonPatchDocument<VolunteeringSection> patchDoc)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateVolunteeringSection(int id, [FromBody] VolunteeringSectionUpdateDto updateDto)
     {
-        if (patchDoc == null)
+        // Verificar que el DTO sea válido
+        if (!ModelState.IsValid)
         {
-            return BadRequest();
+            return BadRequest(ModelState);
         }
 
-        await _volunteeringSectionService.PatchAsync(id, patchDoc);
-        await _volunteeringSectionService.SaveChangesAsync();
+        var existingSection = await _volunteeringSectionService.GetByIdAsync(id);
+        if (existingSection == null)
+        {
+            return NotFound($"GalleryCategory con ID {id} no fue encontrada.");
+        }
 
-        return NoContent();
+        _mapper.Map(updateDto, existingSection);
+        await _volunteeringSectionService.SaveChangesAsync();
+        return Ok(existingSection);
     }
 
     [HttpDelete("{id}")]

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Entities.Informative;
 using Infrastructure.Services.Informative.DTOS;
+using Infrastructure.Services.Informative.DTOS.CreatesDto;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Services.GenericService;
@@ -50,17 +51,24 @@ public class VoluntarieTypeController : ControllerBase
         return CreatedAtAction(nameof(GetVoluntarieType), new { id = voluntarieType.Id_VoluntarieType }, voluntarieType);
     }
 
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchVoluntarieType(int id, [FromBody] JsonPatchDocument<VoluntarieType> patchDoc)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateVoluntarieType(int id, [FromBody] VoluntarieTypeUpdateDto updateDto)
     {
-        if (patchDoc == null)
+        // Verificar que el DTO sea válido
+        if (!ModelState.IsValid)
         {
-            return BadRequest();
+            return BadRequest(ModelState);
         }
 
-        await _voluntarieTypeRepository.PatchAsync(id, patchDoc);
+        var existingSection = await _voluntarieTypeRepository.GetByIdAsync(id);
+        if (existingSection == null)
+        {
+            return NotFound($"VoluntarieType con ID {id} no fue encontrada.");
+        }
+
+        _mapper.Map(updateDto, existingSection);
         await _voluntarieTypeRepository.SaveChangesAsync();
-        return NoContent();
+        return Ok(existingSection);
     }
 
     [HttpDelete("{id}")]

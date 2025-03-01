@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.JsonPatch;
+﻿using AutoMapper;
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
+using Infrastructure.Services.Informative.DTOS.CreatesDto;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Services.GenericService;
@@ -9,10 +12,12 @@ using System.Threading.Tasks;
 public class TypeOfSalaryController : ControllerBase
 {
     private readonly ISvGenericRepository<TypeOfSalary> _typeOfSalaryService;
+    private readonly IMapper _mapper;
 
-    public TypeOfSalaryController(ISvGenericRepository<TypeOfSalary> typeOfSalaryService)
+    public TypeOfSalaryController(ISvGenericRepository<TypeOfSalary> typeOfSalaryService, IMapper mapper)
     {
         _typeOfSalaryService = typeOfSalaryService;
+        _mapper = mapper;
     }
 
     // GET: api/typeofsalary
@@ -57,29 +62,24 @@ public class TypeOfSalaryController : ControllerBase
         }
     }
 
-    // PATCH: api/typeofsalary/{id}
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchTypeOfSalary(int id, [FromBody] JsonPatchDocument<TypeOfSalary> patchDoc)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateTypeOfSalary(int id, [FromBody] TypeOfSalaryUpdateDto updateDto)
     {
-        if (patchDoc == null)
+        // Verificar que el DTO sea válido
+        if (!ModelState.IsValid)
         {
-            return BadRequest("Invalid patch document.");
+            return BadRequest(ModelState);
         }
 
-        try
+        var existingSection = await _typeOfSalaryService.GetByIdAsync(id);
+        if (existingSection == null)
         {
-            // Usa el servicio genérico para aplicar el patch
-            await _typeOfSalaryService.PatchAsync(id, patchDoc);
-
-            // Guarda los cambios en el contexto de la base de datos
-            await _typeOfSalaryService.SaveChangesAsync();
-
-            return NoContent(); // Retorna 204 No Content si fue exitoso
+            return NotFound($"TypeOfSalary con ID {id} no fue encontrada.");
         }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Error occurred while patching TypeOfSalary: {ex.Message}");
-        }
+
+        _mapper.Map(updateDto, existingSection);
+        await _typeOfSalaryService.SaveChangesAsync();
+        return Ok(existingSection);
     }
 
 

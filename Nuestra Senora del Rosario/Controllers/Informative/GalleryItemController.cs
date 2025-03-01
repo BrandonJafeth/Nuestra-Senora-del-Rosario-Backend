@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Entities.Informative;
 using Infrastructure.Services.Informative.DTOS;
+using Infrastructure.Services.Informative.DTOS.CreatesDto;
 using Infrastructure.Services.Informative.GalleryItemService;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -68,19 +69,24 @@ public class GalleryItemController : ControllerBase
         return CreatedAtAction(nameof(GetGalleryItem), new { id = itemDto.Id_GalleryItem }, itemDto);
     }
 
-    // PATCH: api/GalleryItem/{id}
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchGalleryItem(int id, [FromBody] JsonPatchDocument<GalleryItem> patchDoc)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateGalleryItem(int id, [FromBody] GalleryItemUpdateDTO updateDto)
     {
-        if (patchDoc == null)
+        // Verificar que el DTO sea válido
+        if (!ModelState.IsValid)
         {
-            return BadRequest();
+            return BadRequest(ModelState);
         }
 
-        await _galleryItemService.PatchAsync(id, patchDoc);
-        await _galleryItemService.SaveChangesAsync();
+        var existingSection = await _galleryItemService.GetByIdAsync(id);
+        if (existingSection == null)
+        {
+            return NotFound($"GalleryItem con ID {id} no fue encontrada.");
+        }
 
-        return NoContent();
+        _mapper.Map(updateDto, existingSection);
+        await _galleryItemService.SaveChangesAsync();
+        return Ok(existingSection);
     }
 
     // DELETE: api/GalleryItem/{id}
