@@ -39,12 +39,6 @@ public class PaymentReceiptPdfController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, $"Error al enviar el comprobante de pago: {ex.Message}");
-
-
-
-
-
-
         }
     }
 }

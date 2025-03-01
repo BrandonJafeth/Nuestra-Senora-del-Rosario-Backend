@@ -1,4 +1,6 @@
-﻿using Domain.Entities.Informative;
+﻿using AutoMapper;
+using Domain.Entities.Informative;
+using Infrastructure.Services.Informative.DTOS.CreatesDto;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Services.GenericService;
@@ -8,10 +10,13 @@ using Services.GenericService;
 public class SiteSettingsController : ControllerBase
 {
     private readonly ISvGenericRepository<SiteSettings> _siteSettingsService;
+    private readonly IMapper _mapper;
 
-    public SiteSettingsController(ISvGenericRepository<SiteSettings> siteSettingsService)
+    public SiteSettingsController(ISvGenericRepository<SiteSettings> siteSettingsService, IMapper mapper)
     {
         _siteSettingsService = siteSettingsService;
+        _mapper = mapper;
+
     }
 
     [HttpGet]
@@ -24,18 +29,24 @@ public class SiteSettingsController : ControllerBase
 
 
 
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchSiteSetting(int id, [FromBody] JsonPatchDocument<SiteSettings> patchDoc)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateSiteSettings(int id, [FromBody] SiteSettingsUpdateDto updateDto)
     {
-        if (patchDoc == null)
+        // Verificar que el DTO sea válido
+        if (!ModelState.IsValid)
         {
-            return BadRequest();
+            return BadRequest(ModelState);
         }
 
-        await _siteSettingsService.PatchAsync(id, patchDoc);
-        await _siteSettingsService.SaveChangesAsync();
+        var existingSection = await _siteSettingsService.GetByIdAsync(id);
+        if (existingSection == null)
+        {
+            return NotFound($"SiteSettings con ID {id} no fue encontrada.");
+        }
 
-        return NoContent();
+        _mapper.Map(updateDto, existingSection);
+        await _siteSettingsService.SaveChangesAsync();
+        return Ok(existingSection);
     }
 
 

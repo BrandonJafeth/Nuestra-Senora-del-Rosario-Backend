@@ -392,6 +392,8 @@ public class AdministrativeMappingProfile : Profile
 
         CreateMap<HealthcareCenterUpdateDTO, HealthcareCenter>()
             .ForMember(dest => dest.Id_HC, opt => opt.Ignore());
+        
+     
 
 
     }

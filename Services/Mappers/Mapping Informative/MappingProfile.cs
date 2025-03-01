@@ -85,6 +85,7 @@ public class MappingProfile : Profile
         CreateMap<HeroSectionUpdateDTO, HeroSection>()
      .ForMember(dest => dest.Id_Hero, opt => opt.Ignore());
 
-}
+
+    }
 }
 
