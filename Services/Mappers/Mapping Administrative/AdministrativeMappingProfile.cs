@@ -413,5 +413,14 @@ public class AdministrativeMappingProfile : Profile
         CreateMap<ApplicationFormUpdateDto, ApplicationForm>()
             .ForMember(dest => dest.Id_ApplicationForm, opt => opt.Ignore())
             .ForMember(dest => dest.ApplicationDate, opt => opt.Ignore());
+
+        CreateMap<SpecialtyUpdateDto, Specialty>()
+    .ForMember(dest => dest.Id_Specialty, opt => opt.Ignore());
+
+        CreateMap<TypeOfSalaryUpdateDto, TypeOfSalary>()
+            .ForMember(dest => dest.Id_TypeOfSalary, opt => opt.Ignore());
+
+        CreateMap<UnitOfMeasureUpdateDto, UnitOfMeasure>()
+            .ForMember(dest => dest.UnitOfMeasureID, opt => opt.Ignore());
     }
 }

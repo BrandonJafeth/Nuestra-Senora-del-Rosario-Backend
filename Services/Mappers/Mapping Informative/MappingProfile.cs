@@ -100,6 +100,14 @@ public class MappingProfile : Profile
         CreateMap<ServiceSectionUpdateDTO, ServiceSection>()
       .ForMember(dest => dest.Id_ServiceSection, opt => opt.Ignore());
 
+        CreateMap<SiteSettingsUpdateDto, SiteSettings>()
+        .ForMember(dest => dest.Id_Site_Settings, opt => opt.Ignore());
+
+        CreateMap<VoluntarieTypeUpdateDto, VoluntarieType>()
+         .ForMember(dest => dest.Id_VoluntarieType, opt => opt.Ignore());
+
+        CreateMap<VolunteeringSectionUpdateDto, VolunteeringSection>()
+        .ForMember(dest => dest.Id_VolunteeringSection, opt => opt.Ignore());
 
 
     }
