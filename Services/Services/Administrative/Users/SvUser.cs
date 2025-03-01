@@ -229,13 +229,22 @@ namespace Infrastructure.Services.Administrative.Users
         // Login
         public async Task<string> LoginAsync(UserLoginDTO loginDTO)
         {
-            var user = await _userRepository.Query().FirstOrDefaultAsync(u => u.DNI == loginDTO.DniEmployee);
+            var user = await _userRepository.Query()
+                .FirstOrDefaultAsync(u => u.DNI == loginDTO.DniEmployee);
 
+            // Verificación de credenciales
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDTO.Password, user.Password))
             {
                 throw new UnauthorizedAccessException("Credenciales inválidas.");
             }
 
+            // Verificar si está inactivo
+            if (!user.Is_Active)
+            {
+                throw new UnauthorizedAccessException("Este usuario se encuentra inactivo.");
+            }
+
+            // Verificar expiración de contraseña, etc.
             if (user.PasswordExpiration.HasValue && DateTime.Now > user.PasswordExpiration.Value)
             {
                 throw new UnauthorizedAccessException("Tu contraseña ha expirado. Debes cambiarla.");
@@ -454,8 +463,14 @@ namespace Infrastructure.Services.Administrative.Users
             await _userRepository.SaveChangesAsync();
         }
 
-        public async Task UpdateUserStatusAsync(int userId, bool isActive)
+        public async Task UpdateUserStatusAsync(int userId, bool isActive, int performedByUserId)
         {
+            // Verificar si se autoinhabilita
+            if (userId == performedByUserId && isActive == false)
+            {
+                throw new InvalidOperationException("No puedes inhabilitar tu propio usuario.");
+            }
+
             var validationResult = await _statusUpdateValidator.ValidateAsync(new UserStatusUpdateDto { IsActive = isActive });
             if (!validationResult.IsValid)
             {
@@ -469,7 +484,6 @@ namespace Infrastructure.Services.Administrative.Users
             }
 
             user.Is_Active = isActive;
-
             _userRepository.Update(user);
             await _userRepository.SaveChangesAsync();
         }

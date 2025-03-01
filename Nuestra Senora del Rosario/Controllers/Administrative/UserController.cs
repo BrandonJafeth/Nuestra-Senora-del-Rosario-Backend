@@ -223,10 +223,18 @@ public class UserController : ControllerBase
 
 
     // 🔹 Activar/Desactivar usuario (requiere permisos de administrador)
+    // PUT: api/user/{id}/status
     [HttpPut("{id}/status")]
     public async Task<IActionResult> UpdateUserStatus(int id, [FromBody] UserStatusUpdateDto userStatusUpdateDto)
     {
-        await _userService.UpdateUserStatusAsync(id, userStatusUpdateDto.IsActive);
+        var performedByUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+        await _userService.UpdateUserStatusAsync(
+            userId: id,
+            isActive: userStatusUpdateDto.IsActive,
+            performedByUserId: performedByUserId
+        );
+
         return NoContent();
     }
 
