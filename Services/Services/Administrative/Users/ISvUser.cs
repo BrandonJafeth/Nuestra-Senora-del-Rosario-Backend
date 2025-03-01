@@ -29,7 +29,7 @@ namespace Infrastructure.Services.Administrative.Users
         Task<UserGetMeDto> GetAuthenticatedUserAsync(int userId);
         Task UpdateUserProfileAsync(int userId, UserUpdateProfileDto userUpdateProfileDto);
         Task ChangeAuthenticatedUserPasswordAsync(int userId, UserChangePasswordDto userChangePasswordDto);
-        Task UpdateUserStatusAsync(int userId, bool isActive);
+        Task UpdateUserStatusAsync(int userId, bool isActive, int performedByUserId);
 
  
 

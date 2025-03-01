@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.JsonPatch;
+﻿using AutoMapper;
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Services.GenericService;
@@ -9,10 +11,12 @@ using System.Threading.Tasks;
 public class ProfessionController : ControllerBase
 {
     private readonly ISvGenericRepository<Profession> _professionService;
+    private readonly IMapper _mapper;
 
-    public ProfessionController(ISvGenericRepository<Profession> professionService)
+    public ProfessionController(ISvGenericRepository<Profession> professionService, IMapper mapper)
     {
         _professionService = professionService;
+        _mapper = mapper;
     }
 
     // POST: api/profession
@@ -59,30 +63,28 @@ public class ProfessionController : ControllerBase
         return Ok(professions);
     }
 
-    // PATCH: api/profession/{id}
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchProfession(int id, [FromBody] JsonPatchDocument<Profession> patchDoc)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateProfession(int id, [FromBody] CategoryUpdateDTO updateDto)
     {
-        if (patchDoc == null)
-        {
-            return BadRequest("Invalid patch document.");
-        }
-
-        var profession = await _professionService.GetByIdAsync(id);
-        if (profession == null)
-        {
-            return NotFound($"Profession with ID {id} not found.");
-        }
-
-        patchDoc.ApplyTo(profession, ModelState);
+        // Verificar que el DTO sea válido
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
+        var existingSection = await _professionService.GetByIdAsync(id);
+        if (existingSection == null)
+        {
+            return NotFound($"Category con ID {id} no fue encontrada.");
+        }
+
+
+        _mapper.Map(updateDto, existingSection);
         await _professionService.SaveChangesAsync();
-        return NoContent();
+
+        return Ok(existingSection);
     }
+
 
     // DELETE: api/profession/{id}
     [HttpDelete("{id}")]
