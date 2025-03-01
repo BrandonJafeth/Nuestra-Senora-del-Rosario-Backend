@@ -89,16 +89,21 @@ namespace Infrastructure.Services.Administrative.Residents
                 .Include(r => r.Appointments)
                     .ThenInclude(a => a.HealthcareCenter)
                 .Include(r => r.Appointments)
-                    .ThenInclude(a => a.Companion) 
+                    .ThenInclude(a => a.Companion)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(r => r.Id_Resident == id);
 
             if (resident == null)
                 throw new KeyNotFoundException($"Resident with ID {id} not found.");
 
+            var currentYear = DateTime.Now.Year;
+            resident.Appointments = resident
+                .Appointments
+                .Where(a => a.Date.Year == currentYear)
+                .ToList();
+
             return _mapper.Map<ResidentMinimalInfoDto>(resident);
         }
-
 
         // Método para obtener un residente por ID
         public async Task<ResidentGetDto> GetResidentByIdAsync(int id)
