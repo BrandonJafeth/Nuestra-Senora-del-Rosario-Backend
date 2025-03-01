@@ -238,6 +238,25 @@ public class UserController : ControllerBase
         return NoContent();
     }
 
+    // GET: api/user/paginated?pageNumber=1&pageSize=10
+    [HttpGet("paginated")]
+    public async Task<IActionResult> GetAllUsersPaginated([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    {
+        try
+        {
+            var (users, totalPages) = await _userService.GetAllUserWithPaginationAsync(pageNumber, pageSize);
+
+            return Ok(new
+            {
+                users,
+                totalPages
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error interno del servidor: {ex.Message}");
+        }
+    }
 
     /// <summary>
     /// 📌 Login de usuario

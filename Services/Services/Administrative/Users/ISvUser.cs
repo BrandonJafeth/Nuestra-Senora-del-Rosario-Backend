@@ -31,7 +31,11 @@ namespace Infrastructure.Services.Administrative.Users
         Task ChangeAuthenticatedUserPasswordAsync(int userId, UserChangePasswordDto userChangePasswordDto);
         Task UpdateUserStatusAsync(int userId, bool isActive, int performedByUserId);
 
- 
+        Task<(IEnumerable<UserGetDto> Users, int TotalPages)> GetAllUserWithPaginationAsync(int pageNumber, int pageSize);
+
+
+
+
 
 
     }

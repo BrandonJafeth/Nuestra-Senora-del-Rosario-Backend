@@ -179,7 +179,26 @@ namespace Infrastructure.Services.Administrative.Users
             return _mapper.Map<IEnumerable<UserGetDto>>(users);
         }
 
-        // Asignar un rol a un usuario
+
+        public async Task<(IEnumerable<UserGetDto> Users, int TotalPages)> GetAllUserWithPaginationAsync(int pageNumber, int pageSize)
+        {
+            
+            var totalUsers = await _userRepository.Query().CountAsync();
+            var usersQuery = _userRepository
+                .Query()
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role);
+
+            var users = await usersQuery
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var totalPages = (int)Math.Ceiling(totalUsers / (double)pageSize);
+            var userDtos = _mapper.Map<IEnumerable<UserGetDto>>(users);
+
+            return (userDtos, totalPages);
+        }
         public async Task AssignRoleToUserAsync(UserRoleCreateDTO userRoleCreateDto)
         {
             var user = await _userRepository.Query().FirstOrDefaultAsync(u => u.Id_User == userRoleCreateDto.Id_User);
