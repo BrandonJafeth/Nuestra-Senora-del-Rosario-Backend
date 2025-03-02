@@ -7,12 +7,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Infrastructure.Services.Administrative.Residents;
 
 namespace Infrastructure.Services.Administrative.GogleDrive
 {
     public class SvGoogleDrive : ISvGoogleDrive
     {
         private readonly DriveService _driveService;
+        private readonly ISvResident _residentService;
 
         /// <summary>
         /// ID de la carpeta padre donde se van a crear las subcarpetas por cédula.
@@ -20,8 +22,10 @@ namespace Infrastructure.Services.Administrative.GogleDrive
         /// </summary>
         private const string PARENT_FOLDER_ID = "1Yz97xBoW_UIf3QX8FH3zpbTEpPraFU_d";
 
-        public SvGoogleDrive()
+        public SvGoogleDrive(ISvResident residentService)
         {
+
+            _residentService = residentService;
             // 1. Leer credenciales desde variable de entorno
             var credentialsJson = Environment.GetEnvironmentVariable("GOOGLE_CREDENTIALS_JSON");
             if (string.IsNullOrEmpty(credentialsJson))
@@ -204,6 +208,50 @@ namespace Infrastructure.Services.Administrative.GogleDrive
             return updated;
         }
 
+
+        public async Task<string> EnsureResidentFolderAsync(string cedula)
+        {
+            // 1. Obtener al residente para armar el nombre
+            var resident = await _residentService.GetResidentByCedulaAsync(cedula);
+            if (resident == null)
+                throw new Exception($"No se encontró un residente con cédula {cedula}");
+
+            // 2. Construir el nombre de la carpeta con su nombre completo
+            //    Ejemplo: "Juan Carlos Pérez"
+            string folderName = $"{resident.Name_RD} {resident.Lastname1_RD} {resident.Lastname2_RD}".Trim();
+
+            // 3. Buscar si la carpeta con ese nombre ya existe en la carpeta padre
+            var listRequest = _driveService.Files.List();
+            listRequest.Q = $"name = '{folderName}' " +
+                            "and mimeType = 'application/vnd.google-apps.folder' " +
+                            "and trashed = false " +
+                            $"and '{PARENT_FOLDER_ID}' in parents";
+            listRequest.Fields = "files(id, name)";
+
+            var result = await listRequest.ExecuteAsync();
+            if (result.Files?.Count > 0)
+            {
+                // Ya existe; devolvemos su Id.
+                return result.Files[0].Id;
+            }
+
+            // 4. Crear la carpeta con ese nombre dentro de la carpeta padre
+            var folderMetadata = new Google.Apis.Drive.v3.Data.File
+            {
+                Name = folderName,
+                MimeType = "application/vnd.google-apps.folder",
+                Parents = new List<string> { PARENT_FOLDER_ID }
+            };
+
+            var createRequest = _driveService.Files.Create(folderMetadata);
+            createRequest.Fields = "id";
+            var folder = await createRequest.ExecuteAsync();
+
+            // 5. Otorgar permisos de lectura pública ("anyone" -> "reader")
+            await GrantPublicReadAccessAsync(folder.Id);
+
+            return folder.Id;
+        }
 
 
 

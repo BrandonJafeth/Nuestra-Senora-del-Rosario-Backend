@@ -20,32 +20,24 @@ public class FileUploadController : ControllerBase
     public async Task<IActionResult> UploadFile(string cedula, IFormFile file)
     {
         if (file == null || file.Length == 0)
-        {
-            return BadRequest("No se proporcionó archivo en la solicitud.");
-        }
+            return BadRequest("No se proporcionó archivo.");
 
         try
         {
-            // Asegurarnos de tener la carpeta de esa cédula
-            var folderId = await _googleDrive.EnsureCedulaFolderAsync(cedula);
+            // Aseguramos la carpeta con nombre del residente
+            var folderId = await _googleDrive.EnsureResidentFolderAsync(cedula);
 
-            // Subir archivo
+            // Subir archivo, conservando el nombre original, o si quieres cambia
+            var fileName = file.FileName;
+
             using var stream = file.OpenReadStream();
-            var fileId = await _googleDrive.UploadFileAsync(stream, file.FileName, folderId);
+            var fileId = await _googleDrive.UploadFileAsync(stream, fileName, folderId);
 
-            // Opcional: Generar enlace al archivo
-            var publicUrl = $"https://drive.google.com/file/d/{fileId}/view?usp=sharing";
-
-            return Ok(new
-            {
-                message = "Archivo subido con éxito",
-                driveFileId = fileId,
-                driveFilePublicUrl = publicUrl
-            });
+            return Ok(new { message = "Archivo subido con éxito", driveFileId = fileId });
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Error al subir el archivo: {ex.Message}");
+            return StatusCode(500, $"Error: {ex.Message}");
         }
     }
 

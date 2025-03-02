@@ -1,4 +1,5 @@
-﻿using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
+﻿using Domain.Entities.Administration;
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ namespace Infrastructure.Services.Administrative.Residents
 
         Task<IEnumerable<ResidentGetDto>> GetAllResidentsAsync();
         Task<ResidentGetDto> GetResidentByIdAsync(int id);
+        Task<Resident> GetResidentByCedulaAsync(string cedula);
 
         Task<ResidentMinimalInfoDto> GetResidentMinimalInfoAsync(int id);
         Task AddResidentAsync(ResidentCreateDto residentDto);
