@@ -38,6 +38,7 @@ using Infrastructure.Services.Administrative.MedicationSpecifics;
 using Infrastructure.Services.Administrative.ResidentMedications;
 using Infrastructure.Services.Administrative.ResidentPathologies;
 using Infrastructure.Services.Administrative.MedicalHistories;
+using Infrastructure.Services.Administrative.GogleDrive;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -142,7 +143,7 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<ISvResidentMedication, SvResidentMedication>();
             services.AddScoped<ISvResidentPathology, SvResidentPathology>();
             services.AddScoped<ISvMedicalHistory, SvMedicalHistory>();
-
+            services.AddScoped<ISvGoogleDrive, SvGoogleDrive>();
             #endregion
 
             #region Services_Informative

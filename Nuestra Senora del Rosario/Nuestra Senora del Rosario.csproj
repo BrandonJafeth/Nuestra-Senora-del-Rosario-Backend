@@ -13,6 +13,8 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    <PackageReference Include="Google.Apis.Drive.v3" Version="1.69.0.3699" />
+    <PackageReference Include="Google.Apis.Oauth2.v2" Version="1.68.0.1869" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="8.0.10" />
@@ -48,5 +50,6 @@
 	  <Folder Include="Middlewares\" />
 	  <Folder Include="Filters\" />
 	</ItemGroup>
+
 
 </Project>
