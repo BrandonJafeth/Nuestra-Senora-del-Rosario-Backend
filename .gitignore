@@ -141,3 +141,7 @@ ext/
 
 # StyleCop
 StyleCopReport.xml
+
+#Credentials
+Credentials/credentials.json
+
