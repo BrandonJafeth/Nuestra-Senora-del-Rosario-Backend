@@ -308,6 +308,12 @@ namespace Infrastructure.Services.Administrative.Residents
             await _residentRepository.SaveChangesAsync();
         }
 
+        public async Task<Resident> GetResidentByCedulaAsync(string cedula)
+        {
+            // Asumiendo que en tu entidad Resident la propiedad es Cedula_RD
+            return await _residentRepository.Query()
+                .FirstOrDefaultAsync(r => r.Cedula_RD == cedula);
+        }
 
     }
 }

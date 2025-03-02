@@ -23,5 +23,7 @@ namespace Infrastructure.Services.Administrative.GogleDrive
         // Renombrar
         Task<Google.Apis.Drive.v3.Data.File> RenameFileAsync(string fileId, string newName);
 
+        Task<string> EnsureResidentFolderAsync(string cedula);
+
     }
 }
