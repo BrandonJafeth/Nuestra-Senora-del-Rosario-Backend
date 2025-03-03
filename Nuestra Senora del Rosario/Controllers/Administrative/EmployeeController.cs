@@ -109,4 +109,15 @@ public class EmployeeController : ControllerBase
         }
     }
 
+
+    [HttpGet("filter")]
+    public async Task<IActionResult> FilterEmployees(
+             [FromQuery] EmployeeFilterDTO filter,
+             [FromQuery] int pageNumber = 1,
+             [FromQuery] int pageSize = 10)
+    {
+        var result = await _employeeService.FilterEmployeesAsync(filter, pageNumber, pageSize);
+        return Ok(result);
+    }
+
 }

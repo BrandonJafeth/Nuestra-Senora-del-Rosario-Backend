@@ -14,6 +14,9 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.EmployeeServi
         // Obtener todos los empleados con paginación
         Task<(IEnumerable<EmployeeGetDTO> Employees, int TotalPages)> GetAllEmployeesAsync(int pageNumber, int pageSize);
 
+
+        Task<(IEnumerable<EmployeeFilterDTO> Employees, int TotalPages)> FilterEmployeesAsync(EmployeeFilterDTO filter, int pageNumber, int pageSize);
+
         Task UpdateEmployeeAsync(int dni, EmployeeUpdateDto employeeUpdateDto);
 
         Task<IEnumerable<EmployeeByProfessionDTO>> GetEmployeesByProfessionsAsync(IEnumerable<int> professionIds);
