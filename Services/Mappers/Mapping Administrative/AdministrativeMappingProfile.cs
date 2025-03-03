@@ -422,5 +422,11 @@ public class AdministrativeMappingProfile : Profile
 
         CreateMap<UnitOfMeasureUpdateDto, UnitOfMeasure>()
             .ForMember(dest => dest.UnitOfMeasureID, opt => opt.Ignore());
+
+
+
+        CreateMap<Employee, EmployeeFilterDTO>()
+          .ForMember(dest => dest.Name_TypeOfSalary, opt => opt.MapFrom(src => src.TypeOfSalary.Name_TypeOfSalary))
+          .ForMember(dest => dest.Name_Profession, opt => opt.MapFrom(src => src.Profession.Name_Profession));
     }
 }

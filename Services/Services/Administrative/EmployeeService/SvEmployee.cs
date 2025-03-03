@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Infrastructure.Extensions;
 
 namespace Infrastructure.Services.Administrative.AdministrativeDTO.EmployeeService
 {
@@ -92,6 +93,40 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.EmployeeServi
 
             return employees;
         }
+
+        // Método de filtrado con paginación
+        public async Task<(IEnumerable<EmployeeFilterDTO> Employees, int TotalPages)> FilterEmployeesAsync(EmployeeFilterDTO filter, int pageNumber, int pageSize)
+        {
+            IQueryable<Employee> query = _employeeRepository.Query();
+
+            // Incluimos las relaciones para filtrar correctamente
+            query = query.Include(e => e.TypeOfSalary)
+                         .Include(e => e.Profession);
+
+            // Aplicamos los filtros condicionalmente con el método de extensión WhereIf
+            query = query.WhereIf(filter.Dni.HasValue, e => e.Dni == filter.Dni.Value)
+                         .WhereIf(!string.IsNullOrEmpty(filter.First_Name), e => e.First_Name.Contains(filter.First_Name))
+                         .WhereIf(!string.IsNullOrEmpty(filter.Last_Name1), e => e.Last_Name1.Contains(filter.Last_Name1))
+                         .WhereIf(!string.IsNullOrEmpty(filter.Last_Name2), e => e.Last_Name2.Contains(filter.Last_Name2))
+                         .WhereIf(!string.IsNullOrEmpty(filter.Phone_Number), e => e.Phone_Number.Contains(filter.Phone_Number))
+                         .WhereIf(!string.IsNullOrEmpty(filter.Email), e => e.Email.Contains(filter.Email))
+                         .WhereIf(!string.IsNullOrEmpty(filter.Name_TypeOfSalary),
+                                  e => e.TypeOfSalary.Name_TypeOfSalary.Contains(filter.Name_TypeOfSalary))
+                         .WhereIf(!string.IsNullOrEmpty(filter.Name_Profession),
+                                  e => e.Profession.Name_Profession.Contains(filter.Name_Profession));
+
+            // Obtenemos el total de registros que cumplen los filtros
+            var totalRecords = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+            // Aplicamos paginación
+            var employees = await query.Skip((pageNumber - 1) * pageSize)
+                                       .Take(pageSize)
+                                       .ToListAsync();
+
+            return (_mapper.Map<IEnumerable<EmployeeFilterDTO>>(employees), totalPages);
+        }
+
 
     }
 }
