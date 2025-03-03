@@ -224,6 +224,8 @@ namespace Infrastructure.Services.Administrative.Residents
                 await _dependencyHistoryRepository.AddAsync(dependencyHistory);
                 await _dependencyHistoryRepository.SaveChangesAsync();
 
+                _context.ApplicationForms.Remove(applicationForm);
+                await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
             }
             catch (Exception ex)
