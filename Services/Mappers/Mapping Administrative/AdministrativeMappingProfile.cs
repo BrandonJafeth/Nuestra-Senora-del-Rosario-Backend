@@ -421,7 +421,8 @@ public class AdministrativeMappingProfile : Profile
             .ForMember(dest => dest.Id_TypeOfSalary, opt => opt.Ignore());
 
         CreateMap<UnitOfMeasureUpdateDto, UnitOfMeasure>()
-            .ForMember(dest => dest.UnitOfMeasureID, opt => opt.Ignore());
+            .ForMember(dest => dest.UnitOfMeasureID, opt => opt.Ignore())
+        .ForMember(dest => dest.UnitName, opt => opt.MapFrom(src => src.NombreUnidad));
 
 
 
