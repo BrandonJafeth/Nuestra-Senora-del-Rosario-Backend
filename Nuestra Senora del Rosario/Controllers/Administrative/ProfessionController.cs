@@ -64,7 +64,7 @@ public class ProfessionController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateProfession(int id, [FromBody] CategoryUpdateDTO updateDto)
+    public async Task<IActionResult> UpdateProfession(int id, [FromBody] ProfessionUpdateDTO updateDto)
     {
         // Verificar que el DTO sea válido
         if (!ModelState.IsValid)
