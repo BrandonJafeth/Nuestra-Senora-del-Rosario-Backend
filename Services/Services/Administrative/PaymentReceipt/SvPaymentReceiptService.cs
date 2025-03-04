@@ -41,13 +41,13 @@ namespace Infrastructure.Services.Administrative.PaymentReceiptService
             try
             {
                 var paymentReceipt = _mapper.Map<PaymentReceipt>(paymentReceiptCreateDto);
-                paymentReceipt.CreatedAt = DateTime.UtcNow;
+                paymentReceipt.CreatedAt = DateTime.Now;
 
-                decimal totalExtraHoursAmount = paymentReceiptCreateDto.ExtraHourRate * paymentReceiptCreateDto.Overtime;
-                paymentReceipt.TotalExtraHoursAmount = totalExtraHoursAmount;
+               paymentReceipt.TotalExtraHoursAmount = paymentReceiptCreateDto.TotalExtraHoursAmount;
+
 
                 // Calcular el monto bruto
-                paymentReceipt.GrossAmount = paymentReceiptCreateDto.Salary + totalExtraHoursAmount;
+                paymentReceipt.GrossAmount = paymentReceiptCreateDto.Salary + paymentReceiptCreateDto.TotalExtraHoursAmount;
                 // Asignar GrossIncome
                 paymentReceipt.GrossIncome = paymentReceipt.GrossAmount;
                 // Calcular deducciones
