@@ -33,10 +33,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ServicesTest\Administrative\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Services\Infrastructure.csproj" />
   </ItemGroup>
 

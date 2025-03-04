@@ -12,18 +12,20 @@ using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTO
 using Domain.Entities.Administration;
 using iText.Commons.Actions.Contexts;
 using Infrastructure.Persistence.AppDbContext;
+using FluentValidation;
 
 public class SvInventoryService : ISvInventoryService
 {
     private readonly ISvGenericRepository<Inventory> _inventoryRepository;
     private readonly IMapper _mapper;
     private readonly AppDbContext _context;
-
-    public SvInventoryService(ISvGenericRepository<Inventory> inventoryRepository, IMapper mapper, AppDbContext context)
+    private readonly IValidator<InventoryCreateDTO> _inventoryCreateValidator;
+    public SvInventoryService(ISvGenericRepository<Inventory> inventoryRepository, IMapper mapper, AppDbContext context, IValidator<InventoryCreateDTO> inventoryCreateValidator)
     {
         _inventoryRepository = inventoryRepository;
         _mapper = mapper;
         _context = context;
+        _inventoryCreateValidator = inventoryCreateValidator;
     }
 
     public async Task<IEnumerable<InventoryGetDTO>> GetAllMovementsAsync()
@@ -69,7 +71,18 @@ public class SvInventoryService : ISvInventoryService
             throw new ArgumentException("Debe proporcionar al menos un movimiento de inventario.");
         }
 
-        // (Opcional) iniciar transacción si deseas atomicidad:
+        // Validar cada DTO usando el validador inyectado
+        foreach (var dto in inventoryCreateDTOs)
+        {
+            var result = _inventoryCreateValidator.Validate(dto);
+            if (!result.IsValid)
+            {
+                // Puedes acumular los errores o lanzar la excepción directamente
+                throw new ValidationException(result.Errors);
+            }
+        }
+
+        // Inicia una transacción para asegurar atomicidad
         using var transaction = await _context.Database.BeginTransactionAsync();
 
         try
@@ -77,7 +90,6 @@ public class SvInventoryService : ISvInventoryService
             foreach (var dto in inventoryCreateDTOs)
             {
                 var inventoryMovement = _mapper.Map<Inventory>(dto);
-                // Si necesitas lógica adicional por movimiento, colócala aquí
                 await _inventoryRepository.AddAsync(inventoryMovement);
             }
 
@@ -86,9 +98,8 @@ public class SvInventoryService : ISvInventoryService
         }
         catch
         {
-            // Si algo falla, revertimos
             await transaction.RollbackAsync();
-            throw; // Propaga la excepción
+            throw;
         }
     }
 

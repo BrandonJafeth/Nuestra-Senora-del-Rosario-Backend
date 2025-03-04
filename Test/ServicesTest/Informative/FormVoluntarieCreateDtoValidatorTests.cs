@@ -31,7 +31,7 @@ namespace Test.ServicesTest.Informative
                 Vn_Phone = "12345678",   // 8 dígitos
                 Delivery_Date = DateTime.Today,
                 End_Date = DateTime.Today.AddDays(1),
-                VoluntarieTypeId = 1
+                Id_VoluntarieType = 1
             };
 
             // Act: ejecutar la validación
@@ -55,7 +55,7 @@ namespace Test.ServicesTest.Informative
                 Vn_Phone = "12345678",
                 Delivery_Date = DateTime.Today,
                 End_Date = DateTime.Today.AddDays(1),
-                VoluntarieTypeId = 1
+                Id_VoluntarieType = 1
             };
 
             var result = _validator.Validate(dto);
@@ -78,7 +78,7 @@ namespace Test.ServicesTest.Informative
                 Vn_Phone = "12345678",
                 Delivery_Date = DateTime.Today,
                 End_Date = DateTime.Today.AddDays(1),
-                VoluntarieTypeId = 1
+                Id_VoluntarieType = 1
             };
 
             var result = _validator.Validate(dto);
@@ -100,7 +100,7 @@ namespace Test.ServicesTest.Informative
                 Vn_Phone = "12345678",
                 Delivery_Date = DateTime.Today,
                 End_Date = DateTime.Today.AddDays(1),
-                VoluntarieTypeId = 1
+                Id_VoluntarieType = 1
             };
 
             var result = _validator.Validate(dto);
@@ -123,7 +123,7 @@ namespace Test.ServicesTest.Informative
                 Vn_Phone = phone,
                 Delivery_Date = DateTime.Today,
                 End_Date = DateTime.Today.AddDays(1),
-                VoluntarieTypeId = 1
+                Id_VoluntarieType = 1
             };
 
             var result = _validator.Validate(dto);
@@ -146,7 +146,7 @@ namespace Test.ServicesTest.Informative
                 Vn_Phone = phone,   // 7 dígitos, inválido
                 Delivery_Date = DateTime.Today,
                 End_Date = DateTime.Today.AddDays(1),
-                VoluntarieTypeId = 1
+                Id_VoluntarieType = 1
             };
 
             var result = _validator.Validate(dto);
@@ -168,7 +168,7 @@ namespace Test.ServicesTest.Informative
                 Vn_Phone = "12345678",
                 Delivery_Date = DateTime.Today.AddDays(-1), // Fecha pasada
                 End_Date = DateTime.Today.AddDays(1),
-                VoluntarieTypeId = 1
+                Id_VoluntarieType = 1
             };
 
             var result = _validator.Validate(dto);
@@ -190,7 +190,7 @@ namespace Test.ServicesTest.Informative
                 Vn_Phone = "12345678",
                 Delivery_Date = DateTime.Today,
                 End_Date = DateTime.Today, // Misma fecha, no es posterior
-                VoluntarieTypeId = 1
+                Id_VoluntarieType = 1
             };
 
             var result = _validator.Validate(dto);
@@ -213,7 +213,7 @@ namespace Test.ServicesTest.Informative
                 Vn_Phone = "12345678",
                 Delivery_Date = DateTime.Today,
                 End_Date = DateTime.Today.AddDays(1),
-                VoluntarieTypeId = typeId
+                Id_VoluntarieType = typeId
             };
 
             var result = _validator.Validate(dto);
