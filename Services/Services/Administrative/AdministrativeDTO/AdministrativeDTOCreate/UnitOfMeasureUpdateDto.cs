@@ -8,6 +8,6 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.Administrativ
 {
    public class UnitOfMeasureUpdateDto
     {
-        public string UnitName { get; set; }
+        public string NombreUnidad { get; set; }
     }
 }
