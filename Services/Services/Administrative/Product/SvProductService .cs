@@ -7,6 +7,8 @@ using Infrastructure.Services.Administrative.Product;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
 using Domain.Entities.Administration;
+using FluentValidation;
+using FluentValidation.Results;
 
 public class SvProductService : ISvProductService
 {
@@ -14,17 +16,22 @@ public class SvProductService : ISvProductService
     private readonly ISvGenericRepository<Category> _categoryRepository;
     private readonly ISvGenericRepository<UnitOfMeasure> _unitOfMeasureRepository;
     private readonly IMapper _mapper;
+    private readonly IValidator<ProductCreateDTO> _productCreateValidator;
+    private readonly IValidator<ProductPatchDto> _productPatchValidator;
 
     public SvProductService(
         ISvGenericRepository<Product> productRepository,
         ISvGenericRepository<Category> categoryRepository,
         ISvGenericRepository<UnitOfMeasure> unitOfMeasureRepository,
-        IMapper mapper)
+        IMapper mapper, IValidator<ProductCreateDTO> productCreateValidator,
+        IValidator<ProductPatchDto> productPatchValidator)
     {
         _productRepository = productRepository;
         _categoryRepository = categoryRepository;
         _unitOfMeasureRepository = unitOfMeasureRepository;
         _mapper = mapper;
+        _productCreateValidator = productCreateValidator;
+        _productPatchValidator = productPatchValidator;
     }
 
     public async Task<(IEnumerable<ProductGetDTO> Products, int TotalPages)> GetAllProductsAsync(int pageNumber, int pageSize)
@@ -56,6 +63,10 @@ public class SvProductService : ISvProductService
 
     public async Task CreateProductAsync(ProductCreateDTO productCreateDTO)
     {
+        ValidationResult result = await _productCreateValidator.ValidateAsync(productCreateDTO);
+        if (!result.IsValid)
+            throw new ValidationException(result.Errors);
+
         var product = _mapper.Map<Product>(productCreateDTO);
         await _productRepository.AddAsync(product);
         await _productRepository.SaveChangesAsync();
@@ -63,7 +74,10 @@ public class SvProductService : ISvProductService
 
     public async Task PatchProductAsync(int productId, ProductPatchDto patchDto)
     {
-        // Obtener el producto desde la base de datos
+        ValidationResult result = await _productPatchValidator.ValidateAsync(patchDto);
+        if (!result.IsValid)
+            throw new ValidationException(result.Errors);
+
         var product = await _productRepository
             .Query()
             .Include(p => p.Category)
@@ -73,7 +87,6 @@ public class SvProductService : ISvProductService
         if (product == null)
             throw new KeyNotFoundException($"Product with ID {productId} not found");
 
-        // Actualizar las propiedades específicas si están presentes en el DTO
         if (patchDto.CategoryID.HasValue)
         {
             var category = await _categoryRepository.GetByIdAsync(patchDto.CategoryID.Value);
@@ -102,7 +115,6 @@ public class SvProductService : ISvProductService
             product.Name = patchDto.Name;
         }
 
-        // Guardar los cambios en el repositorio
         _productRepository.Update(product);
         await _productRepository.SaveChangesAsync();
     }
