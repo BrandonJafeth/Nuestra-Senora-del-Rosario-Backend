@@ -1,0 +1,6 @@
+@Nuestra_Senora_del_Rosario_HostAddress = http://localhost:5074
+
+GET {{Nuestra_Senora_del_Rosario_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
