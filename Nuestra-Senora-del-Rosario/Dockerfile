@@ -44,21 +44,21 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 # Copiar el archivo .csproj desde su ubicación
-COPY ["Nuestra Senora del Rosario/Nuestra Senora del Rosario.csproj", "Nuestra Senora del Rosario/"]
+COPY ["Nuestra-Senora-del-Rosario/Nuestra-Senora-del-Rosario.csproj", "Nuestra-Senora-del-Rosario/"]
 
 # Restaurar dependencias para todos los proyectos
-RUN dotnet restore "Nuestra Senora del Rosario/Nuestra Senora del Rosario.csproj"
+RUN dotnet restore "Nuestra-Senora-del-Rosario/Nuestra-Senora-del-Rosario.csproj"
 
 # Copiar todo el código fuente
 COPY . .
 
 # Establecer directorio de trabajo y compilar la aplicación
-WORKDIR "/src/Nuestra Senora del Rosario"
-RUN dotnet build "Nuestra Senora del Rosario.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/Nuestra-Senora-del-Rosario"
+RUN dotnet build "Nuestra-Senora-del-Rosario.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # Publicar la aplicación
 FROM build AS publish
-RUN dotnet publish "Nuestra Senora del Rosario.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Nuestra-Senora-del-Rosario.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # Imagen final para ejecutar la aplicación
 FROM base AS final
@@ -66,7 +66,7 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 # Copiar la plantilla HTML a una carpeta conocida dentro del contenedor
-COPY ["Nuestra Senora del Rosario/Templates/", "/app/Templates"]
+COPY ["Nuestra-Senora-del-Rosario/Templates/", "/app/Templates"]
 
 # Entrypoint
-ENTRYPOINT ["dotnet", "Nuestra Senora del Rosario.dll"]
+ENTRYPOINT ["dotnet", "Nuestra-Senora-del-Rosario.dll"]
