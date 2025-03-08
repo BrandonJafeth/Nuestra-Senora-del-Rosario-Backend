@@ -155,8 +155,8 @@ app.MapHub<NotificationHub>("/notificationHub");
 
 ////Cambios para coolify
 //var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
-//app.Urls.Clear();
-//app.Urls.Add($"http://0.0.0.0:{port}");
+app.Urls.Clear();
+app.Urls.Add($"http://0.0.0.0:{port}");
 
 app.Run();
 #endregion
