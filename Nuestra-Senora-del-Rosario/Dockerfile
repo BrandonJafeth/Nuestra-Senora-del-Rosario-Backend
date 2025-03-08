@@ -1,11 +1,9 @@
-
-# Imagen base para ASP.NET en Linux
+# Base image for ASP.NET on Linux
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-# Puerto por defecto para Render
 EXPOSE 10000
 
-# Instalar dependencias necesarias para Puppeteer y Google Chrome
+# Install dependencies for Puppeteer and Google Chrome (fonts, libraries, etc.)
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
@@ -29,44 +27,54 @@ RUN apt-get update && apt-get install -y \
     fonts-noto-color-emoji \
     && rm -rf /var/lib/apt/lists/*
 
-# Agregar el repositorio de Google Chrome y su clave
-RUN wget -qO- https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /usr/share/keyrings/google-chrome.gpg && \
-    echo "deb [signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && \
+# Add Google Chrome repo and key
+RUN wget -qO- https://dl.google.com/linux/linux_signing_key.pub | \
+    gpg --dearmor > /usr/share/keyrings/google-chrome.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/google-chrome.gpg] \
+    http://dl.google.com/linux/chrome/deb/ stable main" \
+    > /etc/apt/sources.list.d/google-chrome.list && \
     apt-get update && apt-get install -y google-chrome-stable && \
     rm -rf /var/lib/apt/lists/*
 
-# Configurar la variable de entorno para Puppeteer
-ENV PUPPETEER_EXECUTABLE_PATH "/usr/bin/google-chrome-stable"
+# Puppeteer env variable
+ENV PUPPETEER_EXECUTABLE_PATH="/usr/bin/google-chrome-stable"
 
-# Imagen SDK para construir el proyecto
+# SDK image for building .NET
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-# Copiar el archivo .csproj desde su ubicación
-COPY ["Nuestra Senora del Rosario/Nuestra Senora del Rosario.csproj", "Nuestra Senora del Rosario/"]
+# Copy the .csproj
+# Make sure your repo folder is named "Nuestra-Senora-del-Rosario"
+# and the project file is "Nuestra-Senora-del-Rosario.csproj"
+COPY ["Nuestra-Senora-del-Rosario/Nuestra-Senora-del-Rosario.csproj", "Nuestra-Senora-del-Rosario/"]
 
-# Restaurar dependencias para todos los proyectos
-RUN dotnet restore "Nuestra Senora del Rosario/Nuestra Senora del Rosario.csproj"
+# Restore packages
+RUN dotnet restore "Nuestra-Senora-del-Rosario/Nuestra-Senora-del-Rosario.csproj"
 
-# Copiar todo el código fuente
+# Copy all source code
 COPY . .
 
-# Establecer directorio de trabajo y compilar la aplicación
-WORKDIR "/src/Nuestra Senora del Rosario"
-RUN dotnet build "Nuestra Senora del Rosario.csproj" -c $BUILD_CONFIGURATION -o /app/build
+# Build the application
+WORKDIR "/src/Nuestra-Senora-del-Rosario"
+RUN dotnet build "Nuestra-Senora-del-Rosario.csproj" \
+    -c $BUILD_CONFIGURATION \
+    -o /app/build
 
-# Publicar la aplicación
+# Publish the application
 FROM build AS publish
-RUN dotnet publish "Nuestra Senora del Rosario.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "Nuestra-Senora-del-Rosario.csproj" \
+    -c $BUILD_CONFIGURATION \
+    -o /app/publish \
+    /p:UseAppHost=false
 
-# Imagen final para ejecutar la aplicación
+# Final image
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Copiar la plantilla HTML a una carpeta conocida dentro del contenedor
-COPY ["Nuestra Senora del Rosario/Templates/", "/app/Templates"]
+# Copy templates folder if needed
+COPY ["Nuestra-Senora-del-Rosario/Templates/", "/app/Templates"]
 
-# Entrypoint
-ENTRYPOINT ["dotnet", "Nuestra Senora del Rosario.dll"]
+ENTRYPOINT ["dotnet", "Nuestra-Senora-del-Rosario.dll"]
