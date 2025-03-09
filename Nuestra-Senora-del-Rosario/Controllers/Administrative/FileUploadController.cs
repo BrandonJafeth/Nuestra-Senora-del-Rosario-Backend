@@ -50,7 +50,7 @@ public class FileUploadController : ControllerBase
         try
         {
             // Obtenemos la carpeta (y la creamos si no existiese).
-            var folderId = await _googleDrive.EnsureCedulaFolderAsync(cedula);
+            var folderId = await _googleDrive.EnsureResidentFolderAsync(cedula);
 
             // Llamamos a un método (que luego definiremos) que liste archivos en esa carpeta.
             var fileList = await _googleDrive.ListFilesInFolderAsync(folderId);
