@@ -24,18 +24,18 @@ namespace Infrastructure.Services.Administrative.Inventory
         List<int> convertProductIds);
 
         Task<IEnumerable<InventoryReportDTO>> GetMonthlyReportByCategoryAsync(
-     int month,
-     int year,
-     string targetUnit,
-     List<int> convertProductIds,
-     int categoryId);
+            int month,
+            int year,
+            Dictionary<int, string> conversionMapping,
+            int categoryId
+        );
 
         Task<IEnumerable<InventoryReportDTO>> GetMonthlyReportByCategoryWithMovementsAsync(
-    int month,
-    int year,
-    string targetUnit,
-    List<int> convertProductIds,
-    int categoryId);
+            int month,
+            int year,
+            Dictionary<int, string> conversionMapping,
+            int categoryId
+        );
         Task RegisterMovementsAsync(IEnumerable<InventoryCreateDTO> inventoryCreateDTOs);
 
         Task PatchInventoryAsync(int inventoryId, JsonPatchDocument<Domain.Entities.Administration.Inventory> patchDoc);

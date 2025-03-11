@@ -10,5 +10,6 @@
         public string UnitOfMeasure { get; set; }
         // Nueva propiedad para mostrar el total convertido
         public double ConvertedTotalInStock { get; set; }
+
     }
 }

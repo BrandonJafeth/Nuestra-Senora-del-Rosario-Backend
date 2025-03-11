@@ -77,44 +77,107 @@ public class InventoryController : ControllerBase
 
 
     [HttpGet("report/category/month")]
-    public async Task<IActionResult> GetMonthlyReportByCategory(
-      [FromQuery] int month,
-      [FromQuery] int year,
-      [FromQuery] int categoryId,
-      [FromQuery] string targetUnit = null,
-      [FromQuery] string productIds = null)
+    public async Task<IActionResult> GetMonthlyReportByCategoryCombo(
+        [FromQuery] int month,
+        [FromQuery] int year,
+        [FromQuery] int categoryId,
+        [FromQuery] string productIds,
+        [FromQuery] string targetUnits)
     {
-        List<int> convertProductIds = null;
+        // 1. Parsear las listas
+        List<int> productIdList = null;
+        List<string> targetUnitList = null;
+
         if (!string.IsNullOrEmpty(productIds))
         {
-            convertProductIds = productIds.Split(',')
+            productIdList = productIds
+                .Split(',')
                 .Select(id => int.Parse(id.Trim()))
                 .ToList();
         }
 
-        var report = await _inventoryService.GetMonthlyReportByCategoryAsync(month, year, targetUnit, convertProductIds, categoryId);
+        if (!string.IsNullOrEmpty(targetUnits))
+        {
+            targetUnitList = targetUnits
+                .Split(',')
+                .Select(u => u.Trim())
+                .ToList();
+        }
+
+        // 2. Validar que tengan la misma longitud
+        if (productIdList == null || targetUnitList == null || productIdList.Count != targetUnitList.Count)
+        {
+            return BadRequest("productIds y targetUnits deben tener la misma longitud y no estar vacíos.");
+        }
+
+        // 3. Crear el diccionario: productId -> targetUnit
+        var conversionMapping = new Dictionary<int, string>();
+        for (int i = 0; i < productIdList.Count; i++)
+        {
+            conversionMapping[productIdList[i]] = targetUnitList[i];
+        }
+
+        // 4. Llamar al servicio
+        var report = await _inventoryService.GetMonthlyReportByCategoryAsync(
+            month,
+            year,
+            conversionMapping,
+            categoryId
+        );
+
         return Ok(report);
     }
 
     // GET: api/inventory/report/category/movements?month=3&year=2025&categoryId=2&targetUnit=paquete&productIds=1,4,7
     [HttpGet("report/category/movements")]
-    public async Task<IActionResult> GetMonthlyReportByCategoryWithMovements(
-    [FromQuery] int month,
-    [FromQuery] int year,
-    [FromQuery] int categoryId,
-    [FromQuery] string targetUnit = null,
-    [FromQuery] string productIds = null)
+    public async Task<IActionResult> GetMonthlyReportByCategoryWithMovementsCombo(
+        [FromQuery] int month,
+        [FromQuery] int year,
+        [FromQuery] int categoryId,
+        [FromQuery] string productIds,
+        [FromQuery] string targetUnits)
     {
-        List<int> convertProductIds = null;
+        // 1. Parsear las listas separadas por comas
+        List<int> productIdList = null;
+        List<string> targetUnitList = null;
+
         if (!string.IsNullOrEmpty(productIds))
         {
-            convertProductIds = productIds.Split(',')
+            productIdList = productIds
+                .Split(',')
                 .Select(id => int.Parse(id.Trim()))
                 .ToList();
         }
 
+        if (!string.IsNullOrEmpty(targetUnits))
+        {
+            targetUnitList = targetUnits
+                .Split(',')
+                .Select(u => u.Trim())
+                .ToList();
+        }
+
+        // Validar que ambas listas existan y tengan la misma cantidad de elementos
+        if (productIdList == null || targetUnitList == null
+            || productIdList.Count != targetUnitList.Count)
+        {
+            return BadRequest("Las listas de productIds y targetUnits deben tener la misma longitud y no estar vacías.");
+        }
+
+        // 2. Combinar en un diccionario: productId -> targetUnit
+        var conversionMapping = new Dictionary<int, string>();
+        for (int i = 0; i < productIdList.Count; i++)
+        {
+            conversionMapping[productIdList[i]] = targetUnitList[i];
+        }
+
+        // 3. Llamar al método del servicio, pasando el mapping y el categoryId
         var report = await _inventoryService.GetMonthlyReportByCategoryWithMovementsAsync(
-            month, year, targetUnit, convertProductIds, categoryId);
+            month,
+            year,
+            conversionMapping,
+            categoryId
+        );
 
         return Ok(report);
     }

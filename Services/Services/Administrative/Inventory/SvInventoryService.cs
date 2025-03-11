@@ -285,50 +285,52 @@ public class SvInventoryService : ISvInventoryService
         return report;
     }
 
-    // Nuevo método: Reporte mensual filtrado por categoría
     public async Task<IEnumerable<InventoryReportDTO>> GetMonthlyReportByCategoryAsync(
         int month,
         int year,
-        string targetUnit,
-        List<int> convertProductIds,
+        Dictionary<int, string> conversionMapping,
         int categoryId)
     {
-        // Obtenemos los productos que pertenecen a la categoría obligatoria
+        // 1. Obtener los productos que pertenecen a la categoría obligatoria
         var products = await _context.Set<Product>()
             .Include(p => p.UnitOfMeasure)
             .Include(p => p.Category)
             .Where(p => p.CategoryID == categoryId)
             .ToListAsync();
 
-        // Obtenemos los movimientos de inventario correspondientes al mes indicado
+        // 2. Obtener los movimientos del mes
         var monthlyMovements = await _inventoryRepository.Query()
             .Where(i => i.Date.Month == month && i.Date.Year == year)
             .ToListAsync();
 
-        // Agrupamos los movimientos por producto para calcular ingresos y egresos del mes
-        var monthlyData = monthlyMovements.GroupBy(m => m.ProductID)
+        // 3. Agrupar movimientos por producto para calcular ingresos y egresos del mes
+        var monthlyData = monthlyMovements
+            .GroupBy(m => m.ProductID)
             .ToDictionary(g => g.Key, g => new {
                 TotalIngresos = g.Where(x => x.MovementType == "Ingreso").Sum(x => x.Quantity),
                 TotalEgresos = g.Where(x => x.MovementType == "Egreso").Sum(x => x.Quantity)
             });
 
+        // 4. Construir el reporte
         var report = products.Select(p =>
         {
-            // Stock global del producto actualizado (almacenado en Product.TotalQuantity)
             int totalQuantity = p.TotalQuantity;
             double convertedQuantity = totalQuantity;
             string unitToShow = p.UnitOfMeasure?.UnitName ?? "Unknown";
 
-            // Si existen movimientos mensuales para este producto, extraemos ingresos y egresos
-            int totalIngress = monthlyData.ContainsKey(p.ProductID) ? monthlyData[p.ProductID].TotalIngresos : 0;
-            int totalEgress = monthlyData.ContainsKey(p.ProductID) ? monthlyData[p.ProductID].TotalEgresos : 0;
+            // Si el producto tuvo movimientos, sacamos los totales
+            int totalIngress = monthlyData.ContainsKey(p.ProductID)
+                ? monthlyData[p.ProductID].TotalIngresos
+                : 0;
+            int totalEgress = monthlyData.ContainsKey(p.ProductID)
+                ? monthlyData[p.ProductID].TotalEgresos
+                : 0;
 
-            // Aplica la conversión solo para los productos que estén en la lista de conversión
-            if (!string.IsNullOrEmpty(targetUnit) &&
-                convertProductIds != null &&
-                convertProductIds.Contains(p.ProductID))
+            // 5. Aplicar la conversión si el diccionario contiene una clave para este producto
+            if (conversionMapping != null && conversionMapping.ContainsKey(p.ProductID))
             {
-                switch (targetUnit.ToLower())
+                string targetUnit = conversionMapping[p.ProductID].ToLower();
+                switch (targetUnit)
                 {
                     case "paquete":
                         // Ejemplo: 1 paquete = 20 unidades
@@ -336,12 +338,12 @@ public class SvInventoryService : ISvInventoryService
                         unitToShow = "Paquete(s)";
                         break;
                     case "kg":
-                        // Ejemplo: para productos en gramos, 1 kg = 1000 gramos
+                        // Ejemplo: para productos en gramos
                         convertedQuantity = _conversionService.ConvertGramsToKilograms(totalQuantity);
                         unitToShow = "kg";
                         break;
                     case "caja":
-                        // Si el producto se mide en litros (ej. leche), usamos la conversión a caja.
+                        // Si el producto se mide en litros (ej. leche), 1 caja = 12 litros
                         if (p.UnitOfMeasure?.UnitName.ToLower().Contains("litro") == true)
                         {
                             var milkConversion = _conversionService.ConvertMilk(totalQuantity, 12);
@@ -350,93 +352,7 @@ public class SvInventoryService : ISvInventoryService
                         }
                         break;
                     default:
-                        // Sin conversión, se mantiene la unidad base
-                        break;
-                }
-            }
-
-            return new InventoryReportDTO
-            {
-                ProductID = p.ProductID,
-                ProductName = p.Name,
-                TotalInStock = totalQuantity,       // Stock global (unidad base)
-                TotalIngresos = totalIngress,         // Ingresos del mes (0 si no hubo movimiento)
-                TotalEgresos = totalEgress,           // Egresos del mes (0 si no hubo movimiento)
-                UnitOfMeasure = unitToShow,
-                ConvertedTotalInStock = convertedQuantity
-            };
-        }).ToList();
-
-        return report;
-    }
-
-
-    // Nuevo método: Reporte mensual filtrado por categoría y que solo muestre productos con movimiento.
-    public async Task<IEnumerable<InventoryReportDTO>> GetMonthlyReportByCategoryWithMovementsAsync(
-        int month,
-        int year,
-        string targetUnit,
-        List<int> convertProductIds,
-        int categoryId)
-    {
-        // 1. Obtener los movimientos del mes
-        var monthlyMovements = await _inventoryRepository.Query()
-            .Where(i => i.Date.Month == month && i.Date.Year == year)
-            .ToListAsync();
-
-        // 2. Extraer los IDs de producto que tuvieron movimiento
-        var productIds = monthlyMovements.Select(m => m.ProductID).Distinct().ToList();
-
-        // 3. Filtrar productos que pertenezcan a la categoría indicada y hayan tenido movimiento
-        var products = await _context.Set<Product>()
-            .Include(p => p.UnitOfMeasure)
-            .Include(p => p.Category)
-            .Where(p => p.CategoryID == categoryId && productIds.Contains(p.ProductID))
-            .ToListAsync();
-
-        // 4. Agrupar movimientos por producto para calcular ingresos y egresos
-        var monthlyData = monthlyMovements.GroupBy(m => m.ProductID)
-            .ToDictionary(g => g.Key, g => new
-            {
-                TotalIngresos = g.Where(x => x.MovementType == "Ingreso").Sum(x => x.Quantity),
-                TotalEgresos = g.Where(x => x.MovementType == "Egreso").Sum(x => x.Quantity)
-            });
-
-        // 5. Construir el reporte para cada producto
-        var report = products.Select(p =>
-        {
-            int totalQuantity = p.TotalQuantity;
-            double convertedQuantity = totalQuantity;
-            string unitToShow = p.UnitOfMeasure?.UnitName ?? "Unknown";
-
-            // Si existen movimientos mensuales, extraer ingresos y egresos
-            int totalIngress = monthlyData.ContainsKey(p.ProductID) ? monthlyData[p.ProductID].TotalIngresos : 0;
-            int totalEgress = monthlyData.ContainsKey(p.ProductID) ? monthlyData[p.ProductID].TotalEgresos : 0;
-
-            // Aplicar conversión para los productos indicados
-            if (!string.IsNullOrEmpty(targetUnit) &&
-                convertProductIds != null &&
-                convertProductIds.Contains(p.ProductID))
-            {
-                switch (targetUnit.ToLower())
-                {
-                    case "paquete":
-                        convertedQuantity = totalQuantity / 20.0;
-                        unitToShow = "Paquete(s)";
-                        break;
-                    case "kg":
-                        convertedQuantity = _conversionService.ConvertGramsToKilograms(totalQuantity);
-                        unitToShow = "kg";
-                        break;
-                    case "caja":
-                        if (p.UnitOfMeasure?.UnitName.ToLower().Contains("litro") == true)
-                        {
-                            var milkConversion = _conversionService.ConvertMilk(totalQuantity, 12);
-                            convertedQuantity = milkConversion.Boxes;
-                            unitToShow = "Caja(s)";
-                        }
-                        break;
-                    default:
+                        // Sin conversión, se deja la unidad base
                         break;
                 }
             }
@@ -455,6 +371,89 @@ public class SvInventoryService : ISvInventoryService
 
         return report;
     }
+
+    // Nuevo método: Reporte mensual filtrado por categoría y que solo muestre productos con movimiento.
+    public async Task<IEnumerable<InventoryReportDTO>> GetMonthlyReportByCategoryWithMovementsAsync(
+     int month,
+     int year,
+     Dictionary<int, string> conversionMapping,
+     int categoryId)
+    {
+        // 1. Movimientos del mes
+        var monthlyMovements = await _inventoryRepository.Query()
+            .Where(i => i.Date.Month == month && i.Date.Year == year)
+            .ToListAsync();
+
+        // 2. IDs de producto con movimiento
+        var productIds = monthlyMovements.Select(m => m.ProductID).Distinct().ToList();
+
+        // 3. Filtrar productos por categoría y movimiento
+        var products = await _context.Set<Product>()
+            .Include(p => p.UnitOfMeasure)
+            .Include(p => p.Category)
+            .Where(p => p.CategoryID == categoryId && productIds.Contains(p.ProductID))
+            .ToListAsync();
+
+        // 4. Agrupar movimientos
+        var monthlyData = monthlyMovements.GroupBy(m => m.ProductID)
+            .ToDictionary(g => g.Key, g => new {
+                TotalIngresos = g.Where(x => x.MovementType == "Ingreso").Sum(x => x.Quantity),
+                TotalEgresos = g.Where(x => x.MovementType == "Egreso").Sum(x => x.Quantity)
+            });
+
+        // 5. Construir reporte
+        var report = products.Select(p =>
+        {
+            int totalQuantity = p.TotalQuantity;
+            double convertedQuantity = totalQuantity;
+            string unitToShow = p.UnitOfMeasure?.UnitName ?? "Unknown";
+
+            int totalIngress = monthlyData.ContainsKey(p.ProductID) ? monthlyData[p.ProductID].TotalIngresos : 0;
+            int totalEgress = monthlyData.ContainsKey(p.ProductID) ? monthlyData[p.ProductID].TotalEgresos : 0;
+
+            // Si en el diccionario de conversión hay una entrada para este producto, aplicarla
+            if (conversionMapping != null && conversionMapping.ContainsKey(p.ProductID))
+            {
+                string targetUnit = conversionMapping[p.ProductID].ToLower();
+                switch (targetUnit)
+                {
+                    case "paquete":
+                        convertedQuantity = totalQuantity / 20.0;
+                        unitToShow = "Paquete(s)";
+                        break;
+                    case "kg":
+                        convertedQuantity = _conversionService.ConvertGramsToKilograms(totalQuantity);
+                        unitToShow = "kg";
+                        break;
+                    case "caja":
+                        if (p.UnitOfMeasure?.UnitName.ToLower().Contains("litro") == true)
+                        {
+                            var milkConversion = _conversionService.ConvertMilk(totalQuantity, 12);
+                            convertedQuantity = milkConversion.Boxes;
+                            unitToShow = "Caja(s)";
+                        }
+                        break;
+                    default:
+                        // Sin conversión, se mantiene la unidad base
+                        break;
+                }
+            }
+
+            return new InventoryReportDTO
+            {
+                ProductID = p.ProductID,
+                ProductName = p.Name,
+                TotalInStock = totalQuantity,
+                TotalIngresos = totalIngress,
+                TotalEgresos = totalEgress,
+                UnitOfMeasure = unitToShow,
+                ConvertedTotalInStock = convertedQuantity
+            };
+        }).ToList();
+
+        return report;
+    }
+
 
 
 
