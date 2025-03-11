@@ -35,18 +35,87 @@ public class InventoryController : ControllerBase
     }
 
     // GET: api/inventory/report/month
-    [HttpGet("report/month")]
-    public async Task<IActionResult> GetMonthlyReportAllProducts([FromQuery] int month, [FromQuery] int year)
+    // GET: api/inventory/report/month
+    // Se puede enviar en la query: targetUnit (por ejemplo "paquete", "kg") y productIds (ej. "1,3,5")
+    [HttpGet("report/all/month")]
+    public async Task<IActionResult> GetMonthlyReportAllProducts(
+        [FromQuery] int month,
+        [FromQuery] int year,
+        [FromQuery] string targetUnit = null,
+        [FromQuery] string productIds = null)
     {
-        var report = await _inventoryService.GetMonthlyReportAllProductsAsync(month, year);
+        List<int> convertProductIds = null;
+        if (!string.IsNullOrEmpty(productIds))
+        {
+            convertProductIds = productIds.Split(',')
+                .Select(id => int.Parse(id.Trim()))
+                .ToList();
+        }
+        var report = await _inventoryService.GetMonthlyReportAllProductsAsync(month, year, targetUnit, convertProductIds);
         return Ok(report);
     }
 
     // GET: api/inventory/report/{productId}/month
-    [HttpGet("report/{productId}/month")]
-    public async Task<IActionResult> GetMonthlyReportForProduct(int productId, [FromQuery] int month, [FromQuery] int year)
+    [HttpGet("report/month")]
+    public async Task<IActionResult> GetMonthlyReport(
+        [FromQuery] int month,
+        [FromQuery] int year,
+        [FromQuery] string targetUnit = null,
+        [FromQuery] string productIds = null)
     {
-        var report = await _inventoryService.GetMonthlyReportAsync(productId, month, year);
+        List<int> convertProductIds = null;
+        if (!string.IsNullOrEmpty(productIds))
+        {
+            convertProductIds = productIds.Split(',')
+                .Select(id => int.Parse(id.Trim()))
+                .ToList();
+        }
+
+        var report = await _inventoryService.GetMonthlyReportAsync(month, year, targetUnit, convertProductIds);
+        return Ok(report);
+    }
+
+
+    [HttpGet("report/category/month")]
+    public async Task<IActionResult> GetMonthlyReportByCategory(
+      [FromQuery] int month,
+      [FromQuery] int year,
+      [FromQuery] int categoryId,
+      [FromQuery] string targetUnit = null,
+      [FromQuery] string productIds = null)
+    {
+        List<int> convertProductIds = null;
+        if (!string.IsNullOrEmpty(productIds))
+        {
+            convertProductIds = productIds.Split(',')
+                .Select(id => int.Parse(id.Trim()))
+                .ToList();
+        }
+
+        var report = await _inventoryService.GetMonthlyReportByCategoryAsync(month, year, targetUnit, convertProductIds, categoryId);
+        return Ok(report);
+    }
+
+    // GET: api/inventory/report/category/movements?month=3&year=2025&categoryId=2&targetUnit=paquete&productIds=1,4,7
+    [HttpGet("report/category/movements")]
+    public async Task<IActionResult> GetMonthlyReportByCategoryWithMovements(
+    [FromQuery] int month,
+    [FromQuery] int year,
+    [FromQuery] int categoryId,
+    [FromQuery] string targetUnit = null,
+    [FromQuery] string productIds = null)
+    {
+        List<int> convertProductIds = null;
+        if (!string.IsNullOrEmpty(productIds))
+        {
+            convertProductIds = productIds.Split(',')
+                .Select(id => int.Parse(id.Trim()))
+                .ToList();
+        }
+
+        var report = await _inventoryService.GetMonthlyReportByCategoryWithMovementsAsync(
+            month, year, targetUnit, convertProductIds, categoryId);
+
         return Ok(report);
     }
 

@@ -13,8 +13,29 @@ namespace Infrastructure.Services.Administrative.Inventory
     {
         Task<IEnumerable<InventoryGetDTO>> GetAllMovementsAsync();
         Task<IEnumerable<InventoryGetDTO>> GetMovementsByMonthAsync(int month, int year); // Nuevo método
-        Task<IEnumerable<InventoryReportDTO>> GetMonthlyReportAllProductsAsync(int month, int year); // Nuevo método
-        Task<InventoryReportDTO> GetMonthlyReportAsync(int productId, int month, int year);
+        Task<IEnumerable<InventoryReportDTO>> GetMonthlyReportAllProductsAsync(
+            int month,
+            int year,
+            string targetUnit = null,
+            List<int> convertProductIds = null);
+        Task<IEnumerable<InventoryReportDTO>> GetMonthlyReportAsync(int month,
+        int year,
+        string targetUnit,
+        List<int> convertProductIds);
+
+        Task<IEnumerable<InventoryReportDTO>> GetMonthlyReportByCategoryAsync(
+     int month,
+     int year,
+     string targetUnit,
+     List<int> convertProductIds,
+     int categoryId);
+
+        Task<IEnumerable<InventoryReportDTO>> GetMonthlyReportByCategoryWithMovementsAsync(
+    int month,
+    int year,
+    string targetUnit,
+    List<int> convertProductIds,
+    int categoryId);
         Task RegisterMovementsAsync(IEnumerable<InventoryCreateDTO> inventoryCreateDTOs);
 
         Task PatchInventoryAsync(int inventoryId, JsonPatchDocument<Domain.Entities.Administration.Inventory> patchDoc);

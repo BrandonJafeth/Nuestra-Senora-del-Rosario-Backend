@@ -40,6 +40,25 @@ public class ProductController : ControllerBase
         return Ok(product);
     }
 
+    [HttpGet("converted/{productId}")]
+    public async Task<IActionResult> GetConvertedProduct(int productId, [FromQuery] string targetUnit)
+    {
+        var productDto = await _productService.GetConvertedProductByIdAsync(productId, targetUnit);
+        return Ok(productDto);
+    }
+
+    // GET: api/product/bycategory
+    // Ejemplo de uso: /api/product/bycategory?categoryId=5&pageNumber=1&pageSize=10
+    [HttpGet("bycategory")]
+    public async Task<IActionResult> GetProductsByCategory(
+        [FromQuery] int categoryId,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10)
+    {
+        var result = await _productService.GetProductsByCategoryAsync(categoryId, pageNumber, pageSize);
+        return Ok(result);
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateProduct([FromBody] ProductCreateDTO productCreateDto)
     {
