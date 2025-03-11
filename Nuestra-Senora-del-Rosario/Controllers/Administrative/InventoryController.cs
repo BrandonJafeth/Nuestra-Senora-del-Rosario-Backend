@@ -38,20 +38,45 @@ public class InventoryController : ControllerBase
     // GET: api/inventory/report/month
     // Se puede enviar en la query: targetUnit (por ejemplo "paquete", "kg") y productIds (ej. "1,3,5")
     [HttpGet("report/all/month")]
-    public async Task<IActionResult> GetMonthlyReportAllProducts(
+    public async Task<IActionResult> GetMonthlyReportAllProductsCombo(
         [FromQuery] int month,
         [FromQuery] int year,
-        [FromQuery] string targetUnit = null,
-        [FromQuery] string productIds = null)
+        [FromQuery] string productIds,
+        [FromQuery] string targetUnits)
     {
-        List<int> convertProductIds = null;
+        // Parsear productIds y targetUnits a listas
+        List<int> productIdList = null;
+        List<string> targetUnitList = null;
+
         if (!string.IsNullOrEmpty(productIds))
         {
-            convertProductIds = productIds.Split(',')
+            productIdList = productIds
+                .Split(',')
                 .Select(id => int.Parse(id.Trim()))
                 .ToList();
         }
-        var report = await _inventoryService.GetMonthlyReportAllProductsAsync(month, year, targetUnit, convertProductIds);
+
+        if (!string.IsNullOrEmpty(targetUnits))
+        {
+            targetUnitList = targetUnits
+                .Split(',')
+                .Select(u => u.Trim())
+                .ToList();
+        }
+
+        if (productIdList == null || targetUnitList == null || productIdList.Count != targetUnitList.Count)
+        {
+            return BadRequest("Las listas de productIds y targetUnits deben tener la misma longitud y no estar vacías.");
+        }
+
+        // Combinar en un diccionario: productId -> targetUnit
+        var conversionMapping = new Dictionary<int, string>();
+        for (int i = 0; i < productIdList.Count; i++)
+        {
+            conversionMapping[productIdList[i]] = targetUnitList[i];
+        }
+
+        var report = await _inventoryService.GetMonthlyReportAllProductsAsync(month, year, conversionMapping);
         return Ok(report);
     }
 
