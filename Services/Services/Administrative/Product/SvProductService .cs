@@ -9,6 +9,7 @@ using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTO
 using Domain.Entities.Administration;
 using FluentValidation;
 using FluentValidation.Results;
+using Infrastructure.Services.Administrative.ConversionService;
 
 public class SvProductService : ISvProductService
 {
@@ -18,13 +19,15 @@ public class SvProductService : ISvProductService
     private readonly IMapper _mapper;
     private readonly IValidator<ProductCreateDTO> _productCreateValidator;
     private readonly IValidator<ProductPatchDto> _productPatchValidator;
+    private readonly ISvConversionService _conversionService;
 
     public SvProductService(
         ISvGenericRepository<Product> productRepository,
         ISvGenericRepository<Category> categoryRepository,
         ISvGenericRepository<UnitOfMeasure> unitOfMeasureRepository,
         IMapper mapper, IValidator<ProductCreateDTO> productCreateValidator,
-        IValidator<ProductPatchDto> productPatchValidator)
+        IValidator<ProductPatchDto> productPatchValidator,
+          ISvConversionService conversionService)
     {
         _productRepository = productRepository;
         _categoryRepository = categoryRepository;
@@ -32,6 +35,7 @@ public class SvProductService : ISvProductService
         _mapper = mapper;
         _productCreateValidator = productCreateValidator;
         _productPatchValidator = productPatchValidator;
+        _conversionService = conversionService;
     }
 
     public async Task<(IEnumerable<ProductGetDTO> Products, int TotalPages)> GetAllProductsAsync(int pageNumber, int pageSize)
@@ -61,6 +65,25 @@ public class SvProductService : ISvProductService
         return _mapper.Map<ProductGetDTO>(product);
     }
 
+    public async Task<(IEnumerable<ProductGetDTO> Products, int TotalPages)> GetProductsByCategoryAsync(int categoryId, int pageNumber, int pageSize)
+    {
+        // Consulta de productos filtrados por categoría
+        var query = _productRepository.Query()
+            .Include(p => p.Category)
+            .Include(p => p.UnitOfMeasure)
+            .Where(p => p.CategoryID == categoryId);
+
+        int totalProducts = await query.CountAsync();
+        var products = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        int totalPages = (int)Math.Ceiling(totalProducts / (double)pageSize);
+
+        var result = _mapper.Map<IEnumerable<ProductGetDTO>>(products);
+        return (result, totalPages);
+    }
     public async Task CreateProductAsync(ProductCreateDTO productCreateDTO)
     {
         ValidationResult result = await _productCreateValidator.ValidateAsync(productCreateDTO);
@@ -125,4 +148,64 @@ public class SvProductService : ISvProductService
         await _productRepository.DeleteAsync(productId);
         await _productRepository.SaveChangesAsync();
     }
+
+
+    public async Task<ProductGetConvertDTO> GetConvertedProductByIdAsync(int productId, string targetUnit)
+    {
+        // 1. Obtener el producto con sus relaciones
+        var product = await _productRepository.Query()
+            .Include(p => p.Category)
+            .Include(p => p.UnitOfMeasure)
+            .FirstOrDefaultAsync(p => p.ProductID == productId);
+
+        if (product == null)
+            throw new KeyNotFoundException($"No se encontró el producto con ID {productId}.");
+
+        // 2. Mapear a DTO
+        var dto = _mapper.Map<ProductGetConvertDTO>(product);
+
+        // 3. Inicializar los campos de conversión
+        dto.ConvertedTotalQuantity = dto.TotalQuantity;
+        dto.ConvertedUnitOfMeasure = dto.UnitOfMeasure;
+
+        // 4. Aplicar conversión si se indica un targetUnit
+        if (!string.IsNullOrEmpty(targetUnit))
+        {
+            double converted = dto.TotalQuantity;
+            string measure = dto.UnitOfMeasure ?? "Unknown";
+
+            switch (targetUnit.ToLower())
+            {
+                case "paquete":
+                    // Ejemplo: 1 paquete = 20 unidades
+                    converted = dto.TotalQuantity / 20.0;
+                    measure = "Paquete(s)";
+                    break;
+                case "kg":
+                    // Ejemplo: si el producto está en gramos, 1 kg = 1000 gramos
+                    converted = _conversionService.ConvertGramsToKilograms(dto.TotalQuantity);
+                    measure = "kg";
+                    break;
+                case "caja":
+                    // Ejemplo: si el producto se mide en litros y 1 caja = 12 litros
+                    if (dto.UnitOfMeasure.ToLower().Contains("litro"))
+                    {
+                        var milkResult = _conversionService.ConvertMilk(dto.TotalQuantity, 12);
+                        converted = milkResult.Boxes;
+                        measure = "Caja(s)";
+                    }
+                    break;
+                // Agrega más casos según tu lógica
+                default:
+                    // No se hace conversión
+                    break;
+            }
+
+            dto.ConvertedTotalQuantity = converted;
+            dto.ConvertedUnitOfMeasure = measure;
+        }
+
+        return dto;
+    }
+
 }

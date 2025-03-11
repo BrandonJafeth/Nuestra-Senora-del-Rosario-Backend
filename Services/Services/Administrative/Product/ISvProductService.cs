@@ -13,6 +13,12 @@ namespace Infrastructure.Services.Administrative.Product
     {
         Task<(IEnumerable<ProductGetDTO> Products, int TotalPages)> GetAllProductsAsync(int pageNumber, int pageSize);
         Task<ProductGetDTO> GetProductByIdAsync(int productId);
+
+        Task<ProductGetConvertDTO> GetConvertedProductByIdAsync(int productId, string targetUnit);
+
+        Task<(IEnumerable<ProductGetDTO> Products, int TotalPages)> GetProductsByCategoryAsync(int categoryId, int pageNumber, int pageSize);
+    
+
         Task CreateProductAsync(ProductCreateDTO productCreateDTO);
 
         // Usa el alias ProductEntity para evitar el conflicto

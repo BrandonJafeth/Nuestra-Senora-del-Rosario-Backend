@@ -429,5 +429,10 @@ public class AdministrativeMappingProfile : Profile
         CreateMap<Employee, EmployeeFilterDTO>()
           .ForMember(dest => dest.Name_TypeOfSalary, opt => opt.MapFrom(src => src.TypeOfSalary.Name_TypeOfSalary))
           .ForMember(dest => dest.Name_Profession, opt => opt.MapFrom(src => src.Profession.Name_Profession));
+
+
+        CreateMap<Product, ProductGetConvertDTO>()
+                     .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.CategoryName))
+            .ForMember(dest => dest.UnitOfMeasure, opt => opt.MapFrom(src => src.UnitOfMeasure.UnitName));
     }
 }

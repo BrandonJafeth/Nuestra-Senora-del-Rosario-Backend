@@ -8,5 +8,7 @@
         public int TotalIngresos { get; set; } // Suma de ingresos
         public int TotalEgresos { get; set; }  // Suma de egresos
         public string UnitOfMeasure { get; set; }
+        // Nueva propiedad para mostrar el total convertido
+        public double ConvertedTotalInStock { get; set; }
     }
 }
