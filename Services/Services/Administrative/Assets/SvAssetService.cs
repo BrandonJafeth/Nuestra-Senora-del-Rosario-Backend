@@ -82,7 +82,7 @@ namespace Infrastructure.Services.Administrative.Assets
             return _mapper.Map<AssetReadDto>(assetEntity);
         }
 
- 
+
         public async Task<AssetReadDto> UpdateAsync(int id, AssetCreateDto dto)
         {
             var existingAsset = await _context.Assets
@@ -214,6 +214,37 @@ namespace Infrastructure.Services.Administrative.Assets
             return (results, totalRecords);
         }
 
+        public async Task<AssetReadDto> MarkAsMalEstadoAsync(int assetId)
+        {
+            // 1) Buscar la entidad
+            var asset = await _context.Assets
+                .Include(a => a.AssetCategory)
+                .Include(a => a.Model)
+                    .ThenInclude(m => m.Brand)
+                .FirstOrDefaultAsync(a => a.IdAsset == assetId);
 
+            if (asset == null)
+            {
+                throw new KeyNotFoundException($"Asset con ID {assetId} no encontrado.");
+            }
+
+            // 2) Verificar el estado actual y alternarlo explícitamente
+            string estadoActual = asset.AssetCondition?.Trim() ?? string.Empty;
+
+            // Comprobar exactamente qué contiene y cambiarlo
+            if (estadoActual.Equals("Buen Estado", StringComparison.OrdinalIgnoreCase))
+            {
+                asset.AssetCondition = "Mal Estado";
+            }
+            else
+            {
+                asset.AssetCondition = "Buen Estado";
+            }
+
+            await _context.SaveChangesAsync();
+
+            // 3) Retornar el DTO actualizado
+            return _mapper.Map<AssetReadDto>(asset);
+        }
     }
-}
+    }

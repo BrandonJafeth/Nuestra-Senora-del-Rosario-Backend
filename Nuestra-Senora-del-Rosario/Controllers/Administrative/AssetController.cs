@@ -177,5 +177,23 @@ namespace Nuestra_Senora_del_Rosario.Controllers.Administrative
         }
 
 
+        [HttpPatch("{id}/toggle-condition")]
+        public async Task<IActionResult> ToggleAssetCondition(int id)
+        {
+            try
+            {
+                var updatedAsset = await _assetService.MarkAsMalEstadoAsync(id);
+                return Ok(updatedAsset);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }

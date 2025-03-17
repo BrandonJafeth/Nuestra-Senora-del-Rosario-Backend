@@ -51,5 +51,8 @@ namespace Infrastructure.Services.Administrative.Assets
 
         // Retorna la lista paginada y el total de registros que coinciden con la condición
         Task<(IEnumerable<AssetReadDto> results, int totalRecords)> GetByConditionPaginatedAsync(string condition, int pageNumber, int pageSize);
+
+
+        Task<AssetReadDto> MarkAsMalEstadoAsync(int assetId);
     }
 }
