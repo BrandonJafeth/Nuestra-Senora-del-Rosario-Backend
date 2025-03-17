@@ -11,5 +11,11 @@
         // Nueva propiedad para mostrar el total convertido
         public double ConvertedTotalInStock { get; set; }
 
+        // Unidad de medida original
+        public string OriginalUnitOfMeasure { get; set; }
+
+        // Nueva propiedad para mostrar a qué unidad se convirtió:
+        public string ConvertedUnitOfMeasure { get; set; }
+
     }
 }
