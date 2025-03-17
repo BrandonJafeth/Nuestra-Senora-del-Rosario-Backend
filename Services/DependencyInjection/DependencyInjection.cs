@@ -125,6 +125,10 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<ISvGenericRepository<ResidentPathology>, SvGenericRepository<ResidentPathology>>();
             services.AddScoped<ISvGenericRepository<ResidentMedication>, SvGenericRepository<ResidentMedication>>();
             services.AddScoped<ISvGenericRepository<MedicalHistory>, SvGenericRepository<MedicalHistory>>();
+            services.AddScoped<ISvGenericRepository<Brand>, SvGenericRepository<Brand>>();
+            services.AddScoped<ISvGenericRepository<Model>, SvGenericRepository<Model>>();
+            services.AddScoped<ISvGenericRepository<Asset>, SvGenericRepository<Asset>>();
+            services.AddScoped<ISvGenericRepository<AssetCategory>, SvGenericRepository<AssetCategory>>();
             #endregion
 
             #region Services_Administrative

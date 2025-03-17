@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System;
+using System.Linq.Expressions;
 
 namespace Services.GenericService
 {
@@ -19,5 +20,12 @@ namespace Services.GenericService
         Task<T> GetByDniAsync(int dniEmployee);  // Si no lo usas, podrías quitarlo
         Task<bool> ExistsAsync(Func<T, bool> predicate);
         Task<T> FirstOrDefaultAsync(Func<T, bool> predicate);
+
+        Task<IEnumerable<T>> GetAllIncludingAsync(
+    params Expression<Func<T, object>>[] includes);
+
+        Task<T> GetSingleIncludingAsync(
+            Expression<Func<T, bool>> predicate,
+            params Expression<Func<T, object>>[] includes);
     }
 }

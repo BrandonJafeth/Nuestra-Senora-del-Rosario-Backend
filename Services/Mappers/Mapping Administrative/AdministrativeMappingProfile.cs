@@ -434,5 +434,39 @@ public class AdministrativeMappingProfile : Profile
         CreateMap<Product, ProductGetConvertDTO>()
                      .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.CategoryName))
             .ForMember(dest => dest.UnitOfMeasure, opt => opt.MapFrom(src => src.UnitOfMeasure.UnitName));
+
+
+        // =========== ASSETCATEGORY ===========
+        CreateMap<AssetCategory, AssetCategoryReadDto>();
+        CreateMap<AssetCategoryCreateDto, AssetCategory>();
+
+        // =========== BRAND ===========
+        CreateMap<Brand, BrandReadDto>();
+        CreateMap<BrandCreateDto, Brand>();
+
+        // =========== MODEL ===========
+        // Model -> ModelReadDto
+        CreateMap<Model, ModelReadDto>()
+            .ForMember(dest => dest.BrandName,
+                       opt => opt.MapFrom(src => src.Brand.BrandName));
+        // Esto asume que 'src.Brand' está cargado 
+        // y copia el nombre de la marca a 'BrandName'.
+
+        CreateMap<ModelCreateDto, Model>();
+
+        // =========== ASSET ===========
+        // De la entidad Asset al DTO de lectura
+        CreateMap<Asset, AssetReadDto>()
+            .ForMember(dest => dest.CategoryName,
+                       opt => opt.MapFrom(src => src.AssetCategory.CategoryName))
+            .ForMember(dest => dest.ModelName,
+                       opt => opt.MapFrom(src => src.Model.ModelName))
+            .ForMember(dest => dest.BrandName,
+                       opt => opt.MapFrom(src => src.Model.Brand.BrandName));
+        // Estos 3 ForMember asumen que has cargado las entidades relacionadas 
+        // (AssetCategory, Model, y Brand de la Model)
+
+        // Del DTO de creación/actualización a la entidad Asset
+        CreateMap<AssetCreateDto, Asset>();
     }
 }
