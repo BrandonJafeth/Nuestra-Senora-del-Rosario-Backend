@@ -39,5 +39,17 @@ namespace Infrastructure.Services.Administrative.Assets
         /// Elimina un Activo por Id.
         /// </summary>
         Task DeleteAsync(int id);
+
+
+        Task<(IEnumerable<AssetReadDto> results, int totalRecords)> GetAllPaginatedAsync(int pageNumber, int pageSize);
+
+        /// <summary>
+        /// Obtiene todos los Assets de una determinada categoría (por IdCategory),
+        /// con las relaciones y devueltos como AssetReadDto.
+        /// </summary>
+        Task<(IEnumerable<AssetReadDto> results, int totalRecords)> GetByCategoryPaginatedAsync(int categoryId, int pageNumber, int pageSize);
+
+        // Retorna la lista paginada y el total de registros que coinciden con la condición
+        Task<(IEnumerable<AssetReadDto> results, int totalRecords)> GetByConditionPaginatedAsync(string condition, int pageNumber, int pageSize);
     }
 }
