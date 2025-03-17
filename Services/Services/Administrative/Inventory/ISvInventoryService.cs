@@ -18,11 +18,11 @@ namespace Infrastructure.Services.Administrative.Inventory
            int year,
            Dictionary<int, string> conversionMapping);
         Task<IEnumerable<InventoryReportDTO>> GetMonthlyReportAsync(
-          int month,
-          int year,
-          string targetUnit,
-          List<int> convertProductIds,
-          int categoryId);
+         int month,
+         int year,
+         string targetUnit,
+         List<int> convertProductIds
+     );
 
         Task<IEnumerable<InventoryReportDTO>> GetMonthlyReportByCategoryAsync(
             int month,

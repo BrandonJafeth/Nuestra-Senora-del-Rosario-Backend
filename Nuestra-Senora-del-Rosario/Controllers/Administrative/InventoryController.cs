@@ -80,7 +80,7 @@ public class InventoryController : ControllerBase
         return Ok(report);
     }
 
-    // GET: api/inventory/report/{productId}/month
+    //// GET: api/inventory/report/{productId}/month
     [HttpGet("report/month")]
     public async Task<IActionResult> GetMonthlyReport(
         [FromQuery] int month,
@@ -96,9 +96,17 @@ public class InventoryController : ControllerBase
                 .ToList();
         }
 
-        var report = await _inventoryService.GetMonthlyReportAsync(month, year, targetUnit, convertProductIds);
+        // Llamada al servicio sin categoryId
+        var report = await _inventoryService.GetMonthlyReportAsync(
+            month,
+            year,
+            targetUnit,
+            convertProductIds
+        );
+
         return Ok(report);
     }
+
 
 
     [HttpGet("report/category/month")]
