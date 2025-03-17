@@ -132,5 +132,88 @@ namespace Infrastructure.Services.Administrative.Assets
             _context.Assets.Remove(existingAsset);
             await _context.SaveChangesAsync();
         }
+
+
+        public async Task<(IEnumerable<AssetReadDto> results, int totalRecords)> GetAllPaginatedAsync(int pageNumber, int pageSize)
+        {
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 10; // Valor por defecto
+
+            // Preparamos la consulta con includes
+            var query = _context.Assets
+                .Include(a => a.AssetCategory)
+                .Include(a => a.Model)
+                    .ThenInclude(m => m.Brand)
+                .AsQueryable();
+
+            // Conteo total sin paginar
+            var totalRecords = await query.CountAsync();
+
+            // Aplica paginación
+            var skip = (pageNumber - 1) * pageSize;
+            var pagedAssets = await query
+                .Skip(skip)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // Mapeamos la lista
+            var resultsDto = _mapper.Map<IEnumerable<AssetReadDto>>(pagedAssets);
+
+            return (resultsDto, totalRecords);
+        }
+
+        public async Task<(IEnumerable<AssetReadDto> results, int totalRecords)> GetByCategoryPaginatedAsync(int categoryId, int pageNumber, int pageSize)
+        {
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 10;
+
+            var query = _context.Assets
+                .Include(a => a.AssetCategory)
+                .Include(a => a.Model)
+                    .ThenInclude(m => m.Brand)
+                .Where(a => a.IdAssetCategory == categoryId)
+                .AsQueryable();
+
+            var totalRecords = await query.CountAsync();
+
+            var skip = (pageNumber - 1) * pageSize;
+
+            var pagedAssets = await query
+                .Skip(skip)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var results = _mapper.Map<IEnumerable<AssetReadDto>>(pagedAssets);
+
+            return (results, totalRecords);
+        }
+
+        public async Task<(IEnumerable<AssetReadDto> results, int totalRecords)> GetByConditionPaginatedAsync(string condition, int pageNumber, int pageSize)
+        {
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 10;
+
+            var query = _context.Assets
+                .Include(a => a.AssetCategory)
+                .Include(a => a.Model)
+                    .ThenInclude(m => m.Brand)
+                .Where(a => a.AssetCondition == condition)
+                .AsQueryable();
+
+            var totalRecords = await query.CountAsync();
+
+            var skip = (pageNumber - 1) * pageSize;
+
+            var pagedAssets = await query
+                .Skip(skip)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var results = _mapper.Map<IEnumerable<AssetReadDto>>(pagedAssets);
+
+            return (results, totalRecords);
+        }
+
+
     }
 }

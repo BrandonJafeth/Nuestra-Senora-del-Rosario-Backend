@@ -120,5 +120,62 @@ namespace Nuestra_Senora_del_Rosario.Controllers.Administrative
                 return NotFound(ex.Message);
             }
         }
+
+
+        [HttpGet("paged")]
+        public async Task<IActionResult> GetAllPaged([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var (results, total) = await _assetService.GetAllPaginatedAsync(pageNumber, pageSize);
+
+            var response = new
+            {
+                Data = results,
+                TotalRecords = total,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+
+            return Ok(response);
+        }
+
+        [HttpGet("byCategoryPaged")]
+        public async Task<IActionResult> GetByCategoryPaged(
+         [FromQuery] int categoryId,
+         [FromQuery] int pageNumber = 1,
+         [FromQuery] int pageSize = 10)
+        {
+            var (results, total) = await _assetService.GetByCategoryPaginatedAsync(categoryId, pageNumber, pageSize);
+
+            var response = new
+            {
+                Data = results,
+                TotalRecords = total,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+
+            return Ok(response);
+        }
+
+        [HttpGet("byConditionPaged")]
+        public async Task<IActionResult> GetByConditionPaged(
+            [FromQuery] string condition,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
+        {
+            var (results, total) = await _assetService.GetByConditionPaginatedAsync(condition, pageNumber, pageSize);
+
+            var response = new
+            {
+                Data = results,
+                TotalRecords = total,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+
+            return Ok(response);
+        }
+
+
     }
 }
