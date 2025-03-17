@@ -14,7 +14,9 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.Administrativ
         public string Plate { get; set; }
         public decimal OriginalCost { get; set; }
         public DateTime PurchaseDate { get; set; }
+        public string Location { get; set; } 
 
+        public string AssetCondition { get; set; }
         // Relaciones (IDs):
         public int IdAssetCategory { get; set; }
         public int? IdModel { get; set; }

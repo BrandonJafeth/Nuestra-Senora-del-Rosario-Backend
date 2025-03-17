@@ -463,10 +463,7 @@ public class AdministrativeMappingProfile : Profile
                        opt => opt.MapFrom(src => src.Model.ModelName))
             .ForMember(dest => dest.BrandName,
                        opt => opt.MapFrom(src => src.Model.Brand.BrandName));
-        // Estos 3 ForMember asumen que has cargado las entidades relacionadas 
-        // (AssetCategory, Model, y Brand de la Model)
-
-        // Del DTO de creación/actualización a la entidad Asset
         CreateMap<AssetCreateDto, Asset>();
+        CreateMap<AssetUpdateDto, Asset>();
     }
 }

@@ -20,7 +20,10 @@ namespace Domain.Entities.Administration
         public decimal OriginalCost { get; set; }
         public DateTime PurchaseDate { get; set; }
 
-        // Required relationship with AssetCategory
+        public string Location { get; set; }
+
+        public string AssetCondition { get; set; }
+
         public int IdAssetCategory { get; set; }
         public AssetCategory AssetCategory { get; set; }
 
