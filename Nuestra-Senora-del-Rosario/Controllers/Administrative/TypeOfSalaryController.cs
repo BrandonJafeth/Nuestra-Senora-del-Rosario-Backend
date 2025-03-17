@@ -22,11 +22,26 @@ public class TypeOfSalaryController : ControllerBase
 
     // GET: api/typeofsalary
     [HttpGet]
-    public async Task<IActionResult> GetAllTypesOfSalary()
+    public async Task<IActionResult> GetAllTypesOfSalary([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
-        var typesOfSalary = await _typeOfSalaryService.GetAllAsync();
-        return Ok(typesOfSalary);
+        var (typesOfSalary, totalRecords) = await _typeOfSalaryService.GetPagedAsync(
+            pageNumber: pageNumber,
+            pageSize: pageSize,
+            orderBy: q => q.OrderBy(ts => ts.Name_TypeOfSalary) // Ordenados alfabéticamente
+        );
+
+        var response = new
+        {
+            Data = typesOfSalary,
+            TotalRecords = totalRecords,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize)
+        };
+
+        return Ok(response);
     }
+
 
     // GET: api/typeofsalary/{id}
     [HttpGet("{id}")]

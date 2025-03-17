@@ -27,5 +27,12 @@ namespace Services.GenericService
         Task<T> GetSingleIncludingAsync(
             Expression<Func<T, bool>> predicate,
             params Expression<Func<T, object>>[] includes);
+
+        Task<(IEnumerable<T> items, int totalCount)> GetPagedAsync(
+    int pageNumber,
+    int pageSize,
+    Expression<Func<T, bool>> filter = null,
+    Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+    params Expression<Func<T, object>>[] includes);
     }
 }

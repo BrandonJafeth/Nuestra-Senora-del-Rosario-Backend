@@ -57,10 +57,23 @@ public class ProfessionController : ControllerBase
 
     // GET: api/profession
     [HttpGet]
-    public async Task<IActionResult> GetAllProfessions()
+    public async Task<IActionResult> GetAllProfessions([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
-        var professions = await _professionService.GetAllAsync();
-        return Ok(professions);
+        var (professions, totalRecords) = await _professionService.GetPagedAsync(
+            pageNumber: pageNumber,
+            pageSize: pageSize
+        );
+
+        var response = new
+        {
+            Data = professions,
+            TotalRecords = totalRecords,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize)
+        };
+
+        return Ok(response);
     }
 
     [HttpPut("{id}")]

@@ -24,12 +24,28 @@ public class UnitOfMeasureController : ControllerBase
 
     // GET: api/unitofmeasure
     [HttpGet]
-    public async Task<IActionResult> GetAllUnitsOfMeasure()
+    public async Task<IActionResult> GetAllUnitsOfMeasure([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
-        var units = await _unitOfMeasureService.GetAllAsync();
+        var (units, totalRecords) = await _unitOfMeasureService.GetPagedAsync(
+            pageNumber: pageNumber,
+            pageSize: pageSize,
+            orderBy: q => q.OrderBy(u => u.UnitName)
+        );
+
         var unitsDto = _mapper.Map<IEnumerable<UnitOfMeasureGetDTO>>(units);
-        return Ok(unitsDto);
+
+        var response = new
+        {
+            Data = unitsDto,
+            TotalRecords = totalRecords,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize)
+        };
+
+        return Ok(response);
     }
+
 
     // GET: api/unitofmeasure/{id}
     [HttpGet("{id}")]

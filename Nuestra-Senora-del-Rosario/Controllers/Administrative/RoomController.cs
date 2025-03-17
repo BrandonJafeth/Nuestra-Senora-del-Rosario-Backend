@@ -23,10 +23,24 @@ public class RoomController : ControllerBase
 
     // GET: api/room
     [HttpGet]
-    public async Task<IActionResult> GetAllRooms()
+    public async Task<IActionResult> GetAllRooms([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
-        var rooms = await _roomService.GetAllAsync();
-        return Ok(rooms);
+        var (rooms, totalRecords) = await _roomService.GetPagedAsync(
+            pageNumber: pageNumber,
+            pageSize: pageSize,
+            orderBy: q => q.OrderBy(r => r.RoomNumber)
+        );
+
+        var response = new
+        {
+            Data = rooms,
+            TotalRecords = totalRecords,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize)
+        };
+
+        return Ok(response);
     }
 
     // GET: api/room/{id}
