@@ -22,11 +22,26 @@ public class DependencyLevelController : ControllerBase
 
     // GET: api/dependencylevel
     [HttpGet]
-    public async Task<IActionResult> GetAllDependencyLevels()
+    public async Task<IActionResult> GetAllDependencyLevels([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
-        var dependencyLevels = await _dependencyLevelService.GetAllAsync();
-        return Ok(dependencyLevels);
+        var (dependencyLevels, totalRecords) = await _dependencyLevelService.GetPagedAsync(
+            pageNumber: pageNumber,
+            pageSize: pageSize,
+            orderBy: q => q.OrderBy(d => d.LevelName)
+        );
+
+        var response = new
+        {
+            Data = dependencyLevels,
+            TotalRecords = totalRecords,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize)
+        };
+
+        return Ok(response);
     }
+
 
     // GET: api/dependencylevel/{id}
     [HttpGet("{id}")]

@@ -6,6 +6,7 @@ using Domain.Entities.Administration;          // Aquí está la entidad Model
 using Services.GenericService;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
+using System.Linq.Expressions;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -22,13 +23,29 @@ public class ModelController : ControllerBase
 
     // GET: api/model
     [HttpGet]
-    public async Task<IActionResult> GetAllModels()
+    public async Task<IActionResult> GetAllModels([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
-        var models = await _modelService.GetAllIncludingAsync(m => m.Brand);
+        var (models, totalRecords) = await _modelService.GetPagedAsync(
+            pageNumber: pageNumber,
+            pageSize: pageSize,
+            orderBy: q => q.OrderBy(m => m.ModelName),
+            includes: new Expression<Func<Model, object>>[] { m => m.Brand }
+        );
 
         var modelDtos = _mapper.Map<IEnumerable<ModelReadDto>>(models);
-        return Ok(modelDtos);
+
+        var response = new
+        {
+            Data = modelDtos,
+            TotalRecords = totalRecords,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize)
+        };
+
+        return Ok(response);
     }
+
 
     // GET: api/model/{id}
     [HttpGet("{id}")]

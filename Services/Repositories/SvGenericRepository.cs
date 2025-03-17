@@ -121,6 +121,50 @@ namespace Services.GenericService
             return await query.FirstOrDefaultAsync(predicate);
         }
 
+        public async Task<(IEnumerable<T> items, int totalCount)> GetPagedAsync(
+            int pageNumber,
+            int pageSize,
+            Expression<Func<T, bool>> filter = null,
+            Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+            params Expression<Func<T, object>>[] includes)
+        {
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 10;
+
+            // Iniciamos con la consulta base
+            IQueryable<T> query = _dbSet;
+
+            // Aplicamos filtros si existen
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            // Incluimos las propiedades de navegación
+            if (includes != null)
+            {
+                query = includes.Aggregate(query, (current, include) => current.Include(include));
+            }
+
+            // Obtenemos el total de registros que coinciden con los filtros
+            int totalCount = await query.CountAsync();
+
+            // Aplicamos ordenación si se especificó
+            if (orderBy != null)
+            {
+                query = orderBy(query);
+            }
+
+            // Aplicamos la paginación
+            int skip = (pageNumber - 1) * pageSize;
+            query = query.Skip(skip).Take(pageSize);
+
+            // Ejecutamos la consulta
+            var items = await query.ToListAsync();
+
+            // Devolvemos los resultados y el conteo total
+            return (items, totalCount);
+        }
 
     }
 }

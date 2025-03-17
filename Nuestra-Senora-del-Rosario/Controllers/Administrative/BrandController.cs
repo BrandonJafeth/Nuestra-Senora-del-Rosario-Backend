@@ -23,12 +23,28 @@ public class BrandController : ControllerBase
 
     // GET: api/brand
     [HttpGet]
-    public async Task<IActionResult> GetAllBrands()
+    public async Task<IActionResult> GetAllBrands([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
-        var brands = await _brandService.GetAllAsync();
+        var (brands, totalRecords) = await _brandService.GetPagedAsync(
+            pageNumber: pageNumber,
+            pageSize: pageSize,
+            orderBy: q => q.OrderBy(b => b.BrandName)
+        );
+
         var brandDtos = _mapper.Map<IEnumerable<BrandReadDto>>(brands);
-        return Ok(brandDtos);
+
+        var response = new
+        {
+            Data = brandDtos,
+            TotalRecords = totalRecords,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize)
+        };
+
+        return Ok(response);
     }
+
 
     // GET: api/brand/{id}
     [HttpGet("{id}")]

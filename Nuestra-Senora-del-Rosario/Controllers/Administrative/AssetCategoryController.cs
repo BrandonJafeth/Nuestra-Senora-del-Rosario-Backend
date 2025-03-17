@@ -22,12 +22,28 @@ public class AssetCategoryController : ControllerBase
 
     // GET: api/assetcategory
     [HttpGet]
-    public async Task<IActionResult> GetAllCategories()
+    public async Task<IActionResult> GetAllCategories([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
-        var categories = await _categoryService.GetAllAsync();
+        var (categories, totalRecords) = await _categoryService.GetPagedAsync(
+            pageNumber: pageNumber,
+            pageSize: pageSize,
+            orderBy: q => q.OrderBy(c => c.CategoryName)
+        );
+
         var categoryDtos = _mapper.Map<IEnumerable<AssetCategoryReadDto>>(categories);
-        return Ok(categoryDtos);
+
+        var response = new
+        {
+            Data = categoryDtos,
+            TotalRecords = totalRecords,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize)
+        };
+
+        return Ok(response);
     }
+
 
     // GET: api/assetcategory/{id}
     [HttpGet("{id}")]
