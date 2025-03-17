@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 // Importa tu AppDbContext
 using Infrastructure.Persistence.AppDbContext;
+using System.Linq.Expressions;
 
 namespace Services.GenericService
 {
@@ -91,5 +92,35 @@ namespace Services.GenericService
         {
             return await Task.FromResult(_dbSet.FirstOrDefault(predicate));
         }
+
+        public async Task<IEnumerable<T>> GetAllIncludingAsync(
+            params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> query = _dbSet.AsQueryable();
+
+            foreach (var includeExpr in includes)
+            {
+                query = query.Include(includeExpr);
+            }
+
+            return await query.ToListAsync();
+        }
+
+
+        public async Task<T> GetSingleIncludingAsync(
+            Expression<Func<T, bool>> predicate,
+            params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> query = _dbSet.AsQueryable();
+
+            foreach (var includeExpr in includes)
+            {
+                query = query.Include(includeExpr);
+            }
+
+            return await query.FirstOrDefaultAsync(predicate);
+        }
+
+
     }
 }

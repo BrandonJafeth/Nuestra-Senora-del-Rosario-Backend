@@ -554,7 +554,93 @@ namespace Infrastructure.Persistence.AppDbContext
 
 
 
+            // ============= ASSETCATEGORY TABLE CONFIG ====================
+            modelBuilder.Entity<AssetCategory>(entity =>
+            {
+                entity.HasKey(ac => ac.IdAssetCategory);
 
+                entity.Property(ac => ac.CategoryName)
+                      .IsRequired()
+                      .HasMaxLength(100);
+
+                // Relationship: One Category -> Many Assets
+                entity.HasMany(ac => ac.Assets)
+                      .WithOne(a => a.AssetCategory)
+                      .HasForeignKey(a => a.IdAssetCategory)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ============= BRAND TABLE CONFIG ====================
+            modelBuilder.Entity<Brand>(entity =>
+            {
+                entity.HasKey(b => b.IdBrand);
+                entity.Property(b => b.BrandName)
+                      .IsRequired()
+                      .HasMaxLength(100);
+
+                // Relationship: One Brand -> Many Models
+                entity.HasMany(b => b.Models)
+                      .WithOne(m => m.Brand)
+                      .HasForeignKey(m => m.IdBrand)
+                      .OnDelete(DeleteBehavior.Restrict);
+                // 'Restrict' so that deleting a brand is blocked if it has models.
+            });
+
+            // ============= MODEL TABLE CONFIG ====================
+            modelBuilder.Entity<Model>(entity =>
+            {
+                entity.HasKey(m => m.IdModel);
+
+                entity.Property(m => m.ModelName)
+                      .IsRequired()
+                      .HasMaxLength(100);
+
+                // Relationship to Brand already configured in the Brand config above
+            });
+
+            // ============= ASSET TABLE CONFIG ====================
+            modelBuilder.Entity<Asset>(entity =>
+            {
+                entity.HasKey(a => a.IdAsset);
+
+                entity.Property(a => a.AssetName)
+                      .IsRequired()
+                      .HasMaxLength(100);
+
+                // Unique constraints
+                entity.Property(a => a.SerialNumber)
+                      .IsRequired()
+                      .HasMaxLength(50);
+
+                entity.Property(a => a.Plate)
+                      .HasMaxLength(50); // Could be null, still unique if provided
+
+                entity.Property(a => a.OriginalCost)
+                      .HasColumnType("decimal(12,2)")
+                      .IsRequired();
+
+                entity.Property(a => a.PurchaseDate)
+                      .IsRequired();
+
+                // Relationship: required link to AssetCategory
+                entity.HasOne(a => a.AssetCategory)
+                      .WithMany(ac => ac.Assets)
+                      .HasForeignKey(a => a.IdAssetCategory)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Relationship: optional link to Model (IdModel can be null)
+                entity.HasOne(a => a.Model)
+                      .WithMany() // or .WithMany(m => m.Assets) if you add an ICollection<Asset> in Model
+                      .HasForeignKey(a => a.IdModel)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Indices for uniqueness
+                entity.HasIndex(a => a.SerialNumber)
+                      .IsUnique();
+
+                entity.HasIndex(a => a.Plate)
+                      .IsUnique();
+            });
 
         }
     }

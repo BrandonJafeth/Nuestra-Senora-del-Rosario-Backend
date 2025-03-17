@@ -64,6 +64,10 @@ namespace Infrastructure.Persistence.AppDbContext
         public DbSet<Inventory> Inventories { get; set; }
 
         public DbSet<MedicalHistory> MedicalHistories { get; set; }
+        public DbSet<Asset> Assets { get; set; }
+        public DbSet<AssetCategory> AssetCategories { get; set; }
+        public DbSet<Brand> Brands { get; set; }
+        public DbSet<Model> Models { get; set; }
 
 
         #endregion
