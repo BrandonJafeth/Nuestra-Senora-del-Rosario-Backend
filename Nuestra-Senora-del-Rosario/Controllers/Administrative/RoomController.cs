@@ -7,6 +7,7 @@ using Domain.Entities.Administration;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Infrastructure.Services.Informative.DTOS.CreatesDto;
 using AutoMapper;
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -31,9 +32,11 @@ public class RoomController : ControllerBase
             orderBy: q => q.OrderBy(r => r.RoomNumber)
         );
 
+        var roomDtos = _mapper.Map<IEnumerable<RoomReadDto>>(rooms);
+
         var response = new
         {
-            Data = rooms,
+            Data = roomDtos,
             TotalRecords = totalRecords,
             PageNumber = pageNumber,
             PageSize = pageSize,
@@ -42,6 +45,8 @@ public class RoomController : ControllerBase
 
         return Ok(response);
     }
+
+
 
     // GET: api/room/{id}
     [HttpGet("{id}")]
@@ -57,17 +62,17 @@ public class RoomController : ControllerBase
 
     // POST: api/room
     [HttpPost]
-    public async Task<IActionResult> CreateRoom([FromBody] Room room)
+    public async Task<IActionResult> CreateRoom([FromBody] RoomCreateDto createDto)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        await _roomService.AddAsync(room);
+        var roomEntity = _mapper.Map<Room>(createDto);
+        await _roomService.AddAsync(roomEntity);
         await _roomService.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetRoomById), new { id = room.Id_Room }, room);
+        return CreatedAtAction(nameof(GetRoomById), new { id = roomEntity.Id_Room }, roomEntity);
     }
 
     [HttpPut("{id}")]

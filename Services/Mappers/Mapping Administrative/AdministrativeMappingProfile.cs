@@ -465,5 +465,7 @@ public class AdministrativeMappingProfile : Profile
                        opt => opt.MapFrom(src => src.Model.Brand.BrandName));
         CreateMap<AssetCreateDto, Asset>();
         CreateMap<AssetUpdateDto, Asset>();
+        CreateMap<Room, RoomReadDto>();
+        CreateMap<RoomCreateDto, Room>();
     }
 }
