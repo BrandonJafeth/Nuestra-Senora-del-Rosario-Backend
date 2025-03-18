@@ -457,7 +457,7 @@ namespace Infrastructure.Persistence.AppDbContext
 
                 // FK a UnitOfMeasure
                 entity.HasOne(ms => ms.UnitOfMeasure)
-                  .WithMany(u => u.MedicationsSpecific) 
+                  .WithMany(u => u.MedicationsSpecific)
                   .HasForeignKey(ms => ms.UnitOfMeasureID)
                   .OnDelete(DeleteBehavior.Restrict);
 
@@ -640,7 +640,29 @@ namespace Infrastructure.Persistence.AppDbContext
 
                 entity.HasIndex(a => a.Plate)
                       .IsUnique();
+
+
+                entity.HasOne(a => a.Law)
+             .WithMany(l => l.Assets)
+             .HasForeignKey(a => a.IdLaw)
+             .OnDelete(DeleteBehavior.SetNull);
+
             });
+
+            // ===================== LAW =========================
+            modelBuilder.Entity<Law>(entity =>
+            {
+
+                entity.HasKey(l => l.IdLaw); // Primary key
+
+                // Opcional: restricción de longitudes, indices, etc.
+                entity.Property(l => l.LawName)
+                      .IsRequired()
+                      .HasMaxLength(200);
+            });
+
+
+
 
         }
     }

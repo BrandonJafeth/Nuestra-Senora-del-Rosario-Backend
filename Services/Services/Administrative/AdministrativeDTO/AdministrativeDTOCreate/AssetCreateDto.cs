@@ -19,5 +19,7 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.Administrativ
         public string AssetCondition { get; set; } 
         public int IdAssetCategory { get; set; }
         public int? IdModel { get; set; } // puede ser null
+
+        public int? IdLaw { get; set; } // puede ser null
     }
 }

@@ -25,5 +25,7 @@ namespace Infrastructure.Services.Administrative.AdministrativeDTO.Administrativ
         public string CategoryName { get; set; }  // Podrías cargarlo desde AssetCategory
         public string ModelName { get; set; }     // Podrías cargarlo desde Model
         public string BrandName { get; set; }     // O desde la relación Model -> Brand
+
+        public string LawName { get; set; }
     }
 }

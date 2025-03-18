@@ -462,10 +462,16 @@ public class AdministrativeMappingProfile : Profile
             .ForMember(dest => dest.ModelName,
                        opt => opt.MapFrom(src => src.Model.ModelName))
             .ForMember(dest => dest.BrandName,
-                       opt => opt.MapFrom(src => src.Model.Brand.BrandName));
+                       opt => opt.MapFrom(src => src.Model.Brand.BrandName))
+        .ForMember(dest => dest.LawName,
+                       opt => opt.MapFrom(src => src.Law.LawName));
         CreateMap<AssetCreateDto, Asset>();
         CreateMap<AssetUpdateDto, Asset>();
         CreateMap<Room, RoomReadDto>();
         CreateMap<RoomCreateDto, Room>();
+
+        CreateMap<LawCreateDto, Law>();
+
+        CreateMap<Law, LawReadDto>();
     }
 }
