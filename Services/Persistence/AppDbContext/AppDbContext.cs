@@ -69,6 +69,8 @@ namespace Infrastructure.Persistence.AppDbContext
         public DbSet<Brand> Brands { get; set; }
         public DbSet<Model> Models { get; set; }
 
+        public DbSet<Law> Laws { get; set; }
+
 
         #endregion
 

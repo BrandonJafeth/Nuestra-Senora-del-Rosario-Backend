@@ -30,5 +30,8 @@ namespace Domain.Entities.Administration
         // Optional relationship with Model, can be null
         public int? IdModel { get; set; }
         public Model Model { get; set; }
+
+        public int? IdLaw { get; set; }
+        public Law Law { get; set; }
     }
 }

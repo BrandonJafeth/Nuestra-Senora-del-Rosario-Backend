@@ -31,6 +31,7 @@ namespace Infrastructure.Services.Administrative.Assets
         {
             var assets = await _context.Assets
                 .Include(a => a.AssetCategory)
+                .Include(a => a.Law)
                 .Include(a => a.Model)
                     .ThenInclude(m => m.Brand)
                 .ToListAsync();
@@ -46,6 +47,7 @@ namespace Infrastructure.Services.Administrative.Assets
         {
             var asset = await _context.Assets
                 .Include(a => a.AssetCategory)
+                .Include(a => a.Law)
                 .Include(a => a.Model)
                     .ThenInclude(m => m.Brand)
                 .FirstOrDefaultAsync(a => a.IdAsset == id);
@@ -75,6 +77,7 @@ namespace Infrastructure.Services.Administrative.Assets
             // Recargar con includes para poder mapear a un AssetReadDto completo
             assetEntity = await _context.Assets
                 .Include(a => a.AssetCategory)
+                .Include(a => a.Law)
                 .Include(a => a.Model)
                     .ThenInclude(m => m.Brand)
                 .FirstOrDefaultAsync(a => a.IdAsset == assetEntity.IdAsset);
@@ -87,6 +90,7 @@ namespace Infrastructure.Services.Administrative.Assets
         {
             var existingAsset = await _context.Assets
                 .Include(a => a.AssetCategory)
+                .Include(a => a.Law)
                 .Include(a => a.Model)
                 .ThenInclude(m => m.Brand)
                 .FirstOrDefaultAsync(a => a.IdAsset == id);
@@ -111,6 +115,7 @@ namespace Infrastructure.Services.Administrative.Assets
             // Volver a recargar para asegurarse de que si cambió IdModel, tengas el nuevo Include
             existingAsset = await _context.Assets
                 .Include(a => a.AssetCategory)
+                .Include(a => a.Law)
                 .Include(a => a.Model)
                     .ThenInclude(m => m.Brand)
                 .FirstOrDefaultAsync(a => a.IdAsset == id);
@@ -142,6 +147,7 @@ namespace Infrastructure.Services.Administrative.Assets
             // Preparamos la consulta con includes
             var query = _context.Assets
                 .Include(a => a.AssetCategory)
+                .Include(a => a.Law)
                 .Include(a => a.Model)
                     .ThenInclude(m => m.Brand)
                 .AsQueryable();
@@ -169,6 +175,7 @@ namespace Infrastructure.Services.Administrative.Assets
 
             var query = _context.Assets
                 .Include(a => a.AssetCategory)
+                .Include (a => a.Law)
                 .Include(a => a.Model)
                     .ThenInclude(m => m.Brand)
                 .Where(a => a.IdAssetCategory == categoryId)
@@ -195,6 +202,7 @@ namespace Infrastructure.Services.Administrative.Assets
 
             var query = _context.Assets
                 .Include(a => a.AssetCategory)
+                .Include(a => a.Law)
                 .Include(a => a.Model)
                     .ThenInclude(m => m.Brand)
                 .Where(a => a.AssetCondition == condition)
@@ -219,6 +227,7 @@ namespace Infrastructure.Services.Administrative.Assets
             // 1) Buscar la entidad
             var asset = await _context.Assets
                 .Include(a => a.AssetCategory)
+                .Include(a => a.Law)
                 .Include(a => a.Model)
                     .ThenInclude(m => m.Brand)
                 .FirstOrDefaultAsync(a => a.IdAsset == assetId);

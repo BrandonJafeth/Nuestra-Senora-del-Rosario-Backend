@@ -130,6 +130,7 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<ISvGenericRepository<Model>, SvGenericRepository<Model>>();
             services.AddScoped<ISvGenericRepository<Asset>, SvGenericRepository<Asset>>();
             services.AddScoped<ISvGenericRepository<AssetCategory>, SvGenericRepository<AssetCategory>>();
+            services.AddScoped<ISvGenericRepository<Law>, SvGenericRepository<Law>>();
             #endregion
 
             #region Services_Administrative
