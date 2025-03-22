@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Domain.Entities.Administration;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;  
-using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;     
-
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.GenericService;
 using System.Collections.Generic;
@@ -12,6 +12,7 @@ namespace Nuestra_Senora_del_Rosario.Controllers.Administrative
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin,Enfermeria")]  // <-- Aquí especificas el rol
     public class PathologyController : ControllerBase
     {
         private readonly ISvGenericRepository<Pathology> _pathologyService;

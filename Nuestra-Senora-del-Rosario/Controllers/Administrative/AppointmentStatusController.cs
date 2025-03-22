@@ -3,11 +3,13 @@ using Domain.Entities.Administration;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
 using Infrastructure.Services.Informative.DTOS.CreatesDto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.GenericService;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin,Enfermeria")]  // <-- Aquí especificas el rol
 public class AppointmentStatusController : ControllerBase
 {
     private readonly ISvGenericRepository<AppointmentStatus> _statusRepository;

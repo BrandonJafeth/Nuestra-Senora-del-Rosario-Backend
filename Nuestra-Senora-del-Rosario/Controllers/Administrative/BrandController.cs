@@ -5,11 +5,13 @@ using AutoMapper;
 using Domain.Entities.Administration;              // Aquí está la entidad Brand
 using Services.GenericService;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
-using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;                    // Servicio genérico
+using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
+using Microsoft.AspNetCore.Authorization;                    // Servicio genérico
 // using [TuNamespace].BrandDTO;                  // Ajusta el namespace de tus DTOs
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin")]  // <-- Aquí especificas el rol
 public class BrandController : ControllerBase
 {
     private readonly ISvGenericRepository<Brand> _brandService;
