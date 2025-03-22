@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Infrastructure.Services.Administrative.EmailServices;
 using Infrastructure.Services.Administrative.PaymentReceiptService;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin")]  // <-- Aquí especificas el rol
 public class PaymentReceiptController : ControllerBase
 {
     private readonly ISvPaymentReceipt _paymentReceiptService;

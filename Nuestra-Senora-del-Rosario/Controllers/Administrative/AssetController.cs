@@ -1,5 +1,6 @@
 ﻿using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Infrastructure.Services.Administrative.Assets;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -9,6 +10,7 @@ namespace Nuestra_Senora_del_Rosario.Controllers.Administrative
 
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin,Enfermeria")]  // <-- Aquí especificas el rol
     public class AssetController : ControllerBase
     {
         private readonly ISvAssetService _assetService;

@@ -2,6 +2,7 @@
 using Domain.Entities.Administration;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOGet;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,7 @@ namespace Nuestra_Senora_del_Rosario.Controllers.Administrative
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin,Enfermeria")]  // <-- Aquí especificas el rol
     public class AdministrationRouteController : ControllerBase
     {
         private readonly ISvGenericRepository<AdministrationRoute> _administrationRouteService;

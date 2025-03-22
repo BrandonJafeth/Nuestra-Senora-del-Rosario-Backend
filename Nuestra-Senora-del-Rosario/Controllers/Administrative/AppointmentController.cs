@@ -2,6 +2,7 @@
 using FluentValidation.Results;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using Infrastructure.Services.Administrative.Appointments;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Validations.Admistrative;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin,Enfermeria")]  // <-- Aquí especificas el rol
 public class AppointmentController : ControllerBase
 {
     private readonly ISvAppointment _appointmentService;

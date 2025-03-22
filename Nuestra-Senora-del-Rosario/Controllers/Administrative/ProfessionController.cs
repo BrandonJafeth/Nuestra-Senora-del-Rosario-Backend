@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin")]  
 public class ProfessionController : ControllerBase
 {
     private readonly ISvGenericRepository<Profession> _professionService;
@@ -21,6 +23,7 @@ public class ProfessionController : ControllerBase
 
     // POST: api/profession
     [HttpPost]
+      
     public async Task<IActionResult> CreateProfession([FromBody] Profession profession)
     {
         if (!ModelState.IsValid)

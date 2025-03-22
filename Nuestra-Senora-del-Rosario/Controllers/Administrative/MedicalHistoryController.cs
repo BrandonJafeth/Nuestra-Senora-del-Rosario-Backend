@@ -4,11 +4,13 @@ using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTO
 using Infrastructure.Services.Administrative.AdministrativeDTO.AdministrativeDTOCreate;
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Nuestra_Senora_del_Rosario.Controllers.Administrative
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin, Enfermeria")] 
     public class MedicalHistoryController : ControllerBase
     {
         private readonly ISvMedicalHistory _medicalHistoryService;

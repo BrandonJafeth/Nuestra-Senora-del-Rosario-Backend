@@ -138,19 +138,22 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Primero CORS
-app.UseCors("AllowAll");
 
-app.UseAuthentication();
-app.UseAuthorization();
-
-// Rate limiting
-app.UseRateLimiter();
-
-// Routing al final
 app.UseRouting();
 
+
+app.UseCors("AllowAll");
+
+// 3) Autenticación
+app.UseAuthentication();
+
+
+app.UseAuthorization();
+
+app.UseRateLimiter();
+
 app.MapControllers();
+
 app.MapHub<NotificationHub>("/notificationHub");
 
 var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
